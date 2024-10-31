@@ -1,0 +1,20 @@
+.input-group:has(input[readonly]) {
+    opacity: 75%;
+    cursor: not-allowed !important;
+    input {
+        cursor: not-allowed !important;
+    }
+}
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+*:has(> .material-symbols-outlined) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+}
