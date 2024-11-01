@@ -1,0 +1,48 @@
+<div class="col-12">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title text-warning">{{ material_symbol('home_storage') | safe }} Estoque</h5>
+      <div class="ms-auto">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#novoIngredienteModal">
+          {{ material_symbol('add') | safe }} Nova Entrada/Saída
+        </button>
+      </div>
+    </div>
+    <div class="card-body">Cadastre entradas (como a compra de insumos) e saídas (como a produção de uma receita) de ingredientes e outros insumos. O campo <code>Valor Pago</code> também é utilizado para calcular o <kbd>Custo/Grama Méd.</kbd> de cada ingrediente, dando assim uma estimativa de quanto foi pago em média por grama nesse ingrediente.</div>
+    <div class="table-responsive">
+      <table class="table table-vcenter">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Data</th>
+            <th>Ingrediente</th>
+            <th>Quantidade</th>
+            <th>Valor Pago</th>
+            <th class="w-1"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for estoque in estoques %}
+          <tr>
+            <td>{{ estoque.id }}</td>
+            <td>{{ estoque.data_criacao | strftime }}</td>
+            <td>{{ estoque.ingrediente.nome }}</td>
+            <td>{{ estoque.quantidade | format_stock_movement | safe}}</td>
+            <td>{{ estoque.valor_pago | format_reais }}</td>
+            <td style="display: flex; gap: 0.5rem">
+              <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#editarIngredienteModal" data-bs-payload="{{estoque.model_dump_json()}}">Editar</a>
+              <a
+                class="btn btn-sm btn-ghost-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#deletarIngredienteModal"
+                data-bs-payload="{{estoque.model_dump_json()}}"
+                >Excluir</a
+              >
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
