@@ -23,3 +23,6 @@ h5:has(> .material-symbols-outlined) {
 .datagrid-content .badge {
     font-size: 14px;
 }
+.status {
+    user-select: none;
+}

@@ -1,4 +1,9 @@
-{% extends 'layout.html' %} {% block content %}
+{% extends 'layout.html' %}
+
+{% include 'receitas/modal_create.html' %}
+{% include 'ingredientes/modal_create.html' %}
+
+{% block content %}
 
 <div class="modal" id="apagarReceita" tabindex="-1">
     <form class="modal-dialog modal-sm" role="document" method="POST" action="{{ url_for('post_receita_deletar', id=receita.id) }}">
@@ -41,7 +46,7 @@
         </div>
       </div>
     </form>
-  </div>
+</div>
 
 <div class="modal" id="apagarReceitaIngredienteModal" tabindex="-1">
   <form class="modal-dialog modal-sm" role="document" method="POST" action="{{ url_for('post_receita_ingredientes_remover', receita_id=receita.id) }}">
@@ -159,14 +164,14 @@
     <div class="card-header">
       <h5 class="card-title text-warning">
         <span class="material-symbols-outlined"> library_books </span>
-        Receita #{{receita.id}} - {{receita.nome}}
+         #{{receita.id}} - {{receita.nome}}
       </h5>
       <div class="dropdown ms-auto">
         <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
-          <a class="dropdown-item" href="#">Exportar CSV</a>
-          <a class="dropdown-item" href="#">Duplicar</a>
-          <a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#apagarReceita">Apagar</a>
+          <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#novaReceitaModal">Nova Receita</a>
+          <a href="#" class="dropdown-item">Exportar CSV</a>
+          <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#apagarReceita">Apagar</a>
         </div>
       </div>
     </div>
@@ -217,19 +222,19 @@
         <div class="datagrid-item text-danger">
           <div class="datagrid-title">Custo</div>
           <div class="datagrid-content">
-            <span class="badge bg-danger-lt"> R$ {{receita.custo_receita}} </span>
+            <span class="badge bg-danger-lt"> {{receita.custo_receita | format_reais}} </span>
           </div>
         </div>
         <div class="datagrid-item text-warning">
           <div class="datagrid-title">Faturamento</div>
           <div class="datagrid-content">
-            <span class="badge bg-warning-lt"> R$ {{receita.faturamento}} </span>
+            <span class="badge bg-warning-lt"> {{receita.faturamento | format_reais}} </span>
           </div>
         </div>
         <div class="datagrid-item text-success">
           <div class="datagrid-title">Lucro</div>
           <div class="datagrid-content">
-            <span class="badge bg-success-lt"> R$ {{receita.lucro}} </span>
+            <span class="badge bg-success-lt"> {{receita.lucro | format_reais}} </span>
           </div>
         </div>
       </div>
@@ -261,13 +266,13 @@
         <div class="datagrid-item">
           <div class="datagrid-title">Custo unidade</div>
           <div class="datagrid-content">
-            <span class="badge bg-secondary-lt"> R$ {{receita.custo_unidade}} </span>
+            <span class="badge bg-secondary-lt"> {{receita.custo_unidade | format_reais}} </span>
           </div>
         </div>
         <div class="datagrid-item">
           <div class="datagrid-title">Preço Sugerido</div>
           <div class="datagrid-content">
-            <span class="badge bg-secondary-lt"> R$ {{receita.preco_sugerido}} </span>
+            <span class="badge bg-secondary-lt"> {{receita.preco_sugerido | format_reais}} </span>
           </div>
         </div>
       </div>
@@ -281,8 +286,14 @@
         <span class="material-symbols-outlined"> package_2 </span>
         Ingredientes
       </h5>
+      <div class="dropdown ms-auto">
+        <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
+        <div class="dropdown-menu">
+          <a href="#cardIngredientes" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#novoIngredienteModal">Novo Ingrediente</a>
+        </div>
+      </div>
     </div>
-    <form class="card-body" method="POST" action="{{ url_for('post_receita_ingredientes_adicionar', id=receita.id) }}">
+    <form class="card-body" method="POST" action="{{ url_for('post_receita_ingredientes_incluir', id=receita.id) }}">
       <div class="datagrid">
         <div class="datagrid-item">
           <label class="datagrid-title form-label">Ingrediente</label>
@@ -307,9 +318,9 @@
           </div>
         </div>
         <div class="datagrid-item">
-          <label class="datagrid-title form-label">Adicionar</label>
+          <label class="datagrid-title form-label">Incluir</label>
           <div class="datagrid-content">
-            <button class="btn">Adicionar</button>
+            <button class="btn">Incluir</button>
           </div>
         </div>
       </div>
@@ -322,7 +333,9 @@
             <th>Nome</th>
             <th>Quantidade (gramas)</th>
             <th>Custo/grama (R$)</th>
+            <th>Custo/grama méd. (R$)</th>
             <th>Custo Total (R$)</th>
+            <th>Estoque Atual</th>
             <th class="w-1"></th>
           </tr>
         </thead>
@@ -331,9 +344,11 @@
           <tr>
             <td>{{ receita_ingrediente.id }}</td>
             <td>{{ receita_ingrediente.ingrediente.nome }}</td>
-            <td>{{ receita_ingrediente.quantidade }} g</td>
-            <td>R$ {{ receita_ingrediente.ingrediente.custo_p_grama }}</td>
-            <td>R$ {{ receita_ingrediente.custo }}</td>
+            <td>{{ receita_ingrediente.quantidade | format_quantity | safe }}</td>
+            <td>{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</td>
+            <td>{{ receita_ingrediente.ingrediente.custo_p_grama_medio | format_reais }}</td>
+            <td>{{ receita_ingrediente.custo | format_reais }}</td>
+            <td>{{ receita_ingrediente.ingrediente.estoque_atual | format_stock | safe }}</td>
             <td style="display: flex">
               <a
                 type="button"
@@ -356,12 +371,14 @@
             </td>
           </tr>
           {% else %}
-          <tr class="table-secondary text-secondary">
+          <tr class="table-primary text-primary">
             <td></td>
             <td><b>{{ receita_ingrediente.ingrediente.nome }}</b></td>
-            <td><b>{{ receita_ingrediente.quantidade }} g</b></td>
-            <td><b>R$ {{ receita_ingrediente.ingrediente.custo_p_grama }}</b></td>
-            <td><b>R$ {{ receita_ingrediente.custo }}</b></td>
+            <td><b>{{ receita_ingrediente.quantidade | format_quantity | safe }}</b></td>
+            <td><b>{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</b></td>
+            <td>-</td>
+            <td><b>{{ receita_ingrediente.custo | format_reais }}</b></td>
+            <td>-</td>
             <td class="w-1"></td>
           </tr>
           {% endif %} {% endfor %}

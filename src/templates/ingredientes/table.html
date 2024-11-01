@@ -1,46 +1,4 @@
-<div class="modal" id="novoIngredienteModal" tabindex="-1">
-  <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_ingredientes_index') }}">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title text-warning">
-          <span class="material-symbols-outlined"> package_2 </span>
-          Novo Ingrediente
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="datagrid">
-          <div class="datagrid-item">
-            <div class="datagrid-title">Nome</div>
-            <input required type="text" class="form-control" name="nome" />
-          </div>
-          <div class="datagrid-item">
-            <div class="datagrid-title">Custo</div>
-            <div class="mb-3 datagrid-content">
-              <div class="input-group input-group-flat">
-                <span class="input-group-text"> R$ </span>
-                <input name="custo" required type="number" class="form-control text-end pe-0" min="1" />
-              </div>
-            </div>
-          </div>
-          <div class="datagrid-item">
-            <div class="datagrid-title">Peso</div>
-            <div class="mb-3 datagrid-content">
-              <div class="input-group input-group-flat">
-                <input required type="number" name="peso" class="form-control pe-0" min="1" />
-                <span class="input-group-text"> g </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
-        <button type="submit" class="btn btn-success">Criar Ingrediente</button>
-      </div>
-    </div>
-  </form>
-</div>
+{% include 'ingredientes/modal_create.html' %}
 
 <div class="modal" id="editarIngredienteModal" tabindex="-1">
   <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_ingredientes_editar') }}">
@@ -168,6 +126,8 @@
             <th>Custo (R$)</th>
             <th>Peso (g)</th>
             <th>Custo/grama (R$)</th>
+            <th>Custo/grama méd. (R$)</th>
+            <th>Estoque Atual</th>
             <th class="w-1"></th>
           </tr>
         </thead>
@@ -176,9 +136,11 @@
           <tr>
             <td>{{ ingrediente.id }}</td>
             <td>{{ ingrediente.nome }}</td>
-            <td>R$ {{ ingrediente.custo }}</td>
+            <td>{{ ingrediente.custo | format_reais }}</td>
             <td>{{ ingrediente.peso }} g</td>
-            <td>R$ {{ ingrediente.custo_p_grama }}</td>
+            <td>{{ ingrediente.custo_p_grama | format_reais }}</td>
+            <td>{{ ingrediente.custo_p_grama_medio | format_reais }}</td>
+            <td>{{ ingrediente.estoque_atual | format_stock | safe }}</td>
             <td style="display: flex; gap: 0.5rem">
               <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#editarIngredienteModal" data-bs-payload="{{ingrediente.model_dump_json()}}">Editar</a>
               <a class="btn btn-sm btn-ghost-danger" data-bs-toggle="modal" data-bs-target="#deletarIngredienteModal" data-bs-payload="{{ingrediente.model_dump_json()}}">Excluir</a>

@@ -1,7 +1,9 @@
 import math
+from datetime import datetime
 from typing import List, Optional
 
-from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy.orm import validates
+from sqlmodel import Field, Relationship, SQLModel, text
 
 
 class ReceitaIngredienteLink(SQLModel, table=True):
@@ -19,16 +21,35 @@ class ReceitaIngredienteLink(SQLModel, table=True):
         return round(self.quantidade * self.ingrediente.custo_p_grama, 2)
 
 
+class Estoque(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    data_criacao: datetime = Field(sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")})
+    ingrediente_id: Optional[int] = Field(default=None, foreign_key="ingrediente.id")
+    ingrediente: "Ingrediente" = Relationship(back_populates="estoque_links")
+    quantidade: float
+    valor_pago: Optional[float] = Field(default=0)
+
+
 class Ingrediente(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     nome: str = Field(index=True, unique=True)
     peso: float
     custo: float
     receita_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='ingrediente')
+    estoque_links: List['Estoque'] = Relationship(back_populates='ingrediente')
+
+    @property
+    def custo_p_grama_medio(self):
+        estoques_com_preco = [(e.valor_pago/e.quantidade) for e in self.estoque_links if e.valor_pago]
+        return sum(estoques_com_preco)/len(estoques_com_preco) if estoques_com_preco else self.custo_p_grama
 
     @property
     def custo_p_grama(self):
         return self.custo / self.peso
+
+    @property
+    def estoque_atual(self):
+        return sum([e.quantidade for e in self.estoque_links])
 
 
 class Receita(SQLModel, table=True):
@@ -38,6 +59,10 @@ class Receita(SQLModel, table=True):
     porcentagem_lucro: int = 33
 
     ingrediente_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='receita')
+
+    @validates('nome')
+    def convert_upper(self, key, value):
+        return value.upper()
 
     @property
     def faturamento(self):
@@ -104,4 +129,6 @@ class Receita(SQLModel, table=True):
             'porcentagem_lucro': self.porcentagem_lucro,
             'ingredientes': ingredientes
         }
+        return ret
+        return ret
         return ret

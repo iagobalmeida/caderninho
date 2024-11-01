@@ -2,7 +2,8 @@ from typing import List
 
 from sqlmodel import Session, select
 
-from domain.entities import Ingrediente, Receita, ReceitaIngredienteLink
+from domain.entities import (Estoque, Ingrediente, Receita,
+                             ReceitaIngredienteLink)
 
 
 def create_receita(session: Session, nome: str) -> Receita:
@@ -105,3 +106,7 @@ def delete_ingrediente(session: Session, id: int) -> bool:
     session.delete(ingrediente)
     session.commit()
     return True
+
+
+def get_estoques(session: Session) -> List[Estoque]:
+    return session.exec(select(Estoque).order_by(Estoque.data_criacao.desc())).all()

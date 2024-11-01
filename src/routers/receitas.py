@@ -1,14 +1,13 @@
 from fastapi import Form, Request
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
-from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
 from db import SESSION_DEP
 from domain import repository
+from templates import templates
 
 router = APIRouter(prefix='/receitas')
-templates = Jinja2Templates(directory='src/templates')
 
 
 @router.get('/')
@@ -25,6 +24,8 @@ async def post_receitas_index(request: Request, nome: str = Form(), session: Ses
 @router.get('/{id}')
 async def get_receita(request: Request, id: int, session: Session = SESSION_DEP):
     db_receita = repository.get_receita(session, id)
+    if not db_receita:
+        raise ValueError(f'Receita com id {id} não encontrada')
     db_ingredientes = repository.get_ingredientes(session)
     return templates.TemplateResponse(
         request=request,
@@ -45,7 +46,7 @@ async def post_receita_atualizar(request: Request, id: int, nome: str = Form(), 
         peso_unitario=peso_unitario,
         porcentagem_lucro=porcentagem_lucro
     )
-    return RedirectResponse(request.url_for('get_receita', id=id), status_code=302)
+    return RedirectResponse(request.headers['referer'], status_code=302)
 
 
 @router.post('/{id}/deletar')
@@ -57,8 +58,8 @@ async def post_receita_deletar(request: Request, id: int, nome: str = Form(), pe
     return RedirectResponse(request.url_for('get_index'), status_code=302)
 
 
-@router.post('/{id}/ingredientes/adicionar')
-async def post_receita_ingredientes_adicionar(request: Request, id: int, ingrediente_id: int = Form(), quantidade: float = Form(), session: Session = SESSION_DEP):
+@router.post('/{id}/ingredientes/incluir')
+async def post_receita_ingredientes_incluir(request: Request, id: int, ingrediente_id: int = Form(), quantidade: float = Form(), session: Session = SESSION_DEP):
     repository.create_receita_ingrediente(
         session,
         receita_id=id,

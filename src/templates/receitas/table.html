@@ -1,30 +1,4 @@
-<div class="modal" id="novaReceitaModal" tabindex="-1">
-    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_receitas_index') }}">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title text-warning">
-                      <span class="material-symbols-outlined">
-                          library_books
-                      </span>
-                      Nova Receita
-                  </h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <div class="datagrid">
-                      <div class="datagrid-item">
-                      <div class="datagrid-title">Nome</div>
-                      <input required type="text" class="form-control" name="nome"/>
-                      </div>
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="submit" class="btn btn-success">Criar Receita</button>
-              </div>
-          </div>
-    </form>
-</div>
+{% include 'receitas/modal_create.html' %}
 
 <div class="col-12">
     <div class="card">
@@ -66,23 +40,20 @@
                         <td>{{ receita.id }}</td>
                         <td>{{ receita.nome }}</td>
                         <td>{{ receita.rendimento_unidades }} Un.</td>
-                        <td>R$ {{ receita.preco_sugerido }}</td>
+                        <td>{{ receita.preco_sugerido | format_reais }}</td>
                         <td>
                             <span class="badge bg-danger-lt">
-                                R$
-                                {{receita.custo_receita}}
+                                {{receita.custo_receita | format_reais}}
                             </span>
                         </td>
                         <td>
                             <span class="badge bg-warning-lt">
-                                R$
-                                {{receita.faturamento}}
+                                {{receita.faturamento | format_reais}}
                             </span>
                         </td>
                         <td>
                             <span class="badge bg-success-lt">
-                                R$
-                                {{receita.lucro}}
+                                {{receita.lucro | format_reais}}
                             </span>
                         </td>
                         <td class="w-1">

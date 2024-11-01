@@ -1,27 +1,39 @@
+from random import randint
+
 from sqlmodel import Session
 
 from db import engine
-from domain.entities import Ingrediente, Receita, ReceitaIngredienteLink
+from domain.entities import (Estoque, Ingrediente, Receita,
+                             ReceitaIngredienteLink)
+
+
+def try_add(obj):
+    try:
+        with Session(engine) as session:
+            __obj = session.add(obj)
+            session.commit()
+        return __obj
+    except Exception as ex:
+        return obj
 
 
 def main():
-    with Session(engine) as session:
-        ingrediente_acucar = Ingrediente(nome='Açúcar', peso=1000, custo=14)
-        ingrediente_manteiga = Ingrediente(nome='Manteiga', peso=1000, custo=40)
-        ingrediente_chocolate = Ingrediente(nome='Chocolate', peso=1000, custo=57)
-        ingrediente_farinha = Ingrediente(nome='Farinha', peso=1000, custo=4)
+    ingredientes = [1, 2, 3, 4]
 
-        receita_cookies = Receita(nome='Cookies', peso_unitario=100)
-        receita_cookies_ingrediente_acucar = ReceitaIngredienteLink(quantidade=100, receita=receita_cookies, ingrediente=ingrediente_acucar)
-        receita_cookies_ingrediente_manteiga = ReceitaIngredienteLink(quantidade=100, receita=receita_cookies, ingrediente=ingrediente_manteiga)
-        receita_cookies_ingrediente_chocolate = ReceitaIngredienteLink(quantidade=100, receita=receita_cookies, ingrediente=ingrediente_chocolate)
-        receita_cookies_ingrediente_farinha = ReceitaIngredienteLink(quantidade=100, receita=receita_cookies, ingrediente=ingrediente_farinha)
+    try_add(Ingrediente(id=1, nome='Açúcar', peso=1000, custo=14))
+    try_add(Ingrediente(id=2, nome='Manteiga', peso=1000, custo=40))
+    try_add(Ingrediente(id=3, nome='Chocolate', peso=1000, custo=57))
+    try_add(Ingrediente(id=4, nome='Farinha', peso=1000, custo=4))
+    try_add(Receita(id=1, nome='Cookies', peso_unitario=100))
 
-        session.add(receita_cookies_ingrediente_acucar)
-        session.add(receita_cookies_ingrediente_manteiga)
-        session.add(receita_cookies_ingrediente_chocolate)
-        session.add(receita_cookies_ingrediente_farinha)
-        session.commit()
+    for __ingrediente in ingredientes:
+        try_add(ReceitaIngredienteLink(quantidade=100, receita_id=1, ingrediente_id=__ingrediente))
+        estoque_quantidade = randint(250, 2000) - randint(250, 2000)
+        try_add(Estoque(
+            ingrediente_id=__ingrediente,
+            quantidade=estoque_quantidade,
+            valor_pago=randint(1, 10) if estoque_quantidade > 0 else 0
+        ))
 
 
 if __name__ == '__main__':

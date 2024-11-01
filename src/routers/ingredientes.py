@@ -1,13 +1,10 @@
-from typing import List
-
-from fastapi import Depends, Form, Request
+from fastapi import Form, Request
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
-from sqlmodel import Session, select
+from sqlmodel import Session
 
-from db import SESSION_DEP, get_session
+from db import SESSION_DEP
 from domain import repository
-from domain.entities import Ingrediente
 
 router = APIRouter(
     prefix='/ingredientes'
@@ -22,7 +19,7 @@ async def post_ingredientes_index(request: Request, nome: str = Form(), peso: fl
         peso=peso,
         custo=custo
     )
-    return RedirectResponse(request.url_for('get_index'), status_code=302)
+    return RedirectResponse(request.headers['referer'], status_code=302)
 
 
 @router.post('/editar')
@@ -34,7 +31,7 @@ async def post_ingredientes_editar(request: Request, id: int = Form(),  nome: st
         peso=peso,
         custo=custo
     )
-    return RedirectResponse(request.url_for('get_index'), status_code=302)
+    return RedirectResponse(request.headers['referer'], status_code=302)
 
 
 @router.post('/excluir')
@@ -43,20 +40,4 @@ async def post_ingredientes_excluir(request: Request, id: int = Form(), session:
         session,
         id=id
     )
-    return RedirectResponse(request.url_for('get_index'), status_code=302)
-
-
-@router.get('/')
-async def get_ingredientes(session: Session = Depends(get_session)) -> List[Ingrediente]:
-    return session.exec(select(Ingrediente)).all()
-
-
-@router.post('/')
-async def criar_ingrediente(ingrediente: Ingrediente, session: Session = Depends(get_session)) -> Ingrediente:
-    try:
-        session.add(ingrediente)
-        session.commit()
-        return ingrediente
-    except Exception as ex:
-        session.rollback()
-        raise ex
+    return RedirectResponse(request.headers['referer'], status_code=302)
