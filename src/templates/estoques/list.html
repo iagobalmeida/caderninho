@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+
+{% block content %}
+    <div class="col-12">
+      <ol class="breadcrumb" aria-label="breadcrumbs">
+        <li class="breadcrumb-item"><a href="/">Herbaria</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Estoque</li>
+      </ol>
+    </div>
+    {% include 'estoques/table.html' %}
+{% endblock %}

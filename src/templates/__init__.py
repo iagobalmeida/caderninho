@@ -4,9 +4,12 @@ from fastapi.templating import Jinja2Templates
 
 templates = Jinja2Templates(directory='src/templates')
 
+CONVERTER_GRAMAS_PARA_KILO = False
+CONVERTER_GRAMAS_PARA_KILO_SEMPRE = False
+
 
 def __unit_converter(input: float, unity: str = 'g'):
-    if abs(input) > 1000 and unity == 'g':
+    if (CONVERTER_GRAMAS_PARA_KILO and abs(input) > 1000 and unity == 'g') or CONVERTER_GRAMAS_PARA_KILO_SEMPRE:
         input = input/1000
         unity = 'Kg'
     return (input, unity)

@@ -11,8 +11,16 @@ router = APIRouter(prefix='/receitas')
 
 
 @router.get('/')
-async def get_receitas_index(request: Request):
-    return RedirectResponse(request.url_for('get_index'), status_code=302)
+async def get_receitas_index(request: Request, session: Session = SESSION_DEP):
+    db_receitas = repository.get_receitas(session)
+    db_receitas = [r.dict() for r in db_receitas]
+    return templates.TemplateResponse(
+        request=request,
+        name='receitas/list.html',
+        context={
+            'receitas': db_receitas
+        }
+    )
 
 
 @router.post('/')

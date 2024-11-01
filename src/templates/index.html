@@ -2,7 +2,6 @@
 
 {% block content %}
 
-
 <div class="col-12">
     <ol class="breadcrumb" aria-label="breadcrumbs">
         <li class="breadcrumb-item">Herbaria</li>
@@ -10,10 +9,52 @@
     </ol>
 </div>
 
-{% include 'receitas/table.html' %}
+<div class="col-4">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="text-warning">
+                {{ material_symbol('library_books') | safe }}
+                Receitas
+            </h3>
+            <p class="text-secondary">{{receitas}} receita cadastrada</p>
+            <div class="ms-auto">
+                <a href="{{ url_for('get_receitas_index') }}" class="btn">Visualizar Receitas</a>
+                <button class="btn btn-success">Nova Receita</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-{% include 'ingredientes/table.html' %}
+<div class="col-4">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="text-warning">
+                {{ material_symbol('package_2') | safe }}
+                Ingredientes
+            </h3>
+            <p class="text-secondary">{{ingredientes}} ingrediente cadastrado</p>
+            <div class="ms-auto">
+                <a href="{{ url_for('get_ingredientes_index') }}" class="btn">Visualizar Ingredientes</a>
+                <button class="btn btn-success">Novo Ingrediente</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-{% include 'estoque/table.html' %}
+<div class="col-4">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="text-warning">
+                {{ material_symbol('home_storage') | safe }}
+                Estoque
+            </h3>
+            <p class="text-secondary">{{estoques}} movimentações cadastradas</p>
+            <div class="ms-auto">
+                <a href="{{ url_for('get_estoques_index') }}" class="btn">Visualizar Estoque</a>
+                <button class="btn btn-success">Nova Movimentação</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

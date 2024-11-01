@@ -155,10 +155,11 @@
 <div class="col-12">
   <ol class="breadcrumb" aria-label="breadcrumbs">
     <li class="breadcrumb-item"><a href="/">Herbaria</a></li>
-    <li class="breadcrumb-item">Receitas</li>
+    <li class="breadcrumb-item"><a href="/receitas">Receitas</a></li>
     <li class="breadcrumb-item active" aria-current="page">#{{receita.id}} - {{receita.nome}}</li>
   </ol>
 </div>
+
 <div class="col-12">
   <div class="card">
     <div class="card-header">
@@ -336,7 +337,7 @@
             <th>Custo/grama méd. (R$)</th>
             <th>Custo Total (R$)</th>
             <th>Estoque Atual</th>
-            <th class="w-1"></th>
+            <th ></th>
           </tr>
         </thead>
         <tbody>
@@ -348,26 +349,28 @@
             <td>{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</td>
             <td>{{ receita_ingrediente.ingrediente.custo_p_grama_medio | format_reais }}</td>
             <td>{{ receita_ingrediente.custo | format_reais }}</td>
-            <td>{{ receita_ingrediente.ingrediente.estoque_atual | format_stock | safe }}</td>
-            <td style="display: flex">
-              <a
-                type="button"
-                class="btn btn-ghost btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#editarReceitaIngredienteModal"
-                data-bs-payload="{{receita_ingrediente.model_dump_json()}}"
-              >
-                Editar
-              </a>
-              <a
-                type="button"
-                class="btn btn-ghost-danger btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#apagarReceitaIngredienteModal"
-                data-bs-payload="{{receita_ingrediente.model_dump_json()}}"
-              >
-                Remover
-              </a>
+            <td class="table-light">{{ receita_ingrediente.ingrediente.estoque_atual | format_stock | safe }}</td>
+            <td>
+              <div class="btn-group">
+                <a
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editarReceitaIngredienteModal"
+                  data-bs-payload="{{receita_ingrediente.model_dump_json()}}"
+                >
+                  Editar
+                </a>
+                <a
+                  type="button"
+                  class="btn btn-ghost-danger btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#apagarReceitaIngredienteModal"
+                  data-bs-payload="{{receita_ingrediente.model_dump_json()}}"
+                >
+                  Remover
+                </a>
+              </div>
             </td>
           </tr>
           {% else %}
@@ -379,7 +382,7 @@
             <td>-</td>
             <td><b>{{ receita_ingrediente.custo | format_reais }}</b></td>
             <td>-</td>
-            <td class="w-1"></td>
+            <td ></td>
           </tr>
           {% endif %} {% endfor %}
         </tbody>

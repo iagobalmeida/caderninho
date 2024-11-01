@@ -14,7 +14,9 @@
   'GRAD' 0,
   'opsz' 24
 }
-h5:has(> .material-symbols-outlined) {
+h5:has(> .material-symbols-outlined),
+h3:has(> .material-symbols-outlined)
+{
     display: flex;
     flex-direction: row;
     align-items: center;

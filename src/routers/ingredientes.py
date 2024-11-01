@@ -5,10 +5,23 @@ from sqlmodel import Session
 
 from db import SESSION_DEP
 from domain import repository
+from templates import templates
 
 router = APIRouter(
     prefix='/ingredientes'
 )
+
+
+@router.get('/')
+async def get_ingredientes_index(request: Request, session: Session = SESSION_DEP):
+    db_ingredientes = repository.get_ingredientes(session)
+    return templates.TemplateResponse(
+        request=request,
+        name='ingredientes/list.html',
+        context={
+            'ingredientes': db_ingredientes
+        }
+    )
 
 
 @router.post('/')

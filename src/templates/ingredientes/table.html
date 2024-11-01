@@ -113,7 +113,7 @@
       </div>
     </div>
     <div class="card-body">
-      Ingredientes são utilizados em <kbd>Receitas</kbd> para calcular o custo, faturamento, preço sugerido e lucro.
+      Ingredientes são utilizados em <code>Receitas</code> para calcular o custo, faturamento, preço sugerido e lucro.
       <br>
       É necessário cadastrar um ingrediente para poder utiliza-lo em uma receita.
     </div>
@@ -128,7 +128,7 @@
             <th>Custo/grama (R$)</th>
             <th>Custo/grama méd. (R$)</th>
             <th>Estoque Atual</th>
-            <th class="w-1"></th>
+            <th ></th>
           </tr>
         </thead>
         <tbody>
@@ -137,13 +137,15 @@
             <td>{{ ingrediente.id }}</td>
             <td>{{ ingrediente.nome }}</td>
             <td>{{ ingrediente.custo | format_reais }}</td>
-            <td>{{ ingrediente.peso }} g</td>
+            <td>{{ ingrediente.peso | format_quantity | safe }}</td>
             <td>{{ ingrediente.custo_p_grama | format_reais }}</td>
             <td>{{ ingrediente.custo_p_grama_medio | format_reais }}</td>
-            <td>{{ ingrediente.estoque_atual | format_stock | safe }}</td>
-            <td style="display: flex; gap: 0.5rem">
-              <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#editarIngredienteModal" data-bs-payload="{{ingrediente.model_dump_json()}}">Editar</a>
-              <a class="btn btn-sm btn-ghost-danger" data-bs-toggle="modal" data-bs-target="#deletarIngredienteModal" data-bs-payload="{{ingrediente.model_dump_json()}}">Excluir</a>
+            <td class="table-light">{{ ingrediente.estoque_atual | format_stock | safe }}</td>
+            <td>
+              <div class="btn-group">
+                <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#editarIngredienteModal" data-bs-payload="{{ingrediente.model_dump_json()}}">Editar</a>
+                <a class="btn btn-sm btn-ghost-danger" data-bs-toggle="modal" data-bs-target="#deletarIngredienteModal" data-bs-payload="{{ingrediente.model_dump_json()}}">Excluir</a>
+              </div>
             </td>
           </tr>
           {% endfor %}

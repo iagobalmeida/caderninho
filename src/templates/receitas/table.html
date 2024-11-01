@@ -31,7 +31,7 @@
                     <th>Custo (R$)</th>
                     <th>Faturamento</th>
                     <th>Lucro</th>
-                    <th class="w-1"></th>
+                    <th ></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -56,7 +56,7 @@
                                 {{receita.lucro | format_reais}}
                             </span>
                         </td>
-                        <td class="w-1">
+                        <td >
                             <a href="{{ url_for('get_receita', id=receita.id) }}" class="btn btn-sm">Detalhes</a>
                         </td>
                     </tr>
