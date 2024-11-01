@@ -14,6 +14,8 @@ class ReceitaIngredienteLink(SQLModel, table=True):
 
     @property
     def custo(self):
+        if not self.ingrediente:
+            return 0
         return round(self.quantidade * self.ingrediente.custo_p_grama, 2)
 
 
@@ -32,7 +34,7 @@ class Ingrediente(SQLModel, table=True):
 class Receita(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     nome: str = Field(index=True, unique=True)
-    peso_unitario: float
+    peso_unitario: float = 0
     porcentagem_lucro: int = 33
 
     ingrediente_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='receita')
@@ -54,13 +56,12 @@ class Receita(SQLModel, table=True):
     @property
     def rendimento(self):
         '''Retorna a soma da quantiadde dos ingredientes usados (em gramas)'''
-        rendimento = sum([i.quantidade for i in self.ingrediente_links])
-        return round(rendimento, 2)
+        return max(1, round(sum([i.quantidade for i in self.ingrediente_links]), 2))
 
     @property
     def rendimento_unidades(self):
         '''Retorna a quantidade de unidades que a receita rende'''
-        return max(1, math.ceil(self.rendimento/self.peso_unitario))
+        return max(1, math.ceil(self.rendimento/self.peso_unitario)) if self.peso_unitario else 1
 
     @property
     def custo_unidade(self):
@@ -73,7 +74,22 @@ class Receita(SQLModel, table=True):
         porcentagem_custo = max(1, 100 - self.porcentagem_lucro)
         return math.ceil(self.custo_unidade*100/porcentagem_custo)
 
-    def dict(self, incluir_detalhes: bool = True, incluir_ingredientes: bool = True):
+    def dict(self):
+        custo_total = round(sum([i.custo for i in self.ingrediente_links]), 2)
+        quantidade_total = max(1, round(sum([i.quantidade for i in self.ingrediente_links]), 2))
+        custo_p_grama_total = round(custo_total/quantidade_total, 2)
+        ingredientes = [
+            *self.ingrediente_links,
+            {
+                'id': -1,
+                'ingrediente': {
+                    'nome': 'Total',
+                    'custo_p_grama': custo_p_grama_total,
+                },
+                'quantidade': quantidade_total,
+                'custo': custo_total
+            }
+        ]
         ret = {
             'id': self.id,
             'nome': self.nome,
@@ -81,13 +97,11 @@ class Receita(SQLModel, table=True):
             'rendimento_unidades': self.rendimento_unidades,
             'preco_sugerido': self.preco_sugerido,
             'faturamento': self.faturamento,
-            'lucro': self.lucro
+            'lucro': self.lucro,
+            'rendimento': self.rendimento,
+            'peso_unitario': self.peso_unitario,
+            'custo_unidade': self.custo_unidade,
+            'porcentagem_lucro': self.porcentagem_lucro,
+            'ingredientes': ingredientes
         }
-        if incluir_detalhes:
-            ret['rendimento'] = self.rendimento
-            ret['peso_unitario'] = self.peso_unitario
-            ret['custo_unidade'] = self.custo_unidade
-            ret['porcentagem_lucro'] = self.porcentagem_lucro
-        if incluir_ingredientes:
-            ret['ingredientes'] = self.ingrediente_links
         return ret

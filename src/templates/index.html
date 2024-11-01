@@ -1,51 +1,17 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+
+
 <div class="col-12">
-    <div class="card">
-        <div class="card-header">
-            <h5 class="card-title text-primary">
-                <span class="material-symbols-outlined">
-                    library_books
-                </span>
-                Receitas
-            </h5>
-        </div>
-        <div class="card-body">
-            Clique em <code>Visualizar</code> para ver os detalhes da receita
-        </div>
-        <div class="table-responsive">
-            <table class="table table-vcenter">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nome</th>
-                    <th>Custo (R$)</th>
-                    <th>Rendimento (Un.)</th>
-                    <th>Preço Sug. (R$)</th>
-                    <th>Faturamento</th>
-                    <th>Lucro</th>
-                    <th class="w-1"></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for receita in receitas %}
-                    <tr>
-                        <td>{{ receita.id }}</td>
-                        <td>{{ receita.nome }}</td>
-                        <td>R$ {{ receita.custo_receita }}</td>
-                        <td>{{ receita.rendimento_unidades }} Un.</td>
-                        <td>R$ {{ receita.preco_sugerido }}</td>
-                        <td>R$ {{ receita.faturamento }}</td>
-                        <td>R$ {{ receita.lucro }}</td>
-                        <td class="w-1">
-                            <a href="/{{ receita.id }}" class="btn btn-sm">Visualizar</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-            </table>
-        </div>
-    </div>
+    <ol class="breadcrumb" aria-label="breadcrumbs">
+        <li class="breadcrumb-item">Herbaria</li>
+        <li class="breadcrumb-item"></li>
+    </ol>
 </div>
+
+{% include 'receitas/table.html' %}
+
+{% include 'ingredientes/table.html' %}
+
 {% endblock %}

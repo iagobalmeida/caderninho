@@ -1,9 +1,11 @@
-.input-group:has(input[readonly]) {
-    opacity: 75%;
-    cursor: not-allowed !important;
-    input {
-        cursor: not-allowed !important;
-    }
+.input-group:has(input[readonly]),
+.datagrid-item:has(input[readonly]),
+.input-group:has(select[readonly]),
+.datagrid-item:has(select[readonly])
+ {
+    opacity: 85%;
+    filter: contrast(0.9);
+    pointer-events: none;
 }
 .material-symbols-outlined {
   font-variation-settings:
@@ -12,9 +14,12 @@
   'GRAD' 0,
   'opsz' 24
 }
-*:has(> .material-symbols-outlined) {
+h5:has(> .material-symbols-outlined) {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: .5rem;
+}
+.datagrid-content .badge {
+    font-size: 14px;
 }
