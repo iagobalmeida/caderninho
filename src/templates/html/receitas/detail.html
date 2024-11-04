@@ -1,0 +1,385 @@
+{% extends 'layout.html' %}
+
+{% include 'receitas/modal_create.html' %}
+{% include 'receitas/modal_delete.html' %}
+
+{% include 'ingredientes/modal_create.html' %}
+
+{% block content %}
+
+<div class="modal" id="apagarReceitaIngredienteModal" tabindex="-1">
+  <form class="modal-dialog modal-sm" role="document" method="POST" action="{{ url_for('post_receita_ingredientes_remover', receita_id=receita.id) }}">
+    <div class="modal-content">
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-status bg-danger"></div>
+      <div class="modal-body text-center py-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="icon mb-2 text-danger icon-lg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M12 9v2m0 4v.01" />
+          <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
+        </svg>
+        <h3>Tem certeza?</h3>
+        <div class="text-secondary">Remover ingrediente da receita?</div>
+        <hr>
+        <input required readonly type="hidden" class="form-control" name="id" />
+        <div class="datagrid">
+          <div class="datagrid-item">
+            <label class="datagrid-title form-label">Ingrediente</label>
+            <div class="datagrid-content">
+              <select required readonly class="form-select" name="ingrediente_id">
+                <option selected value="-1">Selecionar</option>
+                {% for ingrediente in ingredientes %}
+                <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="datagrid-item">
+            <div class="datagrid-title">Quantidade</div>
+            <div class="input-group input-group-flat">
+              <input readonly required type="number" class="form-control pe-0" value="0" min="0" name="quantidade" />
+              <span class="input-group-text"> g </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="w-100">
+          <div class="row">
+            <div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal"> Cancelar </a></div>
+            <div class="col">
+              <button type="submit" class="btn btn-danger w-100">Excluir Ingrediente</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal" id="editarReceitaIngredienteModal" tabindex="-1">
+  <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_receita_ingredientes_atualizar', receita_id=receita.id) }}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <span class="material-symbols-outlined"> package_2 </span>
+          Editar Ingrediente
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input required type="hidden" class="form-control pe-0" value="0" min="0" name="id" />
+        <div class="datagrid">
+          <div class="datagrid-item">
+            <label class="datagrid-title form-label">Ingrediente</label>
+            <div class="datagrid-content">
+              <select required readonly class="form-select" name="ingrediente_id">
+                <option selected value="-1">Selecionar</option>
+                {% for ingrediente in ingredientes %}
+                <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="datagrid-item">
+            <label class="datagrid-title form-label">Quantidade (gramas)</label>
+            <div class="datagrid-content">
+              <div class="input-group input-group-flat">
+                <input required type="number" class="form-control pe-0" value="0" min="1" name="quantidade" />
+                <span class="input-group-text"> g </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn">Atualizar</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+<div class="col-12">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title">
+        <span class="material-symbols-outlined"> library_books </span>
+         {{receita.nome}}
+      </h5>
+      <div class="dropdown ms-auto">
+        <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item">Exportar CSV</a>
+          <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#apagarReceita">Apagar</a>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <form class="datagrid" method="POST" action="{{ url_for('post_receita_atualizar') }}">
+        <div class="datagrid-item">
+          <div class="datagrid-title">ID</div>
+          <input required type="text" class="form-control" name="id" value="{{receita.id}}" />
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Nome</div>
+          <input required type="text" class="form-control" name="nome" value="{{receita.nome}}" />
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Peso Unitário</div>
+          <div class="mb-3 datagrid-content">
+            <div class="input-group input-group-flat">
+              <input required type="number" name="peso_unitario" class="form-control pe-0" value="{{receita.peso_unitario}}" min="1" />
+              <span class="input-group-text"> g </span>
+            </div>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Porcetagem Lucro</div>
+          <div class="mb-3 datagrid-content">
+            <div class="input-group input-group-flat">
+              <input required type="number" name="porcentagem_lucro" class="form-control pe-0" value="{{receita.porcentagem_lucro}}" min="1" />
+              <span class="input-group-text"> % </span>
+            </div>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Atualizar</div>
+          <div class="mb-3 datagrid-content">
+            <button type="submit" class="btn">Atualizar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="col-6">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title">
+        <span class="material-symbols-outlined"> trending_up </span>
+        Estimativas
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="datagrid">
+        <div class="datagrid-item text-danger">
+          <div class="datagrid-title">Custo</div>
+          <div class="datagrid-content">
+            <span class="badge bg-danger-lt"> {{receita.custo | format_reais}} </span>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Faturamento</div>
+          <div class="datagrid-content">
+            <span class="badge bg-warning-lt"> {{receita.faturamento | format_reais}} </span>
+          </div>
+        </div>
+        <div class="datagrid-item text-success">
+          <div class="datagrid-title">Lucro</div>
+          <div class="datagrid-content">
+            <span class="badge bg-success-lt"> {{receita.lucro | format_reais}} </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-6">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title">
+        <span class="material-symbols-outlined"> currency_exchange </span>
+        Precificação
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="datagrid">
+        <div class="datagrid-item">
+          <div class="datagrid-title">Rendimento</div>
+          <div class="datagrid-content">
+            <span class="badge bg-secondary-lt"> {{receita.rendimento}} g </span>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Rendimento Unidades</div>
+          <div class="datagrid-content">
+            <span class="badge bg-secondary-lt"> {{receita.rendimento_unidades}} Un. </span>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Custo unidade</div>
+          <div class="datagrid-content">
+            <span class="badge bg-secondary-lt"> {{receita.custo_unidade | format_reais}} </span>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Preço Sugerido</div>
+          <div class="datagrid-content">
+            <span class="badge bg-secondary-lt"> {{receita.preco_sugerido | format_reais}} </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-12">
+  <div class="card" id="cardIngredientes">
+    <div class="card-header">
+      <h5 class="card-title">
+        <span class="material-symbols-outlined"> package_2 </span>
+        Ingredientes
+      </h5>
+      <div class="dropdown ms-auto">
+        <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
+        <div class="dropdown-menu">
+          <a href="#cardIngredientes" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#novoIngredienteModal">Novo Ingrediente</a>
+        </div>
+      </div>
+    </div>
+    <form class="card-body" method="POST" action="{{ url_for('post_receita_ingredientes_incluir', id=receita.id) }}">
+      <div class="datagrid">
+        <div class="datagrid-item">
+          <label class="datagrid-title form-label">Ingrediente</label>
+          <div class="datagrid-content">
+            <select required class="form-select" name="ingrediente_id">
+              <option selected value="">Selecionar</option>
+              {% for ingrediente in ingredientes %}
+              <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
+              {% endfor %}
+            </select>
+            <small style="display: block; margin-top: 8px" class="text-secondary" id="ingrediente_custo_p_grama">Selecione um ingrediente</small>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <label class="datagrid-title form-label">Quantidade (gramas)</label>
+          <div class="datagrid-content">
+            <div class="input-group input-group-flat">
+              <input required type="number" class="form-control pe-0" value="0" min="0" name="quantidade" />
+              <span class="input-group-text"> g </span>
+            </div>
+            <small style="display: block; margin-top: 8px" class="text-secondary" id="ingediente_custo_final">Insira uma quantidade</small>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <label class="datagrid-title form-label">Incluir</label>
+          <div class="datagrid-content">
+            <button class="btn">Incluir</button>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="table-responsive">
+      <table class="table table-vcenter">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Quantidade (gramas)</th>
+            <th>Custo/grama (R$)</th>
+            <th>Custo/grama méd. (R$)</th>
+            <th>Custo Total (R$)</th>
+            <th>Estoque Atual</th>
+            <th class="w-1"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for receita_ingrediente in receita.ingrediente_links %} {% if receita_ingrediente.id >= 0 %}
+          <tr>
+            <td>{{ receita_ingrediente.id }}</td>
+            <td>{{ receita_ingrediente.ingrediente.nome }}</td>
+            <td>{{ receita_ingrediente.quantidade | format_quantity | safe }}</td>
+            <td>{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</td>
+            <td>{{ receita_ingrediente.ingrediente.custo_p_grama_medio | format_reais }}</td>
+            <td>{{ receita_ingrediente.custo | format_reais }}</td>
+            <td>{{ receita_ingrediente.ingrediente.estoque_atual | format_stock | safe }}</td>
+            <td>
+              <div class="btn-group">
+                <a
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editarReceitaIngredienteModal"
+                  data-bs-payload="{{receita_ingrediente.model_dump_json()}}"
+                >
+                  Editar
+                </a>
+                <a
+                  type="button"
+                  class="btn btn-ghost-danger btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#apagarReceitaIngredienteModal"
+                  data-bs-payload="{{receita_ingrediente.model_dump_json()}}"
+                >
+                  Remover
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr class="table-primary text-primary">
+            <td></td>
+            <td><b>{{ receita_ingrediente.ingrediente.nome }}</b></td>
+            <td><b>{{ receita_ingrediente.quantidade | format_quantity | safe }}</b></td>
+            <td><b>{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</b></td>
+            <td>-</td>
+            <td><b>{{ receita_ingrediente.custo | format_reais }}</b></td>
+            <td>-</td>
+            <td></td>
+          </tr>
+          {% endif %} {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<script>
+  window.addEventListener("load", () => {
+    const inputQuantidade = document.querySelector('#cardIngredientes input[name="quantidade"]');
+    const selectIngrediente = document.querySelector('#cardIngredientes select[name="ingrediente_id"]');
+
+    const getSelectIngredienteSelectedOption = () => {
+      const selected_option = Array.from(selectIngrediente.options).find((o) => o.value == selectIngrediente.value);
+      if (!selected_option) return null;
+      return selected_option;
+    };
+
+    const getSelectIngredienteSelectedOptionAttr = (attrName) => {
+      const selected_option = getSelectIngredienteSelectedOption();
+      if (!selected_option) return null;
+      const custo_p_grama = selected_option.getAttribute(attrName);
+      if (!custo_p_grama) return null;
+      return parseFloat(custo_p_grama).toFixed(3);
+    };
+
+    const updatePreview = () => {
+      const custo_p_grama = getSelectIngredienteSelectedOptionAttr("data-custo_p_grama");
+      if (!custo_p_grama) {
+        document.querySelector("#ingrediente_custo_p_grama").innerHTML = "Selecione um ingrediente";
+        document.querySelector("#ingediente_custo_final").innerHTML = "Insira uma quantidade";
+        return;
+      } else {
+        const custo_final = parseFloat(inputQuantidade.value * custo_p_grama).toFixed(2);
+        document.querySelector("#ingrediente_custo_p_grama").innerHTML = `Custo por grama: R$ ${custo_p_grama}/g`;
+        document.querySelector("#ingediente_custo_final").innerHTML = `Custo final: R$ ${custo_final}`;
+      }
+    };
+
+    selectIngrediente.addEventListener("change", updatePreview);
+    inputQuantidade.addEventListener("change", updatePreview);
+  });
+</script>
+{% endblock %}

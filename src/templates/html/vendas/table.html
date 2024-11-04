@@ -1,0 +1,64 @@
+<div class="col-12">
+  <div class="card">
+    <div class="card-body">
+      <form class="datagrid">
+        <div class="datagrid-item">
+          <div class="datagrid-title">Data Ínicio</div>
+          <div class="datagrid-content">
+            <input type="date" class="form-control">
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Data Fim</div>
+          <div class="datagrid-content">
+            <input type="date" class="form-control">
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Filtrar</div>
+          <div class="datagrid-content">
+            <input type="submit" class="btn" value="Filtrar">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="col-12">
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-vcenter">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Valor</th>
+            <th class="w-1"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for venda in vendas %}
+          <tr>
+            <td>{{ venda.data_criacao | strftime }}</td>
+            <td>{{ venda.descricao }}</td>
+            <td><b class="text-success">{{ venda.valor | format_reais }}</b></td>
+            <td>
+              <div class="btn-group">
+                <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#editarIngredienteModal" data-bs-payload="{{venda.model_dump_json()}}">Editar</a>
+                <a
+                  class="btn btn-sm btn-ghost-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deletarIngredienteModal"
+                  data-bs-payload="{{venda.model_dump_json()}}"
+                  >Excluir</a
+                >
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+
+<div class="page">
+    <!-- Sidebar -->
+    <aside class="navbar navbar-vertical navbar-expand-sm navbar-dark">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <h1 class="navbar-brand navbar-brand-autodark">
+          <a href="#">
+            {{title}}
+          </a>
+        </h1>
+        <div class="collapse navbar-collapse" id="sidebar-menu">
+          <ul class="navbar-nav pt-lg-3">
+            {% include 'navbar_items.html' %}
+          </ul>
+        </div>
+      </div>
+    </aside>
+    <div class="page-wrapper">
+      <div class="page-body">
+        <div class="container-xl">
+          <div class="row row-deck row-cards">
+            <div class="page-header">
+              <div class="row align-items-center">
+                <div class="col">
+                  <div class="page-pretitle">
+                    {{ header.pretitle }}
+                  </div>
+                  <h2 class="page-title">
+                    {{ material_symbol(header.symbol) | safe }}
+                    {{ header.title }}
+                  </h2>
+                  <div class="mb-1">
+                    <ol class="breadcrumb" aria-label="breadcrumbs">
+                      {% for breadcrumb in breadcrumbs %}
+                        <li class="breadcrumb-item">
+                          {% if loop.last %}
+                            <a>{{breadcrumb.label | title}}</a>
+                          {% else %}
+                            <a href="{{breadcrumb.url}}">{{breadcrumb.label | title}}</a>
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ol>
+                  </div>
+                </div>
+                {% if header.buttons %}
+                  <div class="col-auto ms-auto">
+                    <div class="btn-list">
+                      {% for button in header.buttons %}
+                        {% if button.href %}
+                          <span class="d-none d-sm-inline">
+                            <a
+                            href="{{button.href}}"
+                            class="{{button.classname}}"
+                            {% if button.attributes %}
+                              {% for name, value in button.attributes.items() %}
+                                {{name}} = "{{value}}"
+                              {% endfor %}
+                            {% endif %}
+                            >
+                              {% if button.symbol %}
+                                {{ material_symbol(button.symbol) | safe}}
+                              {% endif %}
+                              {{button.content}}
+                            </a>
+                          </span>
+                        {% else %}
+                          <span class="d-none d-sm-inline">
+                            <button
+                            class="{{button.classname}}"
+                            {% if button.attributes %}
+                              {% for name, value in button.attributes.items() %}
+                                {{name}} = "{{value}}"
+                              {% endfor %}
+                            {% endif %}
+                            >
+                              {% if button.symbol %}
+                                {{ material_symbol(button.symbol) | safe}}
+                              {% endif %}
+                              {{button.content}}
+                            </button>
+                          </span>
+                        {% endif %}
+              
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            {% block content %}
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+{% endblock %}

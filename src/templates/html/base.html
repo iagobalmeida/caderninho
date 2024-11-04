@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herbaria</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="{{ url_for('static', path='/style.css') }}" rel="stylesheet">
+</head>
+<body class="-theme-dark-auto">
+    {% block layout %}
+    {% endblock %}
+    <script>
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener("show.bs.modal", (e) => {
+                const payload = JSON.parse(e.relatedTarget.getAttribute('data-bs-payload'));
+                Object.keys(payload).forEach(payload_key => {
+                    const targetInput = modal.querySelector(`input[name="${payload_key}"]`);
+                    if(targetInput) targetInput.value = payload[payload_key];
+                    const targetSelect = modal.querySelector(`select[name="${payload_key}"]`);
+                    if(targetSelect) targetSelect.value = payload[payload_key];
+                });
+            });
+        });
+    </script>
+    {% block script %}
+    {% endblock %}
+</body>
+</html>

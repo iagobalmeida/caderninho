@@ -1,0 +1,69 @@
+<div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <form class="datagrid">
+          <div class="datagrid-item">
+            <div class="datagrid-title">Nome</div>
+            <div class="datagrid-content">
+                <input type="text" class="form-control">
+            </div>
+          </div>
+          <div class="datagrid-item">
+            <div class="datagrid-title">Filtrar</div>
+            <div class="datagrid-content">
+              <input type="submit" class="btn" value="Filtrar">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<div class="col-12">
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-vcenter">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Rendimento (Un.)</th>
+                    <th>Preço Sug. (R$)</th>
+                    <th>Custo (R$)</th>
+                    <th>Faturamento</th>
+                    <th>Lucro</th>
+                    <th class="w-1"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for receita in receitas %}
+                    <tr>
+                        <td>{{ receita.id }}</td>
+                        <td>{{ receita.nome }}</td>
+                        <td>{{ receita.rendimento_unidades }} Un.</td>
+                        <td>{{ receita.preco_sugerido | format_reais }}</td>
+                        <td>
+                            <span class="badge bg-danger-lt">
+                                {{receita.custo | format_reais}}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-warning-lt">
+                                {{receita.faturamento | format_reais}}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-success-lt">
+                                {{receita.lucro | format_reais}}
+                            </span>
+                        </td>
+                        <td >
+                            <a href="{{ url_for('get_receita', id=receita.id) }}" class="btn btn-sm">Detalhes</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>

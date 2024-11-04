@@ -1,0 +1,14 @@
+{% for navbar_link in navbar.links %}
+    <li class="nav-item">
+        {% with is_active = request.url == navbar_link.url %}
+            {% with class='nav-link active' if is_active else 'nav-link' %}
+                <a href="{{ navbar_link.url }}" class="{{class}}" {{'aria-current="page"' if is_active else ''}}>
+                    <span class="nav-link-title">
+                        {{ navbar_link.symbol | safe }}
+                        {{ navbar_link.title }}
+                    </span>
+                </a>
+            {% endwith %}
+        {% endwith %}
+    </li>
+{% endfor %}

@@ -1,0 +1,49 @@
+
+<div class="col-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                Entradas
+            </h3>
+        </div>
+        <div class="card-body">
+            <h2>
+                {{ entradas | format_reais }}
+                {{ material_symbol('arrow_downward') | safe }}
+            </h2>
+            <p class="text-secondary">Soma de todas as <a href="{{url_for('get_vendas_index')}}">Vendas</a></p>
+        </div>
+    </div>
+</div>
+<div class="col-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                Saídas
+            </h3>
+        </div>
+        <div class="card-body">
+            <h2>
+                {{ saidas | format_reais }}
+                {{ material_symbol('arrow_upward') | safe }}
+            </h2>
+            <p class="text-secondary">Soma de todas os <a href="{{url_for('get_estoques_index')}}">Estoques</a></p>
+        </div>
+    </div>
+</div>
+<div class="col-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                Caixa
+            </h3>
+        </div>
+        <div class="card-body">
+            <h2>
+                {{ caixa | format_reais }}
+                {{ material_symbol('sync') | safe }}
+            </h2>
+            <p class="text-secondary">Estimativa do valor em caixa</p>
+        </div>
+    </div>
+</div>

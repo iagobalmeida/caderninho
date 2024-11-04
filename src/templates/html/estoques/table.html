@@ -1,0 +1,83 @@
+<div class="col-12">
+  <div class="card">
+    <div class="card-body">
+      <form class="datagrid" method="GET" action="{{request.url}}">
+        <div class="datagrid-item">
+          <div class="datagrid-title">Ingrediente</div>
+          <div class="datagrid-content">
+            <select class="form-select" name="filter_ingrediente_id">
+              <option value="-1">Todos</option>
+              {% for ingrediente in ingredientes %}
+                <option {{'selected' if ingrediente.id == filter_ingrediente_id else ''}} value="{{ingrediente.id}}">{{ingrediente.nome | title}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Data Ínicio</div>
+          <div class="datagrid-content">
+            <input type="date" class="form-control" name="filter_data_inicio" value="{{filter_data_inicio}}">
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Data Fim</div>
+          <div class="datagrid-content">
+            <input type="date" class="form-control" name="filter_data_final" value="{{filter_data_final}}">
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Filtrar</div>
+          <div class="datagrid-content">
+            <input type="submit" class="btn" value="Filtrar">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="col-12">
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-vcenter">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Ingrediente</th>
+            <th>Quantidade</th>
+            <th>Valor Pago</th>
+            <th class="w-1"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for estoque in estoques %}
+            <tr>
+              <td>{{ estoque.data_criacao | strftime }}</td>
+              <td>{{ estoque.ingrediente.nome }}</td>
+              <td>{{ estoque.quantidade | format_stock_movement | safe}}</td>
+              <td class="text-danger">
+                <b>{{ estoque.valor_pago | format_reais }}</b>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#editarIngredienteModal" data-bs-payload="{{estoque.model_dump_json()}}">Editar</a>
+                  <a
+                    class="btn btn-sm btn-ghost-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deletarIngredienteModal"
+                    data-bs-payload="{{estoque.model_dump_json()}}"
+                    >Excluir</a
+                  >
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr colspan="5">
+              <td>Nenhum registro encontrado</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
