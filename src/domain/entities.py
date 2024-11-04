@@ -30,6 +30,13 @@ class Estoque(SQLModel, table=True):
     valor_pago: Optional[float] = Field(default=0)
 
 
+class Venda(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    data_criacao: datetime = Field(sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")})
+    descricao: str
+    valor: float
+
+
 class Ingrediente(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     nome: str = Field(index=True, unique=True)
@@ -98,37 +105,3 @@ class Receita(SQLModel, table=True):
         '''Retorna o preco a ser cobrado'''
         porcentagem_custo = max(1, 100 - self.porcentagem_lucro)
         return math.ceil(self.custo_unidade*100/porcentagem_custo)
-
-    def dict(self):
-        custo_total = round(sum([i.custo for i in self.ingrediente_links]), 2)
-        quantidade_total = max(1, round(sum([i.quantidade for i in self.ingrediente_links]), 2))
-        custo_p_grama_total = round(custo_total/quantidade_total, 2)
-        ingredientes = [
-            *self.ingrediente_links,
-            {
-                'id': -1,
-                'ingrediente': {
-                    'nome': 'Total',
-                    'custo_p_grama': custo_p_grama_total,
-                },
-                'quantidade': quantidade_total,
-                'custo': custo_total
-            }
-        ]
-        ret = {
-            'id': self.id,
-            'nome': self.nome,
-            'custo_receita': self.custo,
-            'rendimento_unidades': self.rendimento_unidades,
-            'preco_sugerido': self.preco_sugerido,
-            'faturamento': self.faturamento,
-            'lucro': self.lucro,
-            'rendimento': self.rendimento,
-            'peso_unitario': self.peso_unitario,
-            'custo_unidade': self.custo_unidade,
-            'porcentagem_lucro': self.porcentagem_lucro,
-            'ingredientes': ingredientes
-        }
-        return ret
-        return ret
-        return ret

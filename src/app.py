@@ -13,8 +13,9 @@ from domain import repository
 from routers.estoques import router as router_estoques
 from routers.ingredientes import router as router_ingredientes
 from routers.receitas import router as router_receitas
+from routers.vendas import router as router_vendas
 from scripts import seed
-from templates import templates
+from templates import render
 
 rootlogger.setLevel(logging.WARN)
 
@@ -22,6 +23,7 @@ app = FastAPI()
 app.include_router(router_receitas)
 app.include_router(router_ingredientes)
 app.include_router(router_estoques)
+app.include_router(router_vendas)
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 init()
@@ -29,19 +31,22 @@ init()
 
 @app.get('/')
 async def get_index(request: Request, session: Session = SESSION_DEP):
-    db_receitas = len(repository.get_receitas(session))
-    db_ingredientes = len(repository.get_ingredientes(session))
-    db_estoques = len(repository.get_estoques(session))
+    db_receitas = repository.get_receitas(session)
+    db_ingredientes = repository.get_ingredientes(session)
+    db_estoques = repository.list_estoques(session)
+    db_vendas = repository.get_vendas(session)
 
-    return templates.TemplateResponse(
-        request=request,
-        name='index.html',
-        context={
-            'receitas': db_receitas,
-            'ingredientes': db_ingredientes,
-            'estoques': db_estoques
-        }
-    )
+    entradas, saidas, caixa = repository.get_fluxo_caixa(session)
+
+    return render(request, 'index.html', {
+        'receitas': len(db_receitas),
+        'ingredientes': len(db_ingredientes),
+        'estoques': len(db_estoques),
+        'vendas': len(db_vendas),
+        'entradas': entradas,
+        'saidas': saidas,
+        'caixa': caixa
+    })
 
 
 @app.post('/seed')

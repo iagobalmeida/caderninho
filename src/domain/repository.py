@@ -1,9 +1,10 @@
-from typing import List
+from datetime import datetime
+from typing import List, Tuple
 
-from sqlmodel import Session, select
+from sqlmodel import Session, func, select
 
 from domain.entities import (Estoque, Ingrediente, Receita,
-                             ReceitaIngredienteLink)
+                             ReceitaIngredienteLink, Venda)
 
 
 def create_receita(session: Session, nome: str) -> Receita:
@@ -108,5 +109,30 @@ def delete_ingrediente(session: Session, id: int) -> bool:
     return True
 
 
-def get_estoques(session: Session) -> List[Estoque]:
-    return session.exec(select(Estoque).order_by(Estoque.data_criacao.desc())).all()
+def list_estoques(session: Session, filter_ingrediente_id: int = -1, filter_data_inicio: datetime = None, filter_data_final: datetime = None) -> List[Estoque]:
+    query = select(Estoque)
+
+    if filter_ingrediente_id and filter_ingrediente_id != -1:
+        query = query.filter(Estoque.ingrediente_id == filter_ingrediente_id)
+
+    if filter_data_inicio:
+        query = query.filter(Estoque.data_criacao >= filter_data_inicio)
+
+    if filter_data_final:
+        query = query.filter(Estoque.data_criacao >= filter_data_final)
+
+    query = query.order_by(Estoque.data_criacao.desc())
+
+    return session.exec(query).all()
+
+
+def get_vendas(session: Session) -> List[Venda]:
+    ret = session.exec(select(Venda).order_by(Venda.data_criacao.desc())).all()
+    return ret
+
+
+def get_fluxo_caixa(session: Session) -> Tuple[float, float, float]:
+    entradas = session.exec(select(func.sum(Venda.valor))).first()
+    saidas = session.exec(select(func.sum(Estoque.valor_pago))).first()
+    caixa = entradas - saidas
+    return (entradas, saidas, caixa)

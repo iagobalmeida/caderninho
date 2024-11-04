@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 from db import engine
 from domain.entities import (Estoque, Ingrediente, Receita,
-                             ReceitaIngredienteLink)
+                             ReceitaIngredienteLink, Venda)
 
 
 def try_add(obj):
@@ -34,6 +34,10 @@ def main():
             quantidade=estoque_quantidade,
             valor_pago=randint(1, 10) if estoque_quantidade > 0 else 0
         ))
+
+    for _ in range(randint(0, 10)):
+        quantidade = randint(10, 20)
+        try_add(Venda(descricao=f'{quantidade} x MiniCookies', valor=quantidade*12))
 
 
 if __name__ == '__main__':

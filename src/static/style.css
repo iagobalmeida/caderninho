@@ -14,7 +14,9 @@
   'GRAD' 0,
   'opsz' 24
 }
+.nav-link-title:has(> .material-symbols-outlined),
 h5:has(> .material-symbols-outlined),
+h2:has(> .material-symbols-outlined),
 h3:has(> .material-symbols-outlined)
 {
     display: flex;
@@ -27,4 +29,23 @@ h3:has(> .material-symbols-outlined)
 }
 .status {
     user-select: none;
+    white-space: nowrap;
+}
+aside .container-fluid {
+    padding-top: calc(var(--tblr-gutter-x)* .5);
+    padding-bottom: calc(var(--tblr-gutter-x)* .5);
+}
+
+.pagination {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    .btn-list {
+        justify-content: center;
+        align-items: center;
+    }
 }
