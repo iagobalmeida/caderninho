@@ -2,7 +2,7 @@ import fastapi
 from sqlmodel import Session
 
 from db import SESSION_DEP
-from domain import repository
+from domain import inputs, repository
 from templates import render
 from templates.context import Button, Context
 from utils import redirect_back
@@ -40,14 +40,14 @@ async def get_ingredientes_index(request: fastapi.Request, session: Session = SE
 
 
 @router.post('/')
-async def post_ingredientes_index(request: fastapi.Request, nome: str = fastapi.Form(), peso: float = fastapi.Form(), custo: float = fastapi.Form(), session: Session = SESSION_DEP):
-    repository.create_ingrediente(session, nome=nome, peso=peso, custo=custo)
+async def post_ingredientes_index(request: fastapi.Request, payload: inputs.IngredienteCriar = fastapi.Form(), session: Session = SESSION_DEP):
+    repository.create_ingrediente(session, nome=payload.nome, peso=payload.peso, custo=payload.custo)
     return redirect_back(request)
 
 
-@router.post('/editar')
-async def post_ingredientes_editar(request: fastapi.Request, id: int = fastapi.Form(),  nome: str = fastapi.Form(), peso: float = fastapi.Form(), custo: float = fastapi.Form(), session: Session = SESSION_DEP):
-    repository.update_ingrediente(session, id=id, nome=nome, peso=peso, custo=custo)
+@router.post('/atualizar')
+async def post_ingredientes_atualizar(request: fastapi.Request, payload: inputs.IngredienteAtualizar = fastapi.Form(), session: Session = SESSION_DEP):
+    repository.update_ingrediente(session, id=id, nome=payload.nome, peso=payload.peso, custo=payload.custo)
     return redirect_back(request)
 
 

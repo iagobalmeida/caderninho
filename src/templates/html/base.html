@@ -13,9 +13,25 @@
     {% block layout %}
     {% endblock %}
     <script>
+        document.querySelectorAll('input[type="reset"]').forEach(inputReset => {
+            inputReset.addEventListener('click', (e) => {
+                    Array.from(inputReset.form.elements).forEach(element => {
+                        if (element.type === 'search' || element.type === 'text' || element.type === 'textarea' || element.type === 'date') {
+                        element.removeAttribute('value');
+                        element.value = '';
+                    } else if (element.type === 'checkbox' || element.type === 'radio') {
+                        element.checked = false;
+                    } else if (element.tagName === 'SELECT') {
+                        element.selectedIndex = -1;
+                    }
+                });
+                inputReset.form.submit();
+            });
+        });
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener("show.bs.modal", (e) => {
                 const payload = JSON.parse(e.relatedTarget.getAttribute('data-bs-payload'));
+                if(!payload) return;
                 Object.keys(payload).forEach(payload_key => {
                     const targetInput = modal.querySelector(`input[name="${payload_key}"]`);
                     if(targetInput) targetInput.value = payload[payload_key];

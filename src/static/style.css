@@ -1,3 +1,6 @@
+.datagrid {
+    --tblr-datagrid-item-width: 8rem !important;
+}
 .input-group:has(input[readonly]),
 .datagrid-item:has(input[readonly]),
 .input-group:has(select[readonly]),
@@ -29,6 +32,9 @@ h3:has(> .material-symbols-outlined)
 }
 .status {
     user-select: none;
+    white-space: nowrap;
+}
+td {
     white-space: nowrap;
 }
 aside .container-fluid {

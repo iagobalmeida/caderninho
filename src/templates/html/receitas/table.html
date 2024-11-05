@@ -1,23 +1,24 @@
 <div class="col-12">
     <div class="card">
       <div class="card-body">
-        <form class="datagrid">
+        <form class="datagrid" method="GET" action="{{request.url}}">
           <div class="datagrid-item">
             <div class="datagrid-title">Nome</div>
             <div class="datagrid-content">
-                <input type="text" class="form-control">
+                <input type="search" class="form-control" name="filter_nome" placeholder="Buscar por nome" value="{{filter_nome if filter_nome else ''}}">
             </div>
           </div>
           <div class="datagrid-item">
             <div class="datagrid-title">Filtrar</div>
             <div class="datagrid-content">
               <input type="submit" class="btn" value="Filtrar">
+              <input type="reset" class="btn" value="Limpar">
             </div>
           </div>
         </form>
       </div>
     </div>
-  </div>
+</div>
 
 <div class="col-12">
     <div class="card">

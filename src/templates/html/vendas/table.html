@@ -1,23 +1,24 @@
 <div class="col-12">
   <div class="card">
     <div class="card-body">
-      <form class="datagrid">
+      <form class="datagrid" action="{{request.url}}">
         <div class="datagrid-item">
           <div class="datagrid-title">Data Ínicio</div>
           <div class="datagrid-content">
-            <input type="date" class="form-control">
+            <input type="date" name="filter_data_inicio" class="form-control" value="{{filter_data_inicio}}">
           </div>
         </div>
         <div class="datagrid-item">
           <div class="datagrid-title">Data Fim</div>
           <div class="datagrid-content">
-            <input type="date" class="form-control">
+            <input type="date" name="filter_data_final" class="form-control" value="{{filter_data_final}}">
           </div>
         </div>
         <div class="datagrid-item">
           <div class="datagrid-title">Filtrar</div>
           <div class="datagrid-content">
             <input type="submit" class="btn" value="Filtrar">
+            <input type="reset" class="btn" value="Limpar">
           </div>
         </div>
       </form>
@@ -45,11 +46,11 @@
             <td><b class="text-success">{{ venda.valor | format_reais }}</b></td>
             <td>
               <div class="btn-group">
-                <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#editarIngredienteModal" data-bs-payload="{{venda.model_dump_json()}}">Editar</a>
+                <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#atualizarVendaModal" data-bs-payload="{{venda.model_dump_json()}}">Editar</a>
                 <a
                   class="btn btn-sm btn-ghost-danger"
                   data-bs-toggle="modal"
-                  data-bs-target="#deletarIngredienteModal"
+                  data-bs-target="#deletarVendaModal"
                   data-bs-payload="{{venda.model_dump_json()}}"
                   >Excluir</a
                 >

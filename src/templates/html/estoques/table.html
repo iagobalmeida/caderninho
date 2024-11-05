@@ -29,6 +29,7 @@
           <div class="datagrid-title">Filtrar</div>
           <div class="datagrid-content">
             <input type="submit" class="btn" value="Filtrar">
+            <input type="reset" class="btn" value="Limpar">
           </div>
         </div>
       </form>
@@ -60,7 +61,7 @@
               </td>
               <td>
                 <div class="btn-group">
-                  <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#editarIngredienteModal" data-bs-payload="{{estoque.model_dump_json()}}">Editar</a>
+                  <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#atualizarIngredienteModal" data-bs-payload="{{estoque.model_dump_json()}}">Editar</a>
                   <a
                     class="btn btn-sm btn-ghost-danger"
                     data-bs-toggle="modal"

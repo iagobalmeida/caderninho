@@ -1,0 +1,38 @@
+<div class="modal" id="novaVendaModal" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_vendas_index') }}">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title text-primary">
+                      <span class="material-symbols-outlined">
+                        shopping_cart
+                      </span>
+                      Nova Venda
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="datagrid">
+                      <div class="datagrid-item">
+                      <div class="datagrid-title">Descrição</div>
+                        <input required type="text" class="form-control" name="descricao"/>
+                      </div>
+                  </div>
+                  <div class="datagrid">
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Valor</div>
+                        <div class="datagrid-content">
+                            <div class="input-group input-group-flat">
+                            <span class="input-group-text"> R$ </span>
+                            <input name="valor" required type="number" class="form-control text-end pe-0" min="1" />
+                            </div>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" class="btn btn-success">Criar Receita</button>
+              </div>
+          </div>
+    </form>
+</div>

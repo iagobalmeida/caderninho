@@ -31,10 +31,10 @@ init()
 
 @app.get('/')
 async def get_index(request: Request, session: Session = SESSION_DEP):
-    db_receitas = repository.get_receitas(session)
+    db_receitas = repository.list_receitas(session)
     db_ingredientes = repository.get_ingredientes(session)
     db_estoques = repository.list_estoques(session)
-    db_vendas = repository.get_vendas(session)
+    db_vendas = repository.list_vendas(session)
 
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
 

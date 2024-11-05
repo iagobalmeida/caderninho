@@ -1,6 +1,6 @@
 
-<div class="modal" id="atualizarIngredienteModal" tabindex="-1">
-    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_ingredientes_atualizar') }}">
+<div class="modal" id="atualizarVendaModal" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_vendas_atualizar') }}">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title text-primary">
@@ -16,24 +16,15 @@
               <input required readonly type="number" class="form-control" name="id" />
             </div>
             <div class="datagrid-item">
-              <div class="datagrid-title">Nome</div>
-              <input required type="text" class="form-control" name="nome" />
+              <div class="datagrid-title">Descricao</div>
+              <input required type="text" class="form-control" name="descricao" />
             </div>
             <div class="datagrid-item">
-              <div class="datagrid-title">Custo</div>
+              <div class="datagrid-title">Valor</div>
               <div class="datagrid-content">
                 <div class="input-group input-group-flat">
                   <span class="input-group-text"> R$ </span>
-                  <input name="custo" required type="number" class="form-control text-end pe-0" min="1" />
-                </div>
-              </div>
-            </div>
-            <div class="datagrid-item">
-              <div class="datagrid-title">Peso</div>
-              <div class="datagrid-content">
-                <div class="input-group input-group-flat">
-                  <input required type="number" name="peso" class="form-control pe-0" min="1" />
-                  <span class="input-group-text"> g </span>
+                  <input name="valor" required type="number" class="form-control text-end pe-0" min="1" />
                 </div>
               </div>
             </div>
