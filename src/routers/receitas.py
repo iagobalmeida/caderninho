@@ -28,8 +28,8 @@ context_header = Context.Header(
 
 @router.post('/')
 async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form(), session: Session = SESSION_DEP):
-    nova_receita = repository.create_receita(session, nome)
-    return redirect_url_for(request, 'get_receita', id=nova_receita.id)
+    db_receita = repository.create_receita(session, nome)
+    return redirect_url_for(request, 'get_receita', id=db_receita.id)
 
 
 @router.get('/')
@@ -76,9 +76,9 @@ async def post_receita_atualizar(request: fastapi.Request, payload: inputs.Recei
 
 
 @router.post('/deletar')
-async def post_receita_deletar(id: int = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_receita_deletar(request: fastapi.Request, id: int = fastapi.Form(), session: Session = SESSION_DEP):
     repository.delete_receita(session, id=id)
-    return redirect_url_for('get_index')
+    return redirect_url_for(request, 'get_receitas_index')
 
 
 @router.post('/ingredientes/incluir')

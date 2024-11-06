@@ -250,6 +250,7 @@
       </div>
     </div>
     <form class="card-body" method="POST" action="{{ url_for('post_receita_ingredientes_incluir') }}">
+      <input type="hidden" name="id" value="{{receita.id}}">
       <div class="datagrid">
         <div class="datagrid-item">
           <label class="datagrid-title form-label">Ingrediente</label>
@@ -267,7 +268,7 @@
           <label class="datagrid-title form-label">Quantidade (gramas)</label>
           <div class="datagrid-content">
             <div class="input-group input-group-flat">
-              <input required type="number" class="form-control pe-0" value="0" min="0" name="quantidade" />
+              <input required type="number" class="form-control pe-0" min="0" name="quantidade" />
               <span class="input-group-text"> g </span>
             </div>
             <small style="display: block; margin-top: 8px" class="text-secondary" id="ingediente_custo_final">Insira uma quantidade</small>

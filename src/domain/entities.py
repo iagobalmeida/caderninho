@@ -23,7 +23,7 @@ class ReceitaIngredienteLink(SQLModel, table=True):
 
 class Estoque(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    data_criacao: datetime = Field(sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")})
+    data_criacao: datetime = Field(default=datetime.now(), nullable=False)
     ingrediente_id: Optional[int] = Field(default=None, foreign_key="ingrediente.id")
     ingrediente: "Ingrediente" = Relationship(back_populates="estoque_links")
     quantidade: float
@@ -32,7 +32,7 @@ class Estoque(SQLModel, table=True):
 
 class Venda(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    data_criacao: datetime = Field(sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")})
+    data_criacao: datetime = Field(default=datetime.now(), nullable=False)
     descricao: str
     valor: float
 

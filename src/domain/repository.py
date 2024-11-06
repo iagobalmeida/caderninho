@@ -8,7 +8,10 @@ from domain.entities import (Estoque, Ingrediente, Receita,
 
 
 def __delete(session: Session, entity: SQLModel, id: int) -> bool:
-    session.delete(entity, id)
+    db_entity = session.get(entity, id)
+    if not db_entity:
+        return True
+    session.delete(db_entity)
     session.commit()
     return True
 
@@ -40,15 +43,30 @@ def __update(session: Session, entity: SQLModel, id: int, **kwargs) -> SQLModel:
     return db_entity
 
 
-def create_receita(session: Session, nome: str) -> Receita:
-    receita = Receita(
-        nome=nome,
-        peso_unitario=1,
-        porcentagem_lucro=33
-    )
-    session.add(receita)
+def update_receita(session: Session, id: int, nome: str, peso_unitario: float, porcentagem_lucro: float) -> Receita:
+    return __update(session, Receita, id, nome=nome, peso_unitario=peso_unitario, porcentagem_lucro=porcentagem_lucro)
+
+
+def update_ingrediente(session: Session, id: int, nome: str, peso: float, custo: float) -> Ingrediente:
+    return __update(session, Ingrediente, id, nome=nome, peso=peso, custo=custo)
+
+
+def update_receita_ingrediente(session: Session, id: int, quantidade: float) -> ReceitaIngredienteLink:
+    return __update(session, ReceitaIngredienteLink, id, quantidade=quantidade)
+
+
+def update_venda(session: Session, id: int, descricao: str, valor: float) -> Venda:
+    return __update(session, Venda, id, descricao=descricao, valor=valor)
+
+
+def __create(session: Session, entity):
+    session.add(entity)
     session.commit()
-    return receita
+    return entity
+
+
+def create_receita(session: Session, nome: str) -> Receita:
+    return __create(session, Receita(nome=nome, peso_unitario=1, porcentagem_lucro=33))
 
 
 def list_receitas(session: Session, filter_nome: str = None) -> List[Receita]:
@@ -64,27 +82,9 @@ def get_receita(session: Session, id: int) -> Receita:
     return receita
 
 
-def update_receita(session: Session, id: int, nome: str, peso_unitario: float, porcentagem_lucro: float) -> Receita:
-    db_receita = session.get(Receita, id)
-    db_receita.nome = nome
-    db_receita.peso_unitario = peso_unitario
-    db_receita.porcentagem_lucro = porcentagem_lucro
-    session.commit()
-    return db_receita
-
-
 def get_ingredientes(session: Session) -> List[Ingrediente]:
     ingredientes = session.exec(select(Ingrediente)).all()
     return ingredientes
-
-
-def update_ingrediente(session: Session, id: int, nome: str, peso: float, custo: float) -> Ingrediente:
-    db_ingrediente = session.get(Ingrediente, id)
-    db_ingrediente.nome = nome
-    db_ingrediente.peso = peso
-    db_ingrediente.custo = custo
-    session.commit()
-    return db_ingrediente
 
 
 def create_ingrediente(session: Session, nome: str, peso: float, custo: float) -> Ingrediente:
@@ -105,13 +105,6 @@ def create_receita_ingrediente(session: Session, id: int, ingrediente_id: int, q
         quantidade=quantidade
     )
     session.add(receita_ingrediente)
-    session.commit()
-    return receita_ingrediente
-
-
-def update_receita_ingrediente(session: Session, id: int, quantidade: float) -> ReceitaIngredienteLink:
-    receita_ingrediente = session.get(ReceitaIngredienteLink, id)
-    receita_ingrediente.quantidade = quantidade
     session.commit()
     return receita_ingrediente
 
@@ -156,16 +149,10 @@ def create_venda(session: Session, descricao: str, valor: float) -> Venda:
     return venda
 
 
-def update_venda(session: Session, id: int, descricao: str, valor: float) -> Venda:
-    venda = session.get(Venda, id)
-    venda.descricao = descricao
-    venda.valor = valor
-    session.commit()
-    return venda
-
-
 def get_fluxo_caixa(session: Session) -> Tuple[float, float, float]:
     entradas = session.exec(select(func.sum(Venda.valor))).first()
     saidas = session.exec(select(func.sum(Estoque.valor_pago))).first()
-    caixa = entradas - saidas
-    return (entradas, saidas, caixa)
+    if entradas and saidas:
+        caixa = entradas - saidas
+        return (entradas, saidas, caixa)
+    return (0, 0, 0)

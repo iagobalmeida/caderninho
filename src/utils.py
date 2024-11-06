@@ -3,9 +3,8 @@ import fastapi
 
 def redirect_url_for(request: fastapi.Request, url_name: str, status_code: int = 302, **kwargs):
     return fastapi.responses.RedirectResponse(
-        url=request.url_for(url_name),
-        status_code=status_code,
-        **kwargs
+        url=request.url_for(url_name, **kwargs),
+        status_code=status_code
     )
 
 

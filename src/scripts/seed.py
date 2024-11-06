@@ -1,3 +1,4 @@
+from datetime import datetime
 from random import randint
 
 from sqlmodel import Session
@@ -35,9 +36,10 @@ def main():
             valor_pago=randint(1, 10) if estoque_quantidade > 0 else 0
         ))
 
-    for _ in range(randint(0, 10)):
+    for _ in range(30):
         quantidade = randint(10, 20)
-        try_add(Venda(descricao=f'{quantidade} x MiniCookies', valor=quantidade*12))
+        data_criacao = datetime.now().replace(day=randint(1, 24), month=randint(1, 12))
+        try_add(Venda(descricao=f'{quantidade} x MiniCookies', valor=quantidade*12, data_criacao=data_criacao))
 
 
 if __name__ == '__main__':
