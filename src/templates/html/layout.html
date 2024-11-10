@@ -69,7 +69,7 @@
                     <div class="btn-list">
                       {% for button in header.buttons %}
                         {% if button.href %}
-                          <span class="d-none d-sm-inline">
+                          <span class="d-inline">
                             <a
                             href="{{button.href}}"
                             class="{{button.classname}}"
@@ -86,7 +86,7 @@
                             </a>
                           </span>
                         {% else %}
-                          <span class="d-none d-sm-inline">
+                          <span class="d-inline">
                             <button
                             class="{{button.classname}}"
                             {% if button.attributes %}
