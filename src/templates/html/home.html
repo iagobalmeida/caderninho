@@ -1,8 +1,69 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+<div class="col-sm-12 col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                Entradas
+            </h3>
+            <div class="ms-auto">
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateVenda">
+                    {{ material_symbol('add') | safe }}
+                    Nova Venda
+                    &nbsp;
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <h2>
+                {{ entradas | format_reais }}
+                {{ material_symbol('arrow_downward') | safe }}
+            </h2>
+            <p class="text-secondary">Soma de todas as <a href="{{url_for('get_vendas_index')}}">Vendas</a></p>
+        </div>
+    </div>
+</div>
+<div class="col-sm-12 col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                Saídas
+            </h3>
+            <div class="ms-auto">
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateEstoque">
+                    {{ material_symbol('add') | safe }}
+                    Nova Compra
+                    &nbsp;
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <h2>
+                {{ saidas | format_reais }}
+                {{ material_symbol('arrow_upward') | safe }}
+            </h2>
+            <p class="text-secondary">Soma de todas os <a href="{{url_for('get_estoques_index')}}">Estoques</a></p>
+        </div>
+    </div>
+</div>
+<div class="col-sm-12 col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                Caixa
+            </h3>
+        </div>
+        <div class="card-body">
+            <h2>
+                {{ caixa | format_reais }}
+                {{ material_symbol('sync') | safe }}
+            </h2>
+            <p class="text-secondary">Estimativa do valor em caixa</p>
+        </div>
+    </div>
+</div>
 
-{% include 'resumo_caixa.html' %}
 <div class="col-sm-12 col-lg-6">
     <div class="card">
         <div class="card-header">
@@ -69,7 +130,7 @@
             <h3 class="card-title">
                 {{ material_symbol('package_2') | safe }}
                 Ingredientes
-                <small class="text-secondary ms-auto">{{ingredientes}} ingrediente cadastrado</small>
+                <small class="text-secondary ms-auto">{{len_ingredientes}} ingrediente cadastrado</small>
             </h3>
         </div>
         <div class="card-body">

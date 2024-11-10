@@ -1,12 +1,11 @@
-
-<div class="col-sm-12 col-lg-4">
+<div class="d-none d-md-block col-sm-12 col-lg-4">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
                 Entradas
             </h3>
             <div class="ms-auto">
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#novaVendaModal">
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateVenda">
                     {{ material_symbol('add') | safe }}
                     Nova Venda
                     &nbsp;
@@ -22,14 +21,14 @@
         </div>
     </div>
 </div>
-<div class="col-sm-12 col-lg-4">
+<div class="d-none d-md-block col-sm-12 col-lg-4">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
                 Saídas
             </h3>
             <div class="ms-auto">
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#novoEstoqueModal">
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateEstoque">
                     {{ material_symbol('add') | safe }}
                     Nova Compra
                     &nbsp;
@@ -45,7 +44,7 @@
         </div>
     </div>
 </div>
-<div class="col-sm-12 col-lg-4">
+<div class="d-none d-md-block col-sm-12 col-lg-4">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">

@@ -12,3 +12,11 @@
         {% endwith %}
     </li>
 {% endfor %}
+<li class="nav-item">
+    <a href="{{ url_for('get_logout') }}" class="nav-link">
+        <span class="nav-link-title">
+            {{ material_symbol('logout') | safe }}
+            Sair
+        </span>
+    </a>
+</li>

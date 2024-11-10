@@ -29,7 +29,12 @@
           <div class="datagrid-title">Filtrar</div>
           <div class="datagrid-content">
             <input type="submit" class="btn" value="Filtrar">
-            <input type="reset" class="btn" value="Limpar">
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Limpar</div>
+          <div class="datagrid-content">
+            <input type="submit" class="btn" value="Limpar">
           </div>
         </div>
       </form>
@@ -41,9 +46,10 @@
   <div class="card">
     <div class="table-responsive">
       <table class="table table-vcenter">
-        <thead>
+        <thead class="sticky-top">
           <tr>
             <th>Data</th>
+            <th>Descrição</th>
             <th>Ingrediente</th>
             <th>Quantidade</th>
             <th>Valor Pago</th>
@@ -54,6 +60,7 @@
           {% for estoque in estoques %}
             <tr>
               <td>{{ estoque.data_criacao | strftime }}</td>
+              <td>{{ estoque.descricao }}</td>
               <td>{{ estoque.ingrediente.nome }}</td>
               <td>{{ estoque.quantidade | format_stock_movement | safe}}</td>
               <td class="text-danger">
@@ -61,11 +68,11 @@
               </td>
               <td>
                 <div class="btn-group">
-                  <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#atualizarIngredienteModal" data-bs-payload="{{estoque.model_dump_json()}}">Editar</a>
+                  <a class="btn btn-sm" data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque" data-bs-payload="{{estoque.model_dump_json()}}">Editar</a>
                   <a
                     class="btn btn-sm btn-ghost-danger"
                     data-bs-toggle="modal"
-                    data-bs-target="#deletarIngredienteModal"
+                    data-bs-target="#modalDeleteEstoque"
                     data-bs-payload="{{estoque.model_dump_json()}}"
                     >Excluir</a
                   >

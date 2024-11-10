@@ -3,11 +3,30 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import validates
-from sqlmodel import Field, Relationship, SQLModel, text
+from sqlmodel import Field, Relationship, SQLModel
 
 
-class ReceitaIngredienteLink(SQLModel, table=True):
+class Organizacao(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    descricao: str
+    usuarios: List['Usuario'] = Relationship(back_populates='organizacao')
+
+
+class RegistroOrganizacao(SQLModel, table=False):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    organizacao_id: Optional[int] = Field(default=None, foreign_key="organizacao.id")
+
+
+class Usuario(RegistroOrganizacao, table=True):
+    organizacao: "Organizacao" = Relationship(back_populates="usuarios")
+    nome: str
+    email: str
+    senha: str
+    dono: Optional[bool] = Field(default=False)
+    administrador: Optional[bool] = Field(default=False)
+
+
+class ReceitaIngredienteLink(RegistroOrganizacao, table=True):
     quantidade: float
     receita_id: Optional[int] = Field(default=None, foreign_key="receita.id")
     ingrediente_id: Optional[int] = Field(default=None, foreign_key="ingrediente.id")
@@ -21,24 +40,22 @@ class ReceitaIngredienteLink(SQLModel, table=True):
         return round(self.quantidade * self.ingrediente.custo_p_grama, 2)
 
 
-class Estoque(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Estoque(RegistroOrganizacao, table=True):
+    descricao: Optional[str] = Field(default=None)
     data_criacao: datetime = Field(default=datetime.now(), nullable=False)
     ingrediente_id: Optional[int] = Field(default=None, foreign_key="ingrediente.id")
     ingrediente: "Ingrediente" = Relationship(back_populates="estoque_links")
-    quantidade: float
+    quantidade: Optional[float] = Field(default=0)
     valor_pago: Optional[float] = Field(default=0)
 
 
-class Venda(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Venda(RegistroOrganizacao, table=True):
     data_criacao: datetime = Field(default=datetime.now(), nullable=False)
     descricao: str
     valor: float
 
 
-class Ingrediente(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Ingrediente(RegistroOrganizacao, table=True):
     nome: str = Field(index=True, unique=True)
     peso: float
     custo: float
@@ -59,8 +76,7 @@ class Ingrediente(SQLModel, table=True):
         return sum([e.quantidade for e in self.estoque_links])
 
 
-class Receita(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Receita(RegistroOrganizacao, table=True):
     nome: str = Field(index=True, unique=True)
     peso_unitario: float = 0
     porcentagem_lucro: int = 33

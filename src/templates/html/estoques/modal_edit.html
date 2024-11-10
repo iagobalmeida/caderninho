@@ -1,0 +1,65 @@
+<div class="modal" id="modalEditEstoque" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_estoques_atualizar') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-primary">
+            <span class="material-symbols-outlined"> package_2 </span>
+            Editar Gasto
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="datagrid">
+            <div class="datagrid-item">
+              <div class="datagrid-title">ID</div>
+              <input required type="text" class="form-control" name="id" />
+            </div>
+          </div>
+          <hr>
+          <div class="datagrid">
+            <div class="datagrid-item">
+              <div class="datagrid-title">Descricao</div>
+              <input required type="text" class="form-control" name="descricao" />
+            </div>
+            <div class="datagrid-item">
+              <div class="datagrid-title">Valor Pago</div>
+              <div class="datagrid-content">
+                <div class="input-group input-group-flat">
+                  <span class="input-group-text"> R$ </span>
+                  <input name="valor_pago" required type="number" class="form-control text-end pe-0" min="1" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div class="datagrid">
+            <div class="datagrid-item">
+              <div class="datagrid-title">Ingrediente</div>
+              <div class="datagrid-content">
+                <select class="form-select" name="ingrediente_id">
+                  <option selected value="-1">Selecionar</option>
+                  {% for ingrediente in ingredientes %}
+                    <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
+                  {% endfor %}
+                </select>
+                <small style="display: block; margin-top: 8px" class="text-secondary" id="ingrediente_custo_p_grama">Selecione um ingrediente</small>
+              </div>
+            </div>
+            <div class="datagrid-item">
+              <div class="datagrid-title">Quantidade (g)</div>
+              <div class="datagrid-content">
+                <div class="input-group input-group-flat">
+                  <input type="number" name="quantidade" class="form-control pe-0" min="1" />
+                  <span class="input-group-text"> g </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Registrar Gasto</button>
+        </div>
+      </div>
+    </form>
+  </div>

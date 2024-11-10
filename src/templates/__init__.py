@@ -10,8 +10,9 @@ init_filters(templates)
 init_globals(templates)
 
 
-def render(request: Request, template_name: str, context: dict):
+def render(session, request: Request, template_name: str, context: dict = None):
     return context_render(
+        session=session,
         templates=templates,
         request=request,
         template_name=template_name,

@@ -2,12 +2,12 @@ import logging
 import re
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
-from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+import fastapi
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
 
+import auth
 from db import SESSION_DEP, Session, init
 from domain import repository
 from routers.estoques import router as router_estoques
@@ -16,10 +16,11 @@ from routers.receitas import router as router_receitas
 from routers.vendas import router as router_vendas
 from scripts import seed
 from templates import render
+from utils import redirect_url_for
 
 rootlogger.setLevel(logging.WARN)
 
-app = FastAPI()
+app = fastapi.FastAPI(dependencies=[auth.AUTH_DEP])
 app.include_router(router_receitas)
 app.include_router(router_ingredientes)
 app.include_router(router_estoques)
@@ -29,23 +30,44 @@ app.mount("/static", StaticFiles(directory="src/static"), name="static")
 init()
 
 
-@app.get('/')
-async def get_index(request: Request, session: Session = SESSION_DEP):
+@app.get('/', include_in_schema=False)
+async def get_index(request: fastapi.Request, message: str = fastapi.Query(None), session: Session = SESSION_DEP):
+    return render(session, request, 'login.html', {'message': message})
+
+
+@app.post('/login', include_in_schema=False)
+async def post_login(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), session: Session = SESSION_DEP):
+    jwt_token = auth.authenticate(session, email=email, senha=senha)
+    if jwt_token:
+        response = redirect_url_for(request, 'get_home')
+        response.set_cookie('jwt_token', jwt_token)
+    else:
+        url = request.url_for('get_index')
+        url = url.include_query_params(message='Email e/ou senha inválidos!')
+        response = fastapi.responses.RedirectResponse(url, status_code=302)
+        response.delete_cookie('jwt_token')
+    return response
+
+
+@app.get('/logout', include_in_schema=False)
+async def get_logout(request: fastapi.Request):
+    response = redirect_url_for(request, 'get_index')
+    response.delete_cookie('jwt_token')
+    return response
+
+
+@app.get('/home', include_in_schema=False)
+async def get_home(request: fastapi.Request, session: Session = SESSION_DEP):
     db_receitas = repository.list_receitas(session)
     db_ingredientes = repository.get_ingredientes(session)
     db_estoques = repository.list_estoques(session)
     db_vendas = repository.list_vendas(session)
 
-    entradas, saidas, caixa = repository.get_fluxo_caixa(session)
-
-    return render(request, 'index.html', {
+    return render(session, request, 'home.html', {
         'receitas': len(db_receitas),
-        'ingredientes': len(db_ingredientes),
+        'len_ingredientes': len(db_ingredientes),
         'estoques': len(db_estoques),
         'vendas': len(db_vendas),
-        'entradas': entradas,
-        'saidas': saidas,
-        'caixa': caixa
     })
 
 
@@ -56,7 +78,7 @@ async def post_seed():
 
 
 @app.exception_handler(IntegrityError)
-async def integrity_error_exception_handler(req: Request, ex):
+async def integrity_error_exception_handler(req: fastapi.Request, ex):
     parsed_url = urlparse(req.headers['referer'])
     query_params = parse_qs(parsed_url.query)
 
@@ -71,12 +93,12 @@ async def integrity_error_exception_handler(req: Request, ex):
     parsed_url = parsed_url._replace(query=new_query)
     url = urlunparse(parsed_url)
 
-    return RedirectResponse(url, status_code=302)
+    return fastapi.responses.RedirectResponse(url, status_code=302)
 
 
 @app.exception_handler(ValueError)
-async def integrity_error_exception_handler(req: Request, ex):
-    url = str(req.url_for('get_index'))
+async def integrity_error_exception_handler(req: fastapi.Request, ex):
+    url = str(req.url_for('get_home'))
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
 
@@ -87,4 +109,4 @@ async def integrity_error_exception_handler(req: Request, ex):
 
     url = urlunparse(parsed_url)
 
-    return RedirectResponse(url, status_code=302)
+    return fastapi.responses.RedirectResponse(url, status_code=302)

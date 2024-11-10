@@ -1,10 +1,17 @@
 from datetime import datetime
 from typing import List, Tuple
 
+import jwt
 from sqlmodel import Session, SQLModel, func, select
 
 from domain.entities import (Estoque, Ingrediente, Receita,
                              ReceitaIngredienteLink, Venda)
+
+
+def __filter_organization_id(session: Session, query, entity: SQLModel):
+    session_user = session.info.get('user', {})
+    organizacao_id = session_user.get('organizacao_id') if session_user else -1
+    return query.filter(entity.organizacao_id == organizacao_id)
 
 
 def __delete(session: Session, entity: SQLModel, id: int) -> bool:
@@ -26,6 +33,10 @@ def delete_receita_ingrediente(session: Session, receita_ingrediente_id: int) ->
 
 def delete_venda(session: Session, id: int) -> bool:
     return __delete(session, Venda, id)
+
+
+def delete_estoque(session: Session, id: int) -> bool:
+    return __delete(session, Estoque, id)
 
 
 def delete_ingrediente(session: Session, id: int) -> bool:
@@ -59,6 +70,10 @@ def update_venda(session: Session, id: int, descricao: str, valor: float) -> Ven
     return __update(session, Venda, id, descricao=descricao, valor=valor)
 
 
+def update_estoque(session: Session, id: int, descricao: str, valor_pago: float = None, quantidade: float = None, ingrediente_id: float = None) -> Estoque:
+    return __update(session, Estoque, id, descricao=descricao, valor_pago=valor_pago, quantidade=quantidade, ingrediente_id=ingrediente_id)
+
+
 def __create(session: Session, entity):
     session.add(entity)
     session.commit()
@@ -71,6 +86,8 @@ def create_receita(session: Session, nome: str) -> Receita:
 
 def list_receitas(session: Session, filter_nome: str = None) -> List[Receita]:
     query = select(Receita)
+    query = __filter_organization_id(session, query, Receita)
+
     if filter_nome:
         query = query.filter(Receita.nome.like(f'%{filter_nome}%'))
     receitas = session.exec(query).all()
@@ -83,12 +100,17 @@ def get_receita(session: Session, id: int) -> Receita:
 
 
 def get_ingredientes(session: Session) -> List[Ingrediente]:
-    ingredientes = session.exec(select(Ingrediente)).all()
+    query = select(Ingrediente)
+    query = __filter_organization_id(session, query, Receita)
+
+    ingredientes = session.exec(query).all()
     return ingredientes
 
 
 def create_ingrediente(session: Session, nome: str, peso: float, custo: float) -> Ingrediente:
+    organizacao_id = session.info.get('user', {}).get('organizacao_id')
     novo_ingrediente = Ingrediente(
+        organizacao_id=organizacao_id,
         nome=nome,
         peso=peso,
         custo=custo
@@ -99,7 +121,9 @@ def create_ingrediente(session: Session, nome: str, peso: float, custo: float) -
 
 
 def create_receita_ingrediente(session: Session, id: int, ingrediente_id: int, quantidade: float) -> ReceitaIngredienteLink:
+    organizacao_id = session.info.get('user', {}).get('organizacao_id')
     receita_ingrediente = ReceitaIngredienteLink(
+        organizacao_id=organizacao_id,
         receita_id=id,
         ingrediente_id=ingrediente_id,
         quantidade=quantidade
@@ -111,6 +135,8 @@ def create_receita_ingrediente(session: Session, id: int, ingrediente_id: int, q
 
 def list_estoques(session: Session, filter_ingrediente_id: int = -1, filter_data_inicio: datetime = None, filter_data_final: datetime = None) -> List[Estoque]:
     query = select(Estoque)
+
+    query = __filter_organization_id(session, query, Receita)
 
     if filter_ingrediente_id and filter_ingrediente_id != -1:
         query = query.filter(Estoque.ingrediente_id == filter_ingrediente_id)
@@ -129,6 +155,8 @@ def list_estoques(session: Session, filter_ingrediente_id: int = -1, filter_data
 def list_vendas(session: Session, filter_data_inicio: datetime = None, filter_data_final: datetime = None) -> List[Venda]:
     query = select(Venda)
 
+    query = __filter_organization_id(session, query, Receita)
+
     if filter_data_inicio:
         query = query.filter(Venda.data_criacao >= filter_data_inicio)
 
@@ -140,7 +168,9 @@ def list_vendas(session: Session, filter_data_inicio: datetime = None, filter_da
 
 
 def create_venda(session: Session, descricao: str, valor: float) -> Venda:
+    organizacao_id = session.info.get('user', {}).get('organizacao_id')
     venda = Venda(
+        organizacao_id=organizacao_id,
         descricao=descricao,
         valor=valor
     )
@@ -150,9 +180,34 @@ def create_venda(session: Session, descricao: str, valor: float) -> Venda:
 
 
 def get_fluxo_caixa(session: Session) -> Tuple[float, float, float]:
-    entradas = session.exec(select(func.sum(Venda.valor))).first()
-    saidas = session.exec(select(func.sum(Estoque.valor_pago))).first()
+    query_entradas = select(func.sum(Venda.valor))
+
+    query_entradas = __filter_organization_id(session, query_entradas, Receita)
+    entradas = session.exec(query_entradas).first()
+
+    query_saidas = select(func.sum(Estoque.valor_pago))
+    query_saidas = __filter_organization_id(session, query_saidas, Receita)
+    saidas = session.exec(query_saidas).first()
+
     if entradas and saidas:
         caixa = entradas - saidas
         return (entradas, saidas, caixa)
     return (0, 0, 0)
+
+
+def create_estoque(session: Session, descricao: str, ingrediente_id: int = None, quantidade: float = None, valor_pago: float = None) -> Estoque:
+    if not ingrediente_id and not quantidade and not valor_pago:
+        return False
+    if ingrediente_id == -1:
+        ingrediente_id = None
+    if not quantidade:
+        quantidade = None
+
+    db_estoque = Estoque(
+        descricao=descricao,
+        ingrediente_id=ingrediente_id,
+        quantidade=quantidade,
+        valor_pago=valor_pago
+    )
+    __create(session, db_estoque)
+    return True

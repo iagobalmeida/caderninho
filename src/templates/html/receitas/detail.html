@@ -123,7 +123,7 @@
         <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
           <a href="#" class="dropdown-item">Exportar CSV</a>
-          <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#apagarReceita">Apagar</a>
+          <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteReceita">Apagar</a>
         </div>
       </div>
     </div>
@@ -245,7 +245,7 @@
       <div class="dropdown ms-auto">
         <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
-          <a href="#cardIngredientes" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#novoIngredienteModal">Novo Ingrediente</a>
+          <a href="#cardIngredientes" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalCreateIngrediente">Novo Ingrediente</a>
         </div>
       </div>
     </div>
@@ -284,7 +284,7 @@
     </form>
     <div class="table-responsive">
       <table class="table table-vcenter">
-        <thead>
+        <thead class="sticky-top">
           <tr>
             <th>#</th>
             <th>Nome</th>

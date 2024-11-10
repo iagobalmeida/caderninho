@@ -10,6 +10,10 @@
 {% include 'ingredientes/modal_edit.html' %}
 {% include 'ingredientes/modal_delete.html' %}
 
+{% include 'estoques/modal_create.html' %}
+{% include 'estoques/modal_edit.html' %}
+{% include 'estoques/modal_delete.html' %}
+
 {% include 'receitas/modal_create.html' %}
 
 <div class="page">
@@ -20,10 +24,11 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <h1 class="navbar-brand navbar-brand-autodark">
-          <a href="#">
+          <a href="{{url_for('get_home')}}">
             {{title}}
           </a>
         </h1>
+        <h5 class="navbar-brand">Olá, {{request.state.user.nome}}!</h5>
         <div class="collapse navbar-collapse" id="sidebar-menu">
           <ul class="navbar-nav pt-lg-3">
             {% include 'navbar_items.html' %}

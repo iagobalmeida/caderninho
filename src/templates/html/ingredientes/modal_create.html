@@ -1,4 +1,4 @@
-<div class="modal" id="novoIngredienteModal" tabindex="-1">
+<div class="modal" id="modalCreateIngrediente" tabindex="-1">
     <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_ingredientes_index') }}">
       <div class="modal-content">
         <div class="modal-header">
@@ -14,6 +14,9 @@
               <div class="datagrid-title">Nome</div>
               <input required type="text" class="form-control" name="nome" />
             </div>
+          </div>
+          <hr>
+          <div class="datagrid">
             <div class="datagrid-item">
               <div class="datagrid-title">Custo</div>
               <div class="datagrid-content">

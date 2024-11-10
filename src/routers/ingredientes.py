@@ -19,17 +19,18 @@ context_header = Context.Header(
             symbol='add',
             attributes={
                 'data-bs-toggle': 'modal',
-                'data-bs-target': '#novoIngredienteModal'
+                'data-bs-target': '#modalCreateIngrediente'
             }
         )
     ]
 )
 
 
-@router.get('/')
+@router.get('/', include_in_schema=False)
 async def get_ingredientes_index(request: fastapi.Request, session: Session = SESSION_DEP):
     db_ingredientes = repository.get_ingredientes(session)
     return render(
+        session=session,
         request=request,
         template_name='ingredientes/list.html',
         context={
@@ -39,19 +40,19 @@ async def get_ingredientes_index(request: fastapi.Request, session: Session = SE
     )
 
 
-@router.post('/')
+@router.post('/', include_in_schema=False)
 async def post_ingredientes_index(request: fastapi.Request, payload: inputs.IngredienteCriar = fastapi.Form(), session: Session = SESSION_DEP):
     repository.create_ingrediente(session, nome=payload.nome, peso=payload.peso, custo=payload.custo)
     return redirect_back(request)
 
 
-@router.post('/atualizar')
+@router.post('/atualizar', include_in_schema=False)
 async def post_ingredientes_atualizar(request: fastapi.Request, payload: inputs.IngredienteAtualizar = fastapi.Form(), session: Session = SESSION_DEP):
     repository.update_ingrediente(session, id=id, nome=payload.nome, peso=payload.peso, custo=payload.custo)
     return redirect_back(request)
 
 
-@router.post('/excluir')
+@router.post('/excluir', include_in_schema=False)
 async def post_ingredientes_excluir(request: fastapi.Request, id: int = fastapi.Form(), session: Session = SESSION_DEP):
     repository.delete_ingrediente(session, id=id)
     return redirect_back(request)

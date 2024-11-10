@@ -3,6 +3,7 @@ from typing import Dict, List, TypedDict
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
+from domain import repository
 from templates.filters import \
     templates_global_material_symbol as material_symbol
 
@@ -33,7 +34,7 @@ class Context(TypedDict):
         label: str
         url: str
 
-    title: str = 'Herbaria'
+    title: str = 'Caderninho'
     navbar: Navbar
     header: Header
     breadcrumbs: List[Breadcrumb]
@@ -54,7 +55,7 @@ class Context(TypedDict):
         breadcrumbs = [
             Context.Breadcrumb(
                 label='Home',
-                url=f'/'
+                url=request.url_for('get_home')
             )
         ]
         current_path = ""
@@ -73,7 +74,7 @@ class Context(TypedDict):
 
 
 BASE_NAVBAR_LINKS = [
-    ('Home', 'home', 'get_index'),
+    ('Home', 'home', 'get_home'),
     ('Vendas', 'shopping_cart', 'get_vendas_index'),
     ('Estoque', 'home_storage', 'get_estoques_index'),
     ('Receitas', 'library_books', 'get_receitas_index'),
@@ -81,9 +82,9 @@ BASE_NAVBAR_LINKS = [
 ]
 
 
-def get_context(request: Request, context: dict, navbar_links: list = BASE_NAVBAR_LINKS):
+def get_context(session, request: Request, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
     base_context = Context(
-        title='Herbaria',
+        title='Caderninho',
         navbar=Context.Navbar(
             links=[
                 Context.factory_navbar_link(request, __navbar_link[0], __navbar_link[1], __navbar_link[2])
@@ -91,19 +92,30 @@ def get_context(request: Request, context: dict, navbar_links: list = BASE_NAVBA
             ]
         ),
         header=Context.Header(
-            pretitle='HERBARIA',
+            pretitle='CADERNINHO',
             title='Home',
             symbol='home'
         ),
         breadcrumbs=Context.factory_breadcrumbs(request)
     )
-    base_context.update(**context)
+
+    db_ingredientes = repository.get_ingredientes(session)
+    entradas, saidas, caixa = repository.get_fluxo_caixa(session)
+
+    base_context.update(ingredientes=db_ingredientes)
+    base_context.update(entradas=entradas)
+    base_context.update(saidas=saidas)
+    base_context.update(caixa=caixa)
+
+    if context:
+        base_context.update(**context)
+
     return base_context
 
 
-def render(templates: Jinja2Templates, request: Request, template_name: str, context: dict):
+def render(session, templates: Jinja2Templates, request: Request, template_name: str, context: dict = None):
     return templates.TemplateResponse(
         request=request,
         name=template_name,
-        context=get_context(request, context)
+        context=get_context(session, request, context)
     )

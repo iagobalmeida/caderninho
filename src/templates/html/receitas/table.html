@@ -12,7 +12,12 @@
             <div class="datagrid-title">Filtrar</div>
             <div class="datagrid-content">
               <input type="submit" class="btn" value="Filtrar">
-              <input type="reset" class="btn" value="Limpar">
+            </div>
+          </div>
+          <div class="datagrid-item">
+            <div class="datagrid-title">Limpar</div>
+            <div class="datagrid-content">
+              <input type="submit" class="btn" value="Limpar">
             </div>
           </div>
         </form>
@@ -24,17 +29,17 @@
     <div class="card">
         <div class="table-responsive">
             <table class="table table-vcenter">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nome</th>
-                    <th>Rendimento (Un.)</th>
-                    <th>Preço Sug. (R$)</th>
-                    <th>Custo (R$)</th>
-                    <th>Faturamento</th>
-                    <th>Lucro</th>
-                    <th class="w-1"></th>
-                </tr>
+                <thead class="sticky-top">
+                    <tr>
+                        <th>#</th>
+                        <th>Nome</th>
+                        <th>Rendimento (Un.)</th>
+                        <th>Preço Sug. (R$)</th>
+                        <th>Custo (R$)</th>
+                        <th>Faturamento</th>
+                        <th>Lucro</th>
+                        <th class="w-1"></th>
+                    </tr>
                 </thead>
                 <tbody>
                 {% for receita in receitas %}

@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 from pydantic import BaseModel
 
 
@@ -41,4 +43,15 @@ class VendaCriar(BaseModel):
 
 
 class VendaAtualizar(VendaCriar):
+    id: int
+
+
+class EstoqueCriar(BaseModel):
+    descricao: Optional[str] = None
+    ingrediente_id: Optional[int] = None
+    quantidade: Optional[Union[str, float]] = None
+    valor_pago: Optional[float] = None
+
+
+class EstoqueAtualizar(BaseModel):
     id: int

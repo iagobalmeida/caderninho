@@ -1,4 +1,4 @@
-<div class="modal" id="novaVendaModal" tabindex="-1">
+<div class="modal" id="modalCreateVenda" tabindex="-1">
     <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_vendas_index') }}">
           <div class="modal-content">
               <div class="modal-header">
@@ -16,8 +16,6 @@
                       <div class="datagrid-title">Descrição</div>
                         <input required type="text" class="form-control" name="descricao"/>
                       </div>
-                  </div>
-                  <div class="datagrid">
                       <div class="datagrid-item">
                         <div class="datagrid-title">Valor</div>
                         <div class="datagrid-content">
@@ -31,7 +29,7 @@
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="submit" class="btn btn-success">Criar Receita</button>
+                  <button type="submit" class="btn btn-success">Criar Venda</button>
               </div>
           </div>
     </form>
