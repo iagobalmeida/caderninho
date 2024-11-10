@@ -9,8 +9,12 @@ from domain.entities import (Estoque, Ingrediente, Receita,
 
 
 def __filter_organization_id(session: Session, query, entity: SQLModel):
-    session_user = session.info.get('user', {})
-    organizacao_id = session_user.get('organizacao_id') if session_user else -1
+    sessao_usuario = session.info.get('user', {})
+    usuario_administrador = sessao_usuario.get('administrador', False) if sessao_usuario else False
+    organizacao_id = sessao_usuario.get('organizacao_id') if sessao_usuario else -1
+    if usuario_administrador:
+        return query
+
     return query.filter(entity.organizacao_id == organizacao_id)
 
 

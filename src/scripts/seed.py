@@ -43,7 +43,10 @@ def main():
     try_add(Ingrediente(organizacao_id=1, id=2, nome='Manteiga', peso=1000, custo=40))
     try_add(Ingrediente(organizacao_id=1, id=3, nome='Chocolate', peso=1000, custo=57))
     try_add(Ingrediente(organizacao_id=1, id=4, nome='Farinha', peso=1000, custo=4))
+
     try_add(Receita(organizacao_id=1, id=1, nome='Cookies', peso_unitario=100))
+
+    try_add(Receita(organizacao_id=3, id=2, nome='Cookies Apenas ADMIN Vê', peso_unitario=100))
 
     for __ingrediente in ingredientes:
         try_add(ReceitaIngredienteLink(organizacao_id=1, quantidade=100, receita_id=1, ingrediente_id=__ingrediente))
