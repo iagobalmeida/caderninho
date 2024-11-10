@@ -21,8 +21,8 @@ def try_add(obj):
 def main():
     organizacao = Organizacao(descricao='Herbaria', usuarios=[
         Usuario(
-            nome='Juliana Martello',
-            email='julianamartello@gmail.com',
+            nome='Usuário',
+            email='usuario@email.com',
             senha='123',
             dono=True
         )
