@@ -4,7 +4,7 @@
         <div class="modal-header">
           <h5 class="modal-title text-primary">
             <span class="material-symbols-outlined"> package_2 </span>
-            Novo Gasto
+            Nova Movimentação
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -12,7 +12,12 @@
           <div class="datagrid">
             <div class="datagrid-item">
               <div class="datagrid-title">Descricao</div>
-              <input required type="text" class="form-control" name="descricao" />
+              <select name="descricao" class="form-select">
+                <option value="Compra">Compra</option>
+                <option value="Uso em Receita">Uso em Receita</option>
+                <option value="Uso em Receita">Perda</option>
+                <option value="Uso em Receita">Outros</option>
+              </select>
             </div>
             <div class="datagrid-item">
               <div class="datagrid-title">Valor Pago</div>
@@ -35,7 +40,7 @@
                     <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
                   {% endfor %}
                 </select>
-                <small style="display: block; margin-top: 8px" class="text-secondary" id="ingrediente_custo_p_grama">Selecione um ingrediente</small>
+                <a data-bs-toggle="modal" data-bs-target="#modalCreateIngrediente" style="display: block; margin-top: 8px" class="text-primary cursor-pointer" id="ingrediente_custo_p_grama">Novo Ingrediente</a>
               </div>
             </div>
             <div class="datagrid-item">

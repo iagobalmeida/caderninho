@@ -4,7 +4,7 @@ from sqlmodel import MetaData, Session, SQLModel, create_engine
 sqlite_nome_arquivo = "database.db"
 sqlite_url = f"sqlite:///{sqlite_nome_arquivo}"
 
-engine = create_engine(sqlite_url, echo=False)
+engine = create_engine(sqlite_url, echo=True)
 
 
 def get_session(request: Request):

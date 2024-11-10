@@ -1,4 +1,4 @@
-<div class="col-12">
+<div class="col-12 d-none">
     <div class="card">
       <div class="card-body">
         <form class="datagrid" method="GET" action="{{request.url}}">
@@ -31,20 +31,19 @@
             <table class="table table-vcenter">
                 <thead class="sticky-top">
                     <tr>
-                        <th>#</th>
+                        <!-- <th>#</th> -->
                         <th>Nome</th>
                         <th>Rendimento (Un.)</th>
                         <th>Preço Sug. (R$)</th>
                         <th>Custo (R$)</th>
                         <th>Faturamento</th>
                         <th>Lucro</th>
-                        <th class="w-1"></th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for receita in receitas %}
-                    <tr>
-                        <td>{{ receita.id }}</td>
+                    <tr href="{{ url_for('get_receita', id=receita.id) }}" onclick="window.location = this.getAttribute('href')" class="cursor-pointer">
+                        <!-- <td>{{ receita.id }}</td> -->
                         <td>{{ receita.nome }}</td>
                         <td>{{ receita.rendimento_unidades }} Un.</td>
                         <td>{{ receita.preco_sugerido | format_reais }}</td>
@@ -62,9 +61,6 @@
                             <span class="badge bg-success-lt">
                                 {{receita.lucro | format_reais}}
                             </span>
-                        </td>
-                        <td >
-                            <a href="{{ url_for('get_receita', id=receita.id) }}" class="btn btn-sm">Detalhes</a>
                         </td>
                     </tr>
                 {% endfor %}

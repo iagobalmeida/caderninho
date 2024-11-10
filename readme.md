@@ -26,3 +26,7 @@ O Sistema conta capacidade para múltiplas contas e organizações e permite ger
 4. Use a conta `usuario@emai.com` com a senha `123` para acessar como usuário
 5. Use a conta `admin@email.com` com a senha `admin` para acessar como admin
 
+## TODO
+- [ ] Cadastrar movimentação de estoque a partir de `receita_id` e `quantidade_produzida`
+- [ ] Remover tela `Ingredientes (confusa)`
+

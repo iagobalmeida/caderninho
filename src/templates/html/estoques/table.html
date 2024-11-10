@@ -1,4 +1,4 @@
-<div class="col-12">
+<div class="col-12 d-none">
   <div class="card">
     <div class="card-body">
       <form class="datagrid" method="GET" action="{{request.url}}">
@@ -53,30 +53,17 @@
             <th>Ingrediente</th>
             <th>Quantidade</th>
             <th>Valor Pago</th>
-            <th class="w-1"></th>
           </tr>
         </thead>
         <tbody>
           {% for estoque in estoques %}
-            <tr>
+            <tr class="cursor-pointer" data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque">
               <td>{{ estoque.data_criacao | strftime }}</td>
               <td>{{ estoque.descricao }}</td>
               <td>{{ estoque.ingrediente.nome }}</td>
               <td>{{ estoque.quantidade | format_stock_movement | safe}}</td>
               <td class="text-danger">
                 <b>{{ estoque.valor_pago | format_reais }}</b>
-              </td>
-              <td>
-                <div class="btn-group">
-                  <a class="btn btn-sm" data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque" data-bs-payload="{{estoque.model_dump_json()}}">Editar</a>
-                  <a
-                    class="btn btn-sm btn-ghost-danger"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalDeleteEstoque"
-                    data-bs-payload="{{estoque.model_dump_json()}}"
-                    >Excluir</a
-                  >
-                </div>
               </td>
             </tr>
           {% else %}

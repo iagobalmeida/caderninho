@@ -32,7 +32,8 @@
         <h3>Tem certeza?</h3>
         <div class="text-secondary">Remover ingrediente da receita?</div>
         <hr>
-        <input required readonly type="hidden" class="form-control" name="id" value="{{receita.id}}" />
+        <input required readonly type="hidden" class="form-control" name="receita_id" value="{{receita.id}}" />
+        <input required readonly type="hidden" class="form-control" name="id" />
         <div class="datagrid">
           <div class="datagrid-item">
             <label class="datagrid-title form-label">Ingrediente</label>
@@ -59,7 +60,7 @@
           <div class="row">
             <div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal"> Cancelar </a></div>
             <div class="col">
-              <button type="submit" class="btn btn-danger w-100">Excluir Ingrediente</button>
+              <button type="submit" class="btn btn-danger w-100">Remover da Receita</button>
             </div>
           </div>
         </div>
@@ -74,12 +75,13 @@
       <div class="modal-header">
         <h5 class="modal-title">
           <span class="material-symbols-outlined"> package_2 </span>
-          Editar Ingrediente
+          Editar Uso de Ingrediente
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <input required type="hidden" class="form-control pe-0" value="{{receita.id}}" min="0" name="id" />
+        <input required type="hidden" class="form-control pe-0" value="{{receita.id}}" name="receita_id" />
+        <input required type="hidden" class="form-control pe-0"  name="id" />
         <div class="datagrid">
           <div class="datagrid-item">
             <label class="datagrid-title form-label">Ingrediente</label>
@@ -93,7 +95,7 @@
             </div>
           </div>
           <div class="datagrid-item">
-            <label class="datagrid-title form-label">Quantidade (gramas)</label>
+            <label class="datagrid-title form-label">Quantidade Utilizada (gramas)</label>
             <div class="datagrid-content">
               <div class="input-group input-group-flat">
                 <input required type="number" class="form-control pe-0" value="0" min="1" name="quantidade" />
@@ -243,14 +245,14 @@
         Ingredientes
       </h5>
       <div class="dropdown ms-auto">
-        <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
-        <div class="dropdown-menu">
-          <a href="#cardIngredientes" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalCreateIngrediente">Novo Ingrediente</a>
-        </div>
+        <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCreateIngrediente">
+          {{material_symbol('add') | safe }}
+          Novo Ingrediente
+        </a>
       </div>
     </div>
     <form class="card-body" method="POST" action="{{ url_for('post_receita_ingredientes_incluir') }}">
-      <input type="hidden" name="id" value="{{receita.id}}">
+      <input type="hidden" name="receita_id" value="{{receita.id}}">
       <div class="datagrid">
         <div class="datagrid-item">
           <label class="datagrid-title form-label">Ingrediente</label>
@@ -290,7 +292,7 @@
             <th>Nome</th>
             <th>Quantidade (gramas)</th>
             <th>Custo/grama (R$)</th>
-            <th>Custo/grama méd. (R$)</th>
+            <!-- <th>Custo/grama méd. (R$)</th> -->
             <th>Custo Total (R$)</th>
             <th>Estoque Atual</th>
             <th class="w-1"></th>
@@ -303,7 +305,7 @@
             <td>{{ receita_ingrediente.ingrediente.nome }}</td>
             <td>{{ receita_ingrediente.quantidade | format_quantity | safe }}</td>
             <td>{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</td>
-            <td>{{ receita_ingrediente.ingrediente.custo_p_grama_medio | format_reais }}</td>
+            <!-- <td>{{ receita_ingrediente.ingrediente.custo_p_grama_medio | format_reais }}</td> -->
             <td>{{ receita_ingrediente.custo | format_reais }}</td>
             <td>{{ receita_ingrediente.ingrediente.estoque_atual | format_stock | safe }}</td>
             <td>
@@ -335,12 +337,13 @@
             <td><b>{{ receita_ingrediente.ingrediente.nome }}</b></td>
             <td><b>{{ receita_ingrediente.quantidade | format_quantity | safe }}</b></td>
             <td><b>{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</b></td>
-            <td>-</td>
+            <!-- <td>-</td> -->
             <td><b>{{ receita_ingrediente.custo | format_reais }}</b></td>
             <td>-</td>
             <td></td>
           </tr>
-          {% endif %} {% endfor %}
+          {% endif %}
+          {% endfor %}
         </tbody>
       </table>
     </div>

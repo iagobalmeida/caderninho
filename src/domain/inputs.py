@@ -11,19 +11,20 @@ class ReceitaAtualizar(BaseModel):
 
 
 class ReceitaIngredienteAdicionar(BaseModel):
-    id: int
+    receita_id: int
     ingrediente_id: int
     quantidade: float
 
 
 class ReceitaIngredienteAtualizar(BaseModel):
-    id: int
+    receita_id: int
     ingrediente_id: int
     quantidade: float
 
 
 class ReceitaIngredienteRemover(BaseModel):
     id: int
+    receita_id: int
     ingrediente_id: int
 
 

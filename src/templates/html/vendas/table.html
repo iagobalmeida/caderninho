@@ -1,4 +1,4 @@
-<div class="col-12">
+<div class="col-12 d-none">
   <div class="card">
     <div class="card-body">
       <form class="datagrid" action="{{request.url}}">
@@ -40,27 +40,14 @@
             <th>Data</th>
             <th>Descrição</th>
             <th>Valor</th>
-            <th class="w-1"></th>
           </tr>
         </thead>
         <tbody>
           {% for venda in vendas %}
-          <tr>
+          <tr class="cursor-pointer" data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}">
             <td>{{ venda.data_criacao | strftime }}</td>
             <td>{{ venda.descricao }}</td>
             <td><b class="text-success">{{ venda.valor | format_reais }}</b></td>
-            <td>
-              <div class="btn-group">
-                <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}">Editar</a>
-                <a
-                  class="btn btn-sm btn-ghost-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalDeleteVenda"
-                  data-bs-payload="{{venda.model_dump_json()}}"
-                  >Excluir</a
-                >
-              </div>
-            </td>
           </tr>
           {% endfor %}
         </tbody>

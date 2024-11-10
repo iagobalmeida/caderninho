@@ -33,8 +33,8 @@ def delete_receita(session: Session, id: int) -> bool:
     return __delete(session, Receita, id)
 
 
-def delete_receita_ingrediente(session: Session, receita_ingrediente_id: int) -> bool:
-    return __delete(session, ReceitaIngredienteLink, receita_ingrediente_id)
+def delete_receita_ingrediente(session: Session, id: int) -> bool:
+    return __delete(session, ReceitaIngredienteLink, id)
 
 
 def delete_venda(session: Session, id: int) -> bool:
@@ -126,11 +126,11 @@ def create_ingrediente(session: Session, nome: str, peso: float, custo: float) -
     return novo_ingrediente
 
 
-def create_receita_ingrediente(session: Session, id: int, ingrediente_id: int, quantidade: float) -> ReceitaIngredienteLink:
+def create_receita_ingrediente(session: Session, receita_id: int, ingrediente_id: int, quantidade: float) -> ReceitaIngredienteLink:
     organizacao_id = session.info.get('user', {}).get('organizacao_id')
     receita_ingrediente = ReceitaIngredienteLink(
         organizacao_id=organizacao_id,
-        receita_id=id,
+        receita_id=receita_id,
         ingrediente_id=ingrediente_id,
         quantidade=quantidade
     )

@@ -30,13 +30,19 @@
         });
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener("show.bs.modal", (e) => {
-                const payload = JSON.parse(e.relatedTarget.getAttribute('data-bs-payload'));
+                const payload_json = e.relatedTarget.getAttribute('data-bs-payload');
+                const payload = JSON.parse(payload_json);
                 if(!payload) return;
                 Object.keys(payload).forEach(payload_key => {
-                    const targetInput = modal.querySelector(`input[name="${payload_key}"]`);
-                    if(targetInput) targetInput.value = payload[payload_key];
-                    const targetSelect = modal.querySelector(`select[name="${payload_key}"]`);
-                    if(targetSelect) targetSelect.value = payload[payload_key];
+                    const targetInput = modal.querySelectorAll(`input[name="${payload_key}"]`).forEach(el => {
+                        el.value = payload[payload_key];
+                    })
+                    const targetSelect = modal.querySelectorAll(`select[name="${payload_key}"]`).forEach(el => {
+                        el.value = payload[payload_key];
+                    })
+                    const targetBsPayload = modal.querySelectorAll('[data-bs-payload]').forEach(el => {
+                        el.setAttribute('data-bs-payload', payload_json);
+                    })
                 });
             });
         });

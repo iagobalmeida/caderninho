@@ -9,18 +9,15 @@
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <input required readonly type="hidden" class="form-control" name="id" />
         <div class="modal-body">
           <div class="datagrid">
-            <div class="datagrid-item">
-              <div class="datagrid-title">ID</div>
-              <input required readonly type="number" class="form-control" name="id" />
-            </div>
             <div class="datagrid-item">
               <div class="datagrid-title">Nome</div>
               <input required type="text" class="form-control" name="nome" />
             </div>
             <div class="datagrid-item">
-              <div class="datagrid-title">Custo</div>
+              <div class="datagrid-title">Custo (Pacote)</div>
               <div class="datagrid-content">
                 <div class="input-group input-group-flat">
                   <span class="input-group-text"> R$ </span>
@@ -29,7 +26,7 @@
               </div>
             </div>
             <div class="datagrid-item">
-              <div class="datagrid-title">Peso</div>
+              <div class="datagrid-title">Peso (Pacote)</div>
               <div class="datagrid-content">
                 <div class="input-group input-group-flat">
                   <input required type="number" name="peso" class="form-control pe-0" min="1" />

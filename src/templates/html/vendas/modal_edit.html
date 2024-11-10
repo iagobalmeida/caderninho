@@ -3,17 +3,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title text-primary">
-            <span class="material-symbols-outlined"> package_2 </span>
-            Editar Ingrediente
+            <span class="material-symbols-outlined"> shopping_cart </span>
+            Editar Venda
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <input required readonly type="hidden" class="form-control" name="id" />
         <div class="modal-body">
           <div class="datagrid">
-            <div class="datagrid-item">
-              <div class="datagrid-title">ID</div>
-              <input required readonly type="number" class="form-control" name="id" />
-            </div>
             <div class="datagrid-item">
               <div class="datagrid-title">Descricao</div>
               <input required type="text" class="form-control" name="descricao" />
@@ -30,7 +27,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-ghost-danger me-auto" data-bs-toggle="modal" data-bs-target="#modalDeleteVenda" data-bs-payload="">Apagar</button>
           <button type="submit" class="btn">Atualizar</button>
         </div>
       </div>
