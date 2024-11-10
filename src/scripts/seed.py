@@ -3,9 +3,9 @@ from random import randint
 
 from sqlmodel import Session
 
-from db import engine
-from domain.entities import (Estoque, Ingrediente, Organizacao, Receita,
-                             ReceitaIngredienteLink, Usuario, Venda)
+from src.db import engine
+from src.domain.entities import (Estoque, Ingrediente, Organizacao, Receita,
+                                 ReceitaIngredienteLink, Usuario, Venda)
 
 
 def try_add(obj):

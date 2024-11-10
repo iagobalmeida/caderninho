@@ -3,8 +3,8 @@ from typing import List, Tuple
 
 from sqlmodel import Session, SQLModel, func, select
 
-from domain.entities import (Estoque, Ingrediente, Receita,
-                             ReceitaIngredienteLink, Venda)
+from src.domain.entities import (Estoque, Ingrediente, Receita,
+                                 ReceitaIngredienteLink, Venda)
 
 
 def __filter_organization_id(session: Session, query, entity: SQLModel):

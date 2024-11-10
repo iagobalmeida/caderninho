@@ -17,7 +17,7 @@ O Sistema conta capacidade para múltiplas contas e organizações e permite ger
 3. Instale as bibliotecas necessárias com `pip install -r requirements.txt`
 
 ### Execução
-1. Inicie a aplicação com `fastpi dev src/app.py`
+1. Inicie a aplicação com `uvicorn src.app:app`
 
 ### Testes
 1. Inicie a aplicação

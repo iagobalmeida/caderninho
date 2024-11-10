@@ -1,11 +1,11 @@
 import fastapi
 from sqlmodel import Session
 
-from db import SESSION_DEP
-from domain import inputs, repository
-from templates import render
-from templates.context import Button, Context
-from utils import redirect_back, redirect_url_for
+from src.db import SESSION_DEP
+from src.domain import inputs, repository
+from src.templates import render
+from src.templates.context import Button, Context
+from src.utils import redirect_back
 
 router = fastapi.APIRouter(prefix='/estoques')
 context_header = Context.Header(

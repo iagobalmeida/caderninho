@@ -7,17 +7,14 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
 
-import auth
-import db
-import scripts
-import scripts.seed
-from domain import repository
-from routers.estoques import router as router_estoques
-from routers.ingredientes import router as router_ingredientes
-from routers.receitas import router as router_receitas
-from routers.vendas import router as router_vendas
-from templates import render
-from utils import redirect_url_for
+from src import auth, db, scripts
+from src.domain import repository
+from src.routers.estoques import router as router_estoques
+from src.routers.ingredientes import router as router_ingredientes
+from src.routers.receitas import router as router_receitas
+from src.routers.vendas import router as router_vendas
+from src.templates import render
+from src.utils import redirect_url_for
 
 rootlogger.setLevel(logging.WARN)
 

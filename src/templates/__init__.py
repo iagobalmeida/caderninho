@@ -1,8 +1,8 @@
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from templates.context import render as context_render
-from templates.filters import init_filters, init_globals
+from src.templates.context import render as context_render
+from src.templates.filters import init_filters, init_globals
 
 templates = Jinja2Templates(directory='src/templates/html')
 

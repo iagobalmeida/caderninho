@@ -3,8 +3,8 @@ from typing import Dict, List, TypedDict
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from domain import repository
-from templates.filters import \
+from src.domain import repository
+from src.templates.filters import \
     templates_global_material_symbol as material_symbol
 
 

@@ -2,7 +2,7 @@ import jwt
 from fastapi import Depends, Header, Request
 from sqlmodel import Session, select
 
-from domain.entities import Usuario
+from src.domain.entities import Usuario
 
 DEFAULT_JWT_ALG = 'HS256'
 DEFAULT_JWT_SECRET = b'secret'
