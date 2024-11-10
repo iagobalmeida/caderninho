@@ -7,12 +7,13 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
 
-from src import auth, db, scripts
+from src import auth, db
 from src.domain import repository
 from src.routers.estoques import router as router_estoques
 from src.routers.ingredientes import router as router_ingredientes
 from src.routers.receitas import router as router_receitas
 from src.routers.vendas import router as router_vendas
+from src.scripts import seed
 from src.templates import render
 from src.utils import redirect_url_for
 
@@ -76,14 +77,14 @@ async def get_home(request: fastapi.Request, session: db.Session = db.SESSION_DE
 
 @app.post('/scripts/seed', tags=['Scripts'])
 async def post_scripts_seed():
-    scripts.seed.main()
+    seed.main()
     return True
 
 
 @app.post('/scripts/reset_db', tags=['Scripts'])
 async def post_scripts_reset_db():
     db.reset()
-    scripts.seed.main()
+    seed.main()
     return True
 
 
