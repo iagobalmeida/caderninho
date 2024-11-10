@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import List, Tuple
 
-import jwt
 from sqlmodel import Session, SQLModel, func, select
 
 from domain.entities import (Estoque, Ingrediente, Receita,
@@ -10,12 +9,15 @@ from domain.entities import (Estoque, Ingrediente, Receita,
 
 def __filter_organization_id(session: Session, query, entity: SQLModel):
     sessao_usuario = session.info.get('user', {})
-    usuario_administrador = sessao_usuario.get('administrador', False) if sessao_usuario else False
-    organizacao_id = sessao_usuario.get('organizacao_id') if sessao_usuario else -1
-    if usuario_administrador:
-        return query
 
-    return query.filter(entity.organizacao_id == organizacao_id)
+    if sessao_usuario:
+        usuario_administrador = sessao_usuario.get('administrador', False)
+        organizacao_id = sessao_usuario.get('organizacao_id')
+        if usuario_administrador:
+            return query
+        return query.filter(entity.organizacao_id == organizacao_id)
+
+    return query.filter(entity.organizacao_id == -1)
 
 
 def __delete(session: Session, entity: SQLModel, id: int) -> bool:
@@ -184,19 +186,23 @@ def create_venda(session: Session, descricao: str, valor: float) -> Venda:
 
 
 def get_fluxo_caixa(session: Session) -> Tuple[float, float, float]:
-    query_entradas = select(func.sum(Venda.valor))
 
-    query_entradas = __filter_organization_id(session, query_entradas, Receita)
+    query_entradas = select(func.sum(Venda.valor))
+    query_entradas = __filter_organization_id(session, query_entradas, Venda)
     entradas = session.exec(query_entradas).first()
 
     query_saidas = select(func.sum(Estoque.valor_pago))
-    query_saidas = __filter_organization_id(session, query_saidas, Receita)
+    query_saidas = __filter_organization_id(session, query_saidas, Estoque)
     saidas = session.exec(query_saidas).first()
 
-    if entradas and saidas:
-        caixa = entradas - saidas
-        return (entradas, saidas, caixa)
-    return (0, 0, 0)
+    if not entradas and entradas != 0:
+        entradas = 0
+
+    if not saidas and saidas != 0:
+        saidas = 0
+
+    caixa = entradas - saidas
+    return (entradas, saidas, caixa)
 
 
 def create_estoque(session: Session, descricao: str, ingrediente_id: int = None, quantidade: float = None, valor_pago: float = None) -> Estoque:

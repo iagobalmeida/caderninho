@@ -8,13 +8,14 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
 
 import auth
-from db import SESSION_DEP, Session, init
+import db
+import scripts
+import scripts.seed
 from domain import repository
 from routers.estoques import router as router_estoques
 from routers.ingredientes import router as router_ingredientes
 from routers.receitas import router as router_receitas
 from routers.vendas import router as router_vendas
-from scripts import seed
 from templates import render
 from utils import redirect_url_for
 
@@ -27,16 +28,21 @@ app.include_router(router_estoques)
 app.include_router(router_vendas)
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
-init()
+db.init()
 
 
 @app.get('/', include_in_schema=False)
-async def get_index(request: fastapi.Request, message: str = fastapi.Query(None), session: Session = SESSION_DEP):
+async def get_index(request: fastapi.Request, message: str = fastapi.Query(None), session: db.Session = db.SESSION_DEP):
     return render(session, request, 'login.html', {'message': message})
 
 
+@app.post('/authenticate')
+async def post_authenticate(email: str = fastapi.Form(), senha: str = fastapi.Form(), session: db.Session = db.SESSION_DEP):
+    return auth.authenticate(session, email=email, senha=senha)
+
+
 @app.post('/login', include_in_schema=False)
-async def post_login(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_login(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), session: db.Session = db.SESSION_DEP):
     jwt_token = auth.authenticate(session, email=email, senha=senha)
     if jwt_token:
         response = redirect_url_for(request, 'get_home')
@@ -57,7 +63,7 @@ async def get_logout(request: fastapi.Request):
 
 
 @app.get('/home', include_in_schema=False)
-async def get_home(request: fastapi.Request, session: Session = SESSION_DEP):
+async def get_home(request: fastapi.Request, session: db.Session = db.SESSION_DEP):
     db_receitas = repository.list_receitas(session)
     db_ingredientes = repository.get_ingredientes(session)
     db_estoques = repository.list_estoques(session)
@@ -71,9 +77,16 @@ async def get_home(request: fastapi.Request, session: Session = SESSION_DEP):
     })
 
 
-@app.post('/seed')
-async def post_seed():
-    seed.main()
+@app.post('/scripts/seed', tags=['Scripts'])
+async def post_scripts_seed():
+    scripts.seed.main()
+    return True
+
+
+@app.post('/scripts/reset_db', tags=['Scripts'])
+async def post_scripts_reset_db():
+    db.reset()
+    scripts.seed.main()
     return True
 
 

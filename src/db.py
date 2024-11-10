@@ -1,5 +1,5 @@
 from fastapi import Depends, Request
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import MetaData, Session, SQLModel, create_engine
 
 sqlite_nome_arquivo = "database.db"
 sqlite_url = f"sqlite:///{sqlite_nome_arquivo}"
@@ -16,6 +16,12 @@ def get_session(request: Request):
 
 def init():
     SQLModel.metadata.create_all(engine)
+
+
+def reset():
+    SQLModel.metadata.drop_all(bind=engine)
+    SQLModel.metadata.create_all(bind=engine)
+    return True
 
 
 SESSION_DEP = Depends(get_session)
