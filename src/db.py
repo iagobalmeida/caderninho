@@ -1,5 +1,5 @@
 from fastapi import Depends, Request
-from sqlmodel import MetaData, Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine
 
 sqlite_nome_arquivo = "database.db"
 sqlite_url = f"sqlite:///{sqlite_nome_arquivo}"

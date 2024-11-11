@@ -50,8 +50,10 @@ class VendaAtualizar(VendaCriar):
 class EstoqueCriar(BaseModel):
     descricao: Optional[str] = None
     ingrediente_id: Optional[int] = None
-    quantidade: Optional[Union[str, float]] = None
-    valor_pago: Optional[float] = None
+    quantidade_ingrediente: Optional[Union[str, float]] = None
+    receita_id: Optional[int] = None
+    quantidade_receita: Optional[Union[str, float]] = None
+    valor_pago: Optional[Union[str, float]] = None
 
 
 class EstoqueAtualizar(BaseModel):

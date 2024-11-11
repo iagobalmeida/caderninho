@@ -285,7 +285,7 @@
       </div>
     </form>
     <div class="table-responsive">
-      <table class="table table-vcenter">
+      <table class="table table-vcenter table-striped table-hover">
         <thead class="sticky-top">
           <tr>
             <th>#</th>
@@ -332,7 +332,7 @@
             </td>
           </tr>
           {% else %}
-          <tr class="table-primary text-primary">
+          <tr class="table-primary ">
             <td></td>
             <td><b>{{ receita_ingrediente.ingrediente.nome }}</b></td>
             <td><b>{{ receita_ingrediente.quantidade | format_quantity | safe }}</b></td>

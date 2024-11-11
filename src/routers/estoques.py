@@ -11,7 +11,7 @@ router = fastapi.APIRouter(prefix='/estoques')
 context_header = Context.Header(
     pretitle='Registros',
     title='Estoque',
-    symbol='home_storage',
+    symbol='inventory_2',
     buttons=[
         Button(
              content='Nova Movimentação',
@@ -51,13 +51,28 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
 
 @router.post('/', include_in_schema=False)
 async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = SESSION_DEP):
-    repository.create_estoque(
-        session,
-        descricao=payload.descricao,
-        ingrediente_id=payload.ingrediente_id,
-        quantidade=payload.quantidade,
-        valor_pago=payload.valor_pago
-    )
+    if payload.descricao == 'Uso em Receita' and payload.receita_id:
+        db_receita = repository.get_receita(session, payload.receita_id)
+        for ingrediente_link in db_receita.ingrediente_links:
+            quantidade = -1 * ingrediente_link.quantidade * float(payload.quantidade_receita)
+            repository.create_estoque(
+                session,
+                descricao=payload.descricao,
+                ingrediente_id=ingrediente_link.ingrediente_id,
+                quantidade=quantidade,
+                valor_pago=0
+            )
+    else:
+        quantidade = float(payload.quantidade_ingrediente)
+        if payload.descricao != 'Compra':
+            quantidade = quantidade * -1
+        repository.create_estoque(
+            session,
+            descricao=payload.descricao,
+            ingrediente_id=payload.ingrediente_id,
+            quantidade=quantidade,
+            valor_pago=float(payload.valor_pago) if payload.valor_pago else 0
+        )
     return redirect_back(request)
 
 

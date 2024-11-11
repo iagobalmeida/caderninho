@@ -68,7 +68,7 @@ async def get_home(request: fastapi.Request, session: db.Session = db.SESSION_DE
     db_vendas = repository.list_vendas(session)
 
     return render(session, request, 'home.html', {
-        'receitas': len(db_receitas),
+        'len_receitas': len(db_receitas),
         'len_ingredientes': len(db_ingredientes),
         'estoques': len(db_estoques),
         'vendas': len(db_vendas),

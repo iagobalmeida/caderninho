@@ -186,7 +186,6 @@ def create_venda(session: Session, descricao: str, valor: float) -> Venda:
 
 
 def get_fluxo_caixa(session: Session) -> Tuple[float, float, float]:
-
     query_entradas = select(func.sum(Venda.valor))
     query_entradas = __filter_organization_id(session, query_entradas, Venda)
     entradas = session.exec(query_entradas).first()

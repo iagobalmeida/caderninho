@@ -1,3 +1,7 @@
+<div class="cold-12">
+  <button class="btn" id="btn-apagar-selecionados" disabled>Apagar Selecionados</button>
+</div>
+
 <div class="col-12 d-none">
   <div class="card">
     <div class="card-body">
@@ -34,9 +38,10 @@
 <div class="col-12">
   <div class="card">
     <div class="table-responsive">
-      <table class="table table-vcenter">
+      <table class="table table-vcenter table-striped table-hover">
         <thead>
           <tr>
+            <th class="w-1"></th>
             <th>Data</th>
             <th>Descrição</th>
             <th>Valor</th>
@@ -44,10 +49,13 @@
         </thead>
         <tbody>
           {% for venda in vendas %}
-          <tr class="cursor-pointer" data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}">
-            <td>{{ venda.data_criacao | strftime }}</td>
-            <td>{{ venda.descricao }}</td>
-            <td><b class="text-success">{{ venda.valor | format_reais }}</b></td>
+          <tr class="cursor-pointer">
+            <td class="w-1">
+              <input type="checkbox" name="checkbox_{{venda.id}}" id="checkbox_{{venda.id}}">
+            </td>
+            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}">{{ venda.data_criacao | strftime }}</td>
+            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}">{{ venda.descricao }}</td>
+            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}"><b class="text-success">{{ venda.valor | format_reais }}</b></td>
           </tr>
           {% endfor %}
         </tbody>
@@ -55,3 +63,18 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.querySelectorAll('td input[type="checkbox"]').forEach(el => el.closest('td').addEventListener('click', (ev) => { if(ev.target != el) el.click() }))
+  document.querySelectorAll('td input[type="checkbox"]').forEach(el => {
+      el.addEventListener('change', (e) => {
+        const checkeds = document.querySelectorAll('td input[type="checkbox"]:checked').length;
+        if(checkeds) {
+          document.querySelector('#btn-apagar-selecionados').removeAttribute("disabled")
+        } else {
+          document.querySelector('#btn-apagar-selecionados').setAttribute("disabled", true)
+        }
+      });
+  });
+
+</script>

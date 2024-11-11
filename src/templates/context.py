@@ -76,7 +76,7 @@ class Context(TypedDict):
 BASE_NAVBAR_LINKS = [
     ('Home', 'home', 'get_home'),
     ('Vendas', 'shopping_cart', 'get_vendas_index'),
-    ('Estoque', 'home_storage', 'get_estoques_index'),
+    ('Estoque', 'inventory_2', 'get_estoques_index'),
     ('Receitas', 'library_books', 'get_receitas_index'),
     # ('Ingredientes', 'package_2', 'get_ingredientes_index')
 ]
@@ -100,9 +100,11 @@ def get_context(session, request: Request, context: dict = None, navbar_links: l
     )
 
     db_ingredientes = repository.get_ingredientes(session)
+    db_receitas = repository.list_receitas(session)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
 
     base_context.update(ingredientes=db_ingredientes)
+    base_context.update(receitas=db_receitas)
     base_context.update(entradas=entradas)
     base_context.update(saidas=saidas)
     base_context.update(caixa=caixa)
