@@ -26,23 +26,28 @@ O Sistema conta capacidade para múltiplas contas e organizações e permite ger
 4. Use a conta `usuario@emai.com` com a senha `123` para acessar como usuário
 5. Use a conta `admin@email.com` com a senha `admin` para acessar como admin
 
-## TODO
+## TODO v1.0
 - [X] Separar `scripts.js`
 - [X] Ajustar exibição de datas em modais
-- [ ] Permitir valores quebrados em inputs
+- [X] Permitir valores quebrados em inputs
 - [X] Cadastrar movimentação de estoque a partir de `receita_id` e `quantidade_produzida`
 - [X] Cadastrar quantidade positiva/negativa em estoque a partir de descrição
 - [X] Remover tela `Ingredientes` (confusa)
 - [X] Usar clique em linha em vez de `editar/excluir`
-- [ ] Adicionar checkbox com delete massivo em tabelas
-    - [ ] Vendas
-    - [ ] Estoques
-    - [ ] Receitas
-        - [ ] Listagem
-        - [ ] Ingredientes
-- [ ] Adicionar opção excluir em modal de `editar`
+- [X] Adicionar checkbox com delete massivo em tabelas
+    - [X] Vendas
+    - [X] Estoques
+    - [X] Receitas
+        - [X] Listagem
+        - [X] Ingredientes
+- [X] Adicionar opção excluir em modal de `editar`
     - [X] Vendas
     - [X] Estoque
     - [X] Receitas
         - [X] Listagem
-        - [ ] Ingredientes
+        - [X] Ingredientes
+
+## TODO v1.1
+- [ ] Encontrar lugar para editar nome de ingrediente
+- [ ] Upload e download de CSV
+- [ ] Maior robutes em delete/update para garantir organization_id

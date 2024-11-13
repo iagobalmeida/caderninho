@@ -53,8 +53,10 @@ async def post_vendas_index(request: fastapi.Request, payload: inputs.VendaCriar
 
 
 @router.post('/excluir', include_in_schema=False)
-async def post_vendas_excluir(request: fastapi.Request, id: int = fastapi.Form(), session: Session = SESSION_DEP):
-    repository.delete_venda(session, id=id)
+async def post_vendas_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = SESSION_DEP):
+    if selecionados_ids:
+        for id in selecionados_ids.split(','):
+            repository.delete_venda(session, id=int(id))
     return redirect_back(request)
 
 

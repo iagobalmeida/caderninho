@@ -1,5 +1,5 @@
 <div class="cold-12">
-  <button class="btn" id="btn-apagar-selecionados" disabled>
+  <button class="btn" id="btn-apagar-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalDeleteVenda">
     {{material_symbol('delete') | safe }}
     Apagar Selecionados
   </button>
@@ -54,12 +54,16 @@
           {% for venda in vendas %}
           <tr class="cursor-pointer">
             <td class="w-1">
-              <input type="checkbox" name="checkbox_{{venda.id}}" id="checkbox_{{venda.id}}">
+              <input type="checkbox" name="checkbox_{{venda.id}}" id="checkbox_{{venda.id}}" data-id="{{venda.id}}">
             </td>
             <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}">{{ venda.data_criacao | strftime }}</td>
             <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}">{{ venda.descricao }}</td>
             <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}"><b class="text-success">{{ venda.valor | format_reais }}</b></td>
           </tr>
+          {% else %}
+            <tr>
+              <td colspan="4">Nenhum registro encontrado</td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>

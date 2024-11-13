@@ -42,29 +42,44 @@ document.querySelectorAll('.modal').forEach(modal => {
     });
 });
 
-let lastChange = true;
-
-document.querySelectorAll('td input[type="checkbox"]').forEach(el => {
-    el.addEventListener('change', (e) => {
-        const checkeds = document.querySelectorAll('td input[type="checkbox"]:checked').length;
-        if(checkeds) {
-            document.querySelector('#btn-apagar-selecionados').removeAttribute("disabled")
-        } else {
-            document.querySelector('#btn-apagar-selecionados').setAttribute("disabled", true)
-        }
-    });
-});
-
+const inputSelecionados = document.querySelectorAll('input[name="selecionados_ids"]');
+let checkboxesLastValue = true;
+const updateDeleteAllButton = () => {
+    const checkeds = Array.from(document.querySelectorAll('td input[type="checkbox"]:checked')).map(el => el.getAttribute('data-id'));
+    if(checkeds.length) {
+        document.querySelector('#btn-apagar-selecionados').removeAttribute("disabled")
+    } else {
+        document.querySelector('#btn-apagar-selecionados').setAttribute("disabled", true)
+    }
+    if(inputSelecionados) inputSelecionados.forEach(el => el.value = checkeds);
+}
 document.querySelectorAll('td input[type="checkbox"]').forEach(el => {
         el.style.pointerEvents = 'none';
         el.addEventListener('click', (e) => e.preventDefault());
 
         el.closest('td').addEventListener('mousedown', (ev) => {
-            el.checked = !el.checked
-            lastChange = el.checked;
+            el.checked = !el.checked;
+            checkboxesLastValue = el.checked;
+            updateDeleteAllButton();
         });
+
         el.closest('td').addEventListener('mouseover', (ev) => {
-            el.checked = ev.buttons ? lastChange : el.checked;
+            if(ev.buttons) {
+                el.checked = checkboxesLastValue;
+                updateDeleteAllButton();
+            }
+        });
+
+        el.closest('td').addEventListener('mouseleave', (ev) => {
+            if (window.getSelection) {
+                if (window.getSelection().empty) {  // Chrome
+                    window.getSelection().empty();
+                } else if (window.getSelection().removeAllRanges) {  // Firefox
+                    window.getSelection().removeAllRanges();
+                }
+            } else if (document.selection) {  // IE?
+                document.selection.empty();
+            }
         });
     }
 );

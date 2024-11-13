@@ -1,5 +1,5 @@
 <div class="cold-12">
-  <button class="btn" id="btn-apagar-selecionados" disabled>
+  <button class="btn" id="btn-apagar-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalDeleteEstoque">
     {{material_symbol('delete') | safe }}
     Apagar Selecionados
   </button>
@@ -66,7 +66,7 @@
           {% for estoque in estoques %}
             <tr class="cursor-pointer">
               <td class="w-1">
-                <input type="checkbox" name="checkbox_{{estoque.id}}" id="checkbox_{{estoque.id}}">
+                <input type="checkbox" name="checkbox_{{estoque.id}}" id="checkbox_{{estoque.id}}" data-id="{{estoque.id}}">
               </td>
               <td data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque">{{ estoque.data_criacao | strftime }}</td>
               <td data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque">{{ estoque.descricao }}</td>
@@ -75,8 +75,8 @@
               <td data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque" class="text-danger"><b>{{ estoque.valor_pago | format_reais }}</b></td>
             </tr>
           {% else %}
-            <tr colspan="5">
-              <td>Nenhum registro encontrado</td>
+            <tr>
+              <td colspan="5">Nenhum registro encontrado</td>
             </tr>
           {% endfor %}
         </tbody>

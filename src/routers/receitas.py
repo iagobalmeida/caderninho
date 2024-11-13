@@ -78,8 +78,10 @@ async def post_receita_atualizar(request: fastapi.Request, payload: inputs.Recei
 
 
 @router.post('/deletar', include_in_schema=False)
-async def post_receita_deletar(request: fastapi.Request, id: int = fastapi.Form(), session: Session = SESSION_DEP):
-    repository.delete_receita(session, id=id)
+async def post_receita_deletar(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = SESSION_DEP):
+    if selecionados_ids:
+        for id in selecionados_ids.split(','):
+            repository.delete_receita(session, id=id)
     return redirect_url_for(request, 'get_receitas_index')
 
 
@@ -97,5 +99,7 @@ async def post_receita_ingredientes_atualizar(request: fastapi.Request, payload:
 
 @router.post('/ingredientes/remover', include_in_schema=False)
 async def post_receita_ingredientes_remover(request: fastapi.Request, payload: inputs.ReceitaIngredienteRemover = fastapi.Form(), session: Session = SESSION_DEP):
-    repository.delete_receita_ingrediente(session, id=payload.id)
+    if selecionados_ids:
+        for id in payload.selecionados_ids.split(','):
+            repository.delete_receita_ingrediente(session, id=int(id))
     return redirect_url_for(request, 'get_receita', id=payload.receita_id)

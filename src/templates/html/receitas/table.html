@@ -1,5 +1,5 @@
 <div class="cold-12">
-  <button class="btn" id="btn-apagar-selecionados" disabled>
+  <button class="btn" id="btn-apagar-selecionados" data-bs-toggle="modal" data-bs-target="#modalDeleteReceita" disabled>
     {{material_symbol('delete') | safe }}
     Apagar Selecionados
   </button>
@@ -51,7 +51,7 @@
                 {% for receita in receitas %}
                     <tr>
                         <td class="w-1">
-                          <input type="checkbox" name="checkbox_{{receita.id}}" id="checkbox_{{receita.id}}">
+                          <input type="checkbox" name="checkbox_{{receita.id}}" id="checkbox_{{receita.id}}" data-id="{{receita.id}}">
                         </td>
                         <td href="{{ url_for('get_receita', id=receita.id) }}" onclick="window.location = this.getAttribute('href')" class="cursor-pointer">{{ receita.nome }}</td>
                         <td href="{{ url_for('get_receita', id=receita.id) }}" onclick="window.location = this.getAttribute('href')" class="cursor-pointer">{{ receita.rendimento_unidades }} Un.</td>
@@ -60,6 +60,10 @@
                         <td href="{{ url_for('get_receita', id=receita.id) }}" onclick="window.location = this.getAttribute('href')" class="cursor-pointer"><span class="badge bg-warning-lt">{{receita.faturamento | format_reais}}</span></td>
                         <td href="{{ url_for('get_receita', id=receita.id) }}" onclick="window.location = this.getAttribute('href')" class="cursor-pointer"><span class="badge bg-success-lt">{{receita.lucro | format_reais}}</span></td>
                     </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="7">Nenhum registro encontrado</td>
+                  </tr>
                 {% endfor %}
             </tbody>
             </table>

@@ -77,8 +77,10 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
 
 
 @router.post('/excluir', include_in_schema=False)
-async def post_estoques_excluir(request: fastapi.Request, id: int = fastapi.Form(), session: Session = SESSION_DEP):
-    repository.delete_estoque(session, id=id)
+async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = SESSION_DEP):
+    if selecionados_ids:
+        for id in selecionados_ids.split(','):
+            repository.delete_estoque(session, id=int(id))
     return redirect_back(request)
 
 

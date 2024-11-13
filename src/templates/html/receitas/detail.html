@@ -2,10 +2,37 @@
 
 {% include 'receitas/modal_create.html' %}
 {% include 'receitas/modal_delete.html' %}
-
 {% include 'ingredientes/modal_create.html' %}
 
 {% block content %}
+<div class="modal" id="apagarSelecionados" tabindex="-1">
+  <form class="modal-dialog modal-sm" role="document" method="POST" action="{{ url_for('post_receita_ingredientes_remover') }}">
+    <div class="modal-content">
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-status bg-danger"></div>
+      <div class="modal-body text-center py-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M12 9v2m0 4v.01" />
+          <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
+        </svg>
+        <h3>Confirmar Ação</h3>
+        <div class="text-secondary">Remover ingrediente selecionados?</div>
+        <input required readonly type="hidden" class="form-control" name="receita_id" value="{{receita.id}}" />
+        <input required readonly type="hidden" class="form-control" name="selecionados_ids" />
+      </div>
+      <div class="modal-footer">
+        <div class="w-100">
+          <div class="row">
+            <div class="col">
+              <button type="submit" class="btn btn-danger w-100">Remover Selecionados</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
 
 <div class="modal" id="apagarReceitaIngredienteModal" tabindex="-1">
   <form class="modal-dialog modal-sm" role="document" method="POST" action="{{ url_for('post_receita_ingredientes_remover') }}">
@@ -49,7 +76,7 @@
           <div class="datagrid-item">
             <div class="datagrid-title">Quantidade</div>
             <div class="input-group input-group-flat">
-              <input readonly required type="number" class="form-control pe-0" value="0" min="0" name="quantidade" />
+              <input readonly required type="number" step="any" class="form-control pe-0" value="0" min="0" name="quantidade" />
               <span class="input-group-text"> g </span>
             </div>
           </div>
@@ -98,7 +125,7 @@
             <label class="datagrid-title form-label">Quantidade Utilizada (gramas)</label>
             <div class="datagrid-content">
               <div class="input-group input-group-flat">
-                <input required type="number" class="form-control pe-0" value="0" min="1" name="quantidade" />
+                <input required type="number" step="any" class="form-control pe-0" value="0" min="1" name="quantidade" />
                 <span class="input-group-text"> g </span>
               </div>
             </div>
@@ -143,7 +170,7 @@
           <div class="datagrid-title">Peso Unitário</div>
           <div class="datagrid-content">
             <div class="input-group input-group-flat">
-              <input required type="number" name="peso_unitario" class="form-control pe-0" value="{{receita.peso_unitario}}" min="1" />
+              <input required type="number" step="any" name="peso_unitario" class="form-control pe-0" value="{{receita.peso_unitario}}" min="1" />
               <span class="input-group-text"> g </span>
             </div>
           </div>
@@ -152,7 +179,7 @@
           <div class="datagrid-title">Porcetagem Lucro</div>
           <div class="datagrid-content">
             <div class="input-group input-group-flat">
-              <input required type="number" name="porcentagem_lucro" class="form-control pe-0" value="{{receita.porcentagem_lucro}}" min="1" />
+              <input required type="number" step="any" name="porcentagem_lucro" class="form-control pe-0" value="{{receita.porcentagem_lucro}}" min="1" />
               <span class="input-group-text"> % </span>
             </div>
           </div>
@@ -245,7 +272,7 @@
         Ingredientes
       </h5>
       <div class="dropdown ms-auto">
-        <button disabled class="btn" id="btn-apagar-selecionados">
+        <button disabled class="btn" id="btn-apagar-selecionados" data-bs-toggle="modal" data-bs-target="#apagarSelecionados">
           {{material_symbol('remove') | safe }}
           Remover Selecionados
         </button>
@@ -274,7 +301,7 @@
           <label class="datagrid-title form-label">Quantidade (gramas)</label>
           <div class="datagrid-content">
             <div class="input-group input-group-flat">
-              <input required type="number" class="form-control pe-0" min="0" name="quantidade" />
+              <input required type="number" step="any" class="form-control pe-0" min="0" name="quantidade" />
               <span class="input-group-text"> g </span>
             </div>
             <small style="display: block; margin-top: 8px" class="text-secondary" id="ingediente_custo_final">Insira uma quantidade</small>
@@ -306,7 +333,7 @@
           {% for receita_ingrediente in receita.ingrediente_links %}
           <tr class="cursor-pointer">
             <td class="w-1">
-              <input type="checkbox" name="checkbox_{{receita_ingrediente.id}}" id="checkbox_{{receita_ingrediente.id}}">
+              <input type="checkbox" name="checkbox_{{receita_ingrediente.id}}" id="checkbox_{{receita_ingrediente.id}}" data-id="{{receita_ingrediente.id}}">
             </td>
             <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal" data-bs-payload="{{receita_ingrediente.model_dump_json()}}">{{ receita_ingrediente.ingrediente.nome }}</td>
             <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal" data-bs-payload="{{receita_ingrediente.model_dump_json()}}">{{ receita_ingrediente.quantidade | format_quantity | safe }}</td>

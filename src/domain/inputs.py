@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from pydantic import BaseModel
 
@@ -24,9 +24,8 @@ class ReceitaIngredienteAtualizar(BaseModel):
 
 
 class ReceitaIngredienteRemover(BaseModel):
-    id: int
     receita_id: int
-    ingrediente_id: int
+    selecionados_ids: str
 
 
 class IngredienteCriar(BaseModel):

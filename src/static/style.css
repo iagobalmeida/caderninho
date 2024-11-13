@@ -60,6 +60,6 @@ aside .container-fluid {
 }
 
 td:not(:has(input)) {
-    pointer-events: none;
+    /* pointer-events: none; */
     user-select: none;
 }
