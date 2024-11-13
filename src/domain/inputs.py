@@ -17,6 +17,7 @@ class ReceitaIngredienteAdicionar(BaseModel):
 
 
 class ReceitaIngredienteAtualizar(BaseModel):
+    id: int
     receita_id: int
     ingrediente_id: int
     quantidade: float

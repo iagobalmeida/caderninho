@@ -1,4 +1,3 @@
-
 document.querySelectorAll('input[type="reset"]').forEach(inputReset => {
     inputReset.addEventListener('click', (e) => {
             Array.from(inputReset.form.elements).forEach(element => {
@@ -14,6 +13,7 @@ document.querySelectorAll('input[type="reset"]').forEach(inputReset => {
         inputReset.form.submit();
     });
 });
+
 document.querySelectorAll('.modal').forEach(modal => {
     modal.addEventListener("show.bs.modal", (e) => {
         if(e.relatedTarget.tagName == 'INPUT' && e.type == 'checkbox') {
@@ -41,3 +41,30 @@ document.querySelectorAll('.modal').forEach(modal => {
         });
     });
 });
+
+let lastChange = true;
+
+document.querySelectorAll('td input[type="checkbox"]').forEach(el => {
+    el.addEventListener('change', (e) => {
+        const checkeds = document.querySelectorAll('td input[type="checkbox"]:checked').length;
+        if(checkeds) {
+            document.querySelector('#btn-apagar-selecionados').removeAttribute("disabled")
+        } else {
+            document.querySelector('#btn-apagar-selecionados').setAttribute("disabled", true)
+        }
+    });
+});
+
+document.querySelectorAll('td input[type="checkbox"]').forEach(el => {
+        el.style.pointerEvents = 'none';
+        el.addEventListener('click', (e) => e.preventDefault());
+
+        el.closest('td').addEventListener('mousedown', (ev) => {
+            el.checked = !el.checked
+            lastChange = el.checked;
+        });
+        el.closest('td').addEventListener('mouseover', (ev) => {
+            el.checked = ev.buttons ? lastChange : el.checked;
+        });
+    }
+);

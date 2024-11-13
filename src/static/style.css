@@ -58,3 +58,8 @@ aside .container-fluid {
         align-items: center;
     }
 }
+
+td:not(:has(input)) {
+    pointer-events: none;
+    user-select: none;
+}

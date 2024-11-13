@@ -1,5 +1,8 @@
 <div class="cold-12">
-  <button class="btn" id="btn-apagar-selecionados" disabled>Apagar Selecionados</button>
+  <button class="btn" id="btn-apagar-selecionados" disabled>
+    {{material_symbol('delete') | safe }}
+    Apagar Selecionados
+  </button>
 </div>
 
 <div class="col-12 d-none">
@@ -63,18 +66,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  document.querySelectorAll('td input[type="checkbox"]').forEach(el => el.closest('td').addEventListener('click', (ev) => { if(ev.target != el) el.click() }))
-  document.querySelectorAll('td input[type="checkbox"]').forEach(el => {
-      el.addEventListener('change', (e) => {
-        const checkeds = document.querySelectorAll('td input[type="checkbox"]:checked').length;
-        if(checkeds) {
-          document.querySelector('#btn-apagar-selecionados').removeAttribute("disabled")
-        } else {
-          document.querySelector('#btn-apagar-selecionados').setAttribute("disabled", true)
-        }
-      });
-  });
-
-</script>

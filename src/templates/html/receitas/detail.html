@@ -106,7 +106,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-ghost-danger me-auto" data-bs-toggle="modal" data-bs-target="#apagarReceitaIngredienteModal" data-bs-payload="">Remover da Receita</button>
         <button type="submit" class="btn">Atualizar</button>
       </div>
     </div>
@@ -245,9 +245,13 @@
         Ingredientes
       </h5>
       <div class="dropdown ms-auto">
+        <button disabled class="btn" id="btn-apagar-selecionados">
+          {{material_symbol('remove') | safe }}
+          Remover Selecionados
+        </button>
         <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCreateIngrediente">
           {{material_symbol('add') | safe }}
-          Novo Ingrediente
+          Criar Ingrediente
         </a>
       </div>
     </div>
@@ -288,7 +292,7 @@
       <table class="table table-vcenter table-striped table-hover">
         <thead class="sticky-top">
           <tr>
-            <th>#</th>
+            <td class="w-1"></td>
             <th>Nome</th>
             <th>Quantidade (gramas)</th>
             <th>Custo/grama (R$)</th>
@@ -299,50 +303,17 @@
           </tr>
         </thead>
         <tbody>
-          {% for receita_ingrediente in receita.ingrediente_links %} {% if receita_ingrediente.id >= 0 %}
-          <tr>
-            <td>{{ receita_ingrediente.id }}</td>
-            <td>{{ receita_ingrediente.ingrediente.nome }}</td>
-            <td>{{ receita_ingrediente.quantidade | format_quantity | safe }}</td>
-            <td>{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</td>
-            <!-- <td>{{ receita_ingrediente.ingrediente.custo_p_grama_medio | format_reais }}</td> -->
-            <td>{{ receita_ingrediente.custo | format_reais }}</td>
-            <td>{{ receita_ingrediente.ingrediente.estoque_atual | format_stock | safe }}</td>
-            <td>
-              <div class="btn-group">
-                <a
-                  type="button"
-                  class="btn btn-ghost btn-sm"
-                  data-bs-toggle="modal"
-                  data-bs-target="#atualizarReceitaIngredienteModal"
-                  data-bs-payload="{{receita_ingrediente.model_dump_json()}}"
-                >
-                  Editar
-                </a>
-                <a
-                  type="button"
-                  class="btn btn-ghost-danger btn-sm"
-                  data-bs-toggle="modal"
-                  data-bs-target="#apagarReceitaIngredienteModal"
-                  data-bs-payload="{{receita_ingrediente.model_dump_json()}}"
-                >
-                  Remover
-                </a>
-              </div>
+          {% for receita_ingrediente in receita.ingrediente_links %}
+          <tr class="cursor-pointer">
+            <td class="w-1">
+              <input type="checkbox" name="checkbox_{{receita_ingrediente.id}}" id="checkbox_{{receita_ingrediente.id}}">
             </td>
+            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal" data-bs-payload="{{receita_ingrediente.model_dump_json()}}">{{ receita_ingrediente.ingrediente.nome }}</td>
+            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal" data-bs-payload="{{receita_ingrediente.model_dump_json()}}">{{ receita_ingrediente.quantidade | format_quantity | safe }}</td>
+            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal" data-bs-payload="{{receita_ingrediente.model_dump_json()}}">{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</td>
+            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal" data-bs-payload="{{receita_ingrediente.model_dump_json()}}">{{ receita_ingrediente.custo | format_reais }}</td>
+            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal" data-bs-payload="{{receita_ingrediente.model_dump_json()}}">{{ receita_ingrediente.ingrediente.estoque_atual | format_stock | safe }}</td>
           </tr>
-          {% else %}
-          <tr class="table-primary ">
-            <td></td>
-            <td><b>{{ receita_ingrediente.ingrediente.nome }}</b></td>
-            <td><b>{{ receita_ingrediente.quantidade | format_quantity | safe }}</b></td>
-            <td><b>{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</b></td>
-            <!-- <td>-</td> -->
-            <td><b>{{ receita_ingrediente.custo | format_reais }}</b></td>
-            <td>-</td>
-            <td></td>
-          </tr>
-          {% endif %}
           {% endfor %}
         </tbody>
       </table>
