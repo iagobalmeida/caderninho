@@ -3,9 +3,11 @@ import re
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import fastapi
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from src import auth, db
 from src.decorators.auth import authorized
@@ -21,6 +23,9 @@ from src.utils import redirect_url_for
 rootlogger.setLevel(logging.WARN)
 
 app = fastapi.FastAPI(dependencies=[auth.AUTH_DEP])
+app.add_middleware(HTTPSRedirectMiddleware)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
+
 app.include_router(router_receitas)
 app.include_router(router_ingredientes)
 app.include_router(router_estoques)
