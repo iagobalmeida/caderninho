@@ -61,3 +61,12 @@ O Sistema conta capacidade para múltiplas contas e organizações e permite ger
 - [ ] Formulários verticais em modal
 - [ ] Upload e download de CSV
 - [ ] Tela "Organização"
+
+### Anotações
+```
+curl -X 'POST' \
+  'https://web-production-07a3.up.railway.app/scripts/reset_db' \
+  -H 'accept: application/json' \
+  -H 'Authorization: batatafrita' \
+  -d ''
+```
