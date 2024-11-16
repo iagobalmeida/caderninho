@@ -1,19 +1,17 @@
 {% for navbar_link in navbar.links %}
     <li class="nav-item">
-        {% with is_active = request.url == navbar_link.url %}
-            {% with class='nav-link active' if is_active else 'nav-link' %}
-                <a href="{{ navbar_link.url }}" class="{{class}}" {{'aria-current="page"' if is_active else ''}}>
-                    <span class="nav-link-title">
-                        {{ navbar_link.symbol | safe }}
-                        {{ navbar_link.title }}
-                    </span>
-                </a>
-            {% endwith %}
+        {% with class='nav-link active' if navbar_link.active else 'nav-link' %}
+            <a href="{{ navbar_link.url }}" class="{{class}}" {{'aria-current="page"' if is_active else ''}}>
+                <span class="nav-link-title">
+                    {{ navbar_link.symbol | safe }}
+                    {{ navbar_link.title }}
+                </span>
+            </a>
         {% endwith %}
     </li>
 {% endfor %}
 <li class="nav-item">
-    <a href="{{ url_for('get_logout') }}" class="nav-link">
+    <a data-bs-toggle="modal" data-bs-target="#modalLogout" class="nav-link cursor-pointer">
         <span class="nav-link-title">
             {{ material_symbol('logout') | safe }}
             Sair

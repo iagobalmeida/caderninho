@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import List, Tuple
 
@@ -66,12 +67,17 @@ def templates_filter_format_reais(input: float):
         return f'R$ {input:.2f}'
 
 
+def templates_filter_json(input: str):
+    return json.dumps(input)
+
+
 BASE_FILTERS = [
     ('strftime', templates_filter_strftime),
     ('format_stock', templates_filter_format_stock),
     ('format_stock_movement', templates_filter_format_stock_movement),
     ('format_quantity', templates_filter_format_quantity),
-    ('format_reais', templates_filter_format_reais)
+    ('format_reais', templates_filter_format_reais),
+    ('json', templates_filter_json)
 ]
 
 BASE_GLOBALS = [

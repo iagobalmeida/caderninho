@@ -29,6 +29,7 @@ def header_authorization(request: Request, Authorization: str = Header(None)) ->
     except Exception as ex:
         print(ex)
     request.state.user = user
+    return user
 
 
 AUTH_DEP = Depends(header_authorization)

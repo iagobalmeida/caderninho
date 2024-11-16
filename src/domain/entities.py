@@ -39,6 +39,13 @@ class ReceitaIngredienteLink(RegistroOrganizacao, table=True):
             return 0
         return round(self.quantidade * self.ingrediente.custo_p_grama, 2)
 
+    def dict(self):
+        base_dict = self.model_dump()
+        base_dict['ingrediente_nome'] = self.ingrediente.nome
+        base_dict['ingrediente_custo'] = self.ingrediente.custo
+        base_dict['ingrediente_peso'] = self.ingrediente.peso
+        return base_dict
+
 
 class Estoque(RegistroOrganizacao, table=True):
     descricao: Optional[str] = Field(default=None)

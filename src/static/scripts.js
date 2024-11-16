@@ -53,6 +53,7 @@ const updateDeleteAllButton = () => {
     }
     if(inputSelecionados) inputSelecionados.forEach(el => el.value = checkeds);
 }
+
 document.querySelectorAll('td input[type="checkbox"]').forEach(el => {
         el.style.pointerEvents = 'none';
         el.addEventListener('click', (e) => e.preventDefault());

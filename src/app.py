@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
 
 from src import auth, db
+from src.decorators.auth import authorized
 from src.domain import repository
 from src.routers.estoques import router as router_estoques
 from src.routers.ingredientes import router as router_ingredientes
@@ -61,6 +62,7 @@ async def get_logout(request: fastapi.Request):
 
 
 @app.get('/home', include_in_schema=False)
+@authorized
 async def get_home(request: fastapi.Request, session: db.Session = db.SESSION_DEP):
     db_receitas = repository.list_receitas(session)
     db_ingredientes = repository.get_ingredientes(session)
@@ -76,13 +78,23 @@ async def get_home(request: fastapi.Request, session: db.Session = db.SESSION_DE
 
 
 @app.post('/scripts/seed', tags=['Scripts'])
-async def post_scripts_seed():
+@authorized
+async def post_scripts_seed(session: db.Session = db.SESSION_DEP):
+    sessao_usuario = session.info.get('user', {})
+    usuario_administrador = sessao_usuario.get('administrador', False)
+    if not usuario_administrador:
+        raise fastapi.HTTPException(401, 'Não autorizado')
     seed.main()
     return True
 
 
 @app.post('/scripts/reset_db', tags=['Scripts'])
-async def post_scripts_reset_db():
+@authorized
+async def post_scripts_reset_db(session: db.Session = db.SESSION_DEP):
+    sessao_usuario = session.info.get('user', {})
+    usuario_administrador = sessao_usuario.get('administrador', False)
+    if not usuario_administrador:
+        raise fastapi.HTTPException(401, 'Não autorizado')
     db.reset()
     seed.main()
     return True
@@ -108,8 +120,8 @@ async def integrity_error_exception_handler(req: fastapi.Request, ex):
 
 
 @app.exception_handler(ValueError)
-async def integrity_error_exception_handler(req: fastapi.Request, ex):
-    url = str(req.url_for('get_home'))
+async def integrity_error_exception_handler(request: fastapi.Request, ex):
+    url = str(request.headers['referer'])
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
 

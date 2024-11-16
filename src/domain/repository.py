@@ -7,6 +7,11 @@ from src.domain.entities import (Estoque, Ingrediente, Receita,
                                  ReceitaIngredienteLink, Venda)
 
 
+def __user_from_session(session: Session):
+    sessao_usuario = session.info.get('user', {})
+    return sessao_usuario
+
+
 def __filter_organization_id(session: Session, query, entity: SQLModel):
     sessao_usuario = session.info.get('user', {})
 
@@ -21,9 +26,18 @@ def __filter_organization_id(session: Session, query, entity: SQLModel):
 
 
 def __delete(session: Session, entity: SQLModel, id: int) -> bool:
+    sessao_usuario = __user_from_session(session)
+    sessao_usuario_admin = sessao_usuario.get('administrador', False)
+    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id'))
+
     db_entity = session.get(entity, id)
+
     if not db_entity:
         return True
+
+    if not sessao_usuario_admin and not db_entity.organizacao_id == sessao_usuario_organizacao_id:
+        raise ValueError('Sem permissão para deletar esse registro')
+
     session.delete(db_entity)
     session.commit()
     return True
@@ -53,8 +67,17 @@ def delete_ingrediente(session: Session, id: int) -> bool:
 
 
 def __update(session: Session, entity: SQLModel, id: int, **kwargs) -> SQLModel:
+    sessao_usuario = __user_from_session(session)
+    sessao_usuario_admin = sessao_usuario.get('administrador', False)
+    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id'))
+
     db_entity = session.get(entity, id)
+    if not sessao_usuario_admin and not db_entity.organizacao_id == sessao_usuario_organizacao_id:
+        raise ValueError('Sem permissão para editar esse registro')
+
     for key, value in kwargs.items():
+        if not value:
+            continue
         db_entity.__setattr__(key, value)
     session.commit()
     return db_entity
@@ -64,7 +87,7 @@ def update_receita(session: Session, id: int, nome: str, peso_unitario: float, p
     return __update(session, Receita, id, nome=nome, peso_unitario=peso_unitario, porcentagem_lucro=porcentagem_lucro)
 
 
-def update_ingrediente(session: Session, id: int, nome: str, peso: float, custo: float) -> Ingrediente:
+def update_ingrediente(session: Session, id: int, nome: str = None, peso: float = None, custo: float = None) -> Ingrediente:
     return __update(session, Ingrediente, id, nome=nome, peso=peso, custo=custo)
 
 
@@ -81,6 +104,11 @@ def update_estoque(session: Session, id: int, descricao: str, valor_pago: float 
 
 
 def __create(session: Session, entity):
+    sessao_usuario = __user_from_session(session)
+    sessao_usuario_organizacao_id = sessao_usuario.get('organizacao_id', -1)
+
+    entity.organizacao_id = sessao_usuario_organizacao_id
+
     session.add(entity)
     session.commit()
     return entity

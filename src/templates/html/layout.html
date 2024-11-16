@@ -15,6 +15,7 @@
 {% include 'estoques/modal_delete.html' %}
 
 {% include 'receitas/modal_create.html' %}
+{% include 'modal_logout.html' %}
 
 <div class="page">
     <!-- Sidebar -->
@@ -41,7 +42,7 @@
         <div class="container-xl">
           <div class="row row-deck row-cards">
             <div class="page-header">
-              <div class="row align-items-center">
+              <div class="md-row align-items-center">
                 <div class="col">
                   <div class="page-pretitle">
                     {{ header.pretitle }}
@@ -109,6 +110,19 @@
                 {% endif %}
               </div>
             </div>
+            {% if request.query_params['error'] %}
+              <div class="alert alert-danger alert-dismissible" role="alert">
+                <div class="d-flex">
+                  <div>
+                    <h4 class="alert-title">Ops! Algo deu errado!</h4>
+                    <div class="text-secondary">
+                      {{request.query_params['error'] | safe}}
+                    </div>
+                  </div>
+                </div>
+                <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+              </div>
+            {% endif %}
             {% block content %}
             {% endblock %}
           </div>

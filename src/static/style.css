@@ -63,3 +63,13 @@ td:not(:has(input)) {
     /* pointer-events: none; */
     user-select: none;
 }
+
+.dropdown-menu.show {
+    z-index: 9999;
+}
+
+a[disabled="true"] {
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(1) contrast(0);
+}

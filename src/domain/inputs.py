@@ -20,6 +20,9 @@ class ReceitaIngredienteAtualizar(BaseModel):
     id: int
     receita_id: int
     ingrediente_id: int
+    ingrediente_nome: Optional[str]
+    ingrediente_custo: Optional[float]
+    ingrediente_peso: Optional[float]
     quantidade: float
 
 
@@ -58,3 +61,6 @@ class EstoqueCriar(BaseModel):
 
 class EstoqueAtualizar(BaseModel):
     id: int
+    descricao: str
+    valor_pago: float
+    quantidade: float

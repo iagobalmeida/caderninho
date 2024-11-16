@@ -22,6 +22,7 @@ class Context(TypedDict):
             title: str
             symbol: str
             url: str
+            active: bool = False
         links: Dict[str, Link]
 
     class Header(TypedDict):
@@ -41,10 +42,12 @@ class Context(TypedDict):
 
     @classmethod
     def factory_navbar_link(self, request: Request, title: str, symbol_name: str, url_name: str):
+        nav_url = request.url_for(url_name)
         return Context.Navbar.Link(
             title=title,
             symbol=material_symbol(symbol_name),
-            url=request.url_for(url_name)
+            url=nav_url,
+            active=(request.url == nav_url or str(nav_url) in str(request.url))
         )
 
     @classmethod

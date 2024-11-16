@@ -48,6 +48,16 @@ O Sistema conta capacidade para múltiplas contas e organizações e permite ger
         - [X] Ingredientes
 
 ## TODO v1.1
-- [ ] Encontrar lugar para editar nome de ingrediente
+- [X] Melhorar UX para mobile
+- [X] Bloquear acesso sem login (decorator)
+- [X] Padronizar botão `Ações` contendo `Criar` e `Apagar`
+- [X] Adicionar confirmação para sair
+- [X] Encontrar lugar para editar nome de ingrediente
+- [X] Maior robustes em delete/update para garantir organization_id
+- [X] Autenticação em fluxos de `seed`
+- [X] Ajustar redirect de erro
+
+## TODO v1.8
+- [ ] Formulários verticais em modal
 - [ ] Upload e download de CSV
-- [ ] Maior robutes em delete/update para garantir organization_id
+- [ ] Tela "Organização"
