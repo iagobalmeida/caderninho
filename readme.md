@@ -61,6 +61,8 @@ O Sistema conta capacidade para múltiplas contas e organizações e permite ger
 - [ ] Formulários verticais em modal
 - [ ] Upload e download de CSV
 - [ ] Tela "Organização"
+- [ ] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
+- [ ] Melhorar `db.py`
 
 ### Anotações
 ```
