@@ -103,8 +103,8 @@ async def integrity_error_exception_handler(req: fastapi.Request, ex):
     query_params = parse_qs(parsed_url.query)
 
     detalhe = re.search(r'\.(\w+)$', str(ex.orig))
-    detalhe = detalhe.group(1)
     if detalhe:
+        detalhe = detalhe.group(1)
         query_params['error'] = f'&nbsp;&nbsp;<b>{parsed_url.path}</b>&nbsp;-&nbsp;<span>Campo&nbsp;<code>{detalhe}</code>&nbsp;inválido</span>'
     else:
         query_params['error'] = f'&nbsp;&nbsp;<b>{parsed_url.path}</b>&nbsp;-&nbsp;<span>Verifique os campos preenchidos</span>'
