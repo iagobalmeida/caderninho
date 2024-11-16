@@ -78,16 +78,16 @@ async def get_home(request: fastapi.Request, session: db.Session = db.SESSION_DE
 
 
 @app.post('/scripts/seed', tags=['Scripts'])
-async def post_scripts_seed(authorization: str = fastapi.Header(None)):
-    if not authorization == 'batatafrita':
+async def post_scripts_seed(Authorization: str = fastapi.Header(None)):
+    if not Authorization == 'batatafrita':
         raise fastapi.HTTPException(401, 'Não autorizado')
     seed.main()
     return True
 
 
 @app.post('/scripts/reset_db', tags=['Scripts'])
-async def post_scripts_reset_db(authorization: str = fastapi.Header(None)):
-    if not authorization == 'batatafrita':
+async def post_scripts_reset_db(Authorization: str = fastapi.Header(None)):
+    if not Authorization == 'batatafrita':
         raise fastapi.HTTPException(401, 'Não autorizado')
     db.reset()
     seed.main()
