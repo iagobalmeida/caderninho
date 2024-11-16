@@ -1,4 +1,4 @@
-# CADERNINHO
+# 📕 CADERNINHO
 
 ## Introdução
 Esse SAAS foi desenvolvido para auxiliar minha companheira na gestão de sua loja de cookies.
