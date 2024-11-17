@@ -1,0 +1,39 @@
+<div class="modal" id="modalPerfil" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_receitas_index') }}">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title ">
+                      <span class="material-symbols-outlined">
+                          account_circle
+                      </span>
+                      Meu Perfil
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="datagrid">
+                      <div class="datagrid-item">
+                      <div class="datagrid-title">Nome</div>
+                      <input required type="text" class="form-control" name="nome"/>
+                      </div>
+                  </div>
+                  <div class="datagrid">
+                      <div class="datagrid-item">
+                      <div class="datagrid-title">Email</div>
+                      <input required type="text" class="form-control" name="email"/>
+                      </div>
+                  </div>
+                  <div class="datagrid">
+                      <div class="datagrid-item">
+                      <div class="datagrid-title">Organizacao</div>
+                      <input readonly required type="text" class="form-control" name="organizacao_descricao"/>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-ghost-danger me-auto">Desativar Conta</button>
+                  <button type="submit" class="btn btn-success">Atualizar</button>
+              </div>
+          </div>
+    </form>
+</div>
