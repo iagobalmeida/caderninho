@@ -195,7 +195,7 @@ def list_estoques(session: Session, filter_ingrediente_id: int = -1, filter_data
 def list_vendas(session: Session, filter_data_inicio: datetime = None, filter_data_final: datetime = None) -> List[Venda]:
     query = select(Venda)
 
-    query = __filter_organization_id(session, query, Receita)
+    query = __filter_organization_id(session, query, Venda)
 
     if filter_data_inicio:
         query = query.filter(Venda.data_criacao >= filter_data_inicio)
