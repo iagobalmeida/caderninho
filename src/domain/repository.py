@@ -21,9 +21,10 @@ def __filter_organization_id(session: Session, query, entity: SQLModel):
 
     if sessao_usuario:
         usuario_administrador = sessao_usuario.get('administrador', False)
-        organizacao_id = int(sessao_usuario.get('organizacao_id', -1))
         if usuario_administrador:
             return query
+        organizacao_id = sessao_usuario.get('organizacao_id', -1)
+        organizacao_id = int(organizacao_id) if organizacao_id else -1
         log.info(f'organizacao_id: {organizacao_id}')
         return query.filter(entity.organizacao_id == organizacao_id)
 
