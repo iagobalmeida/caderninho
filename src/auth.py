@@ -23,7 +23,11 @@ def authenticate(session: Session, email: str, senha: str) -> str:
 
     payload = db_usuario.model_dump()
     del payload['senha']
-    payload['organizacao_descricao'] = db_usuario.organizacao.descricao
+
+    if db_usuario.organizacao:
+        payload['organizacao_descricao'] = db_usuario.organizacao.descricao
+    elif db_usuario.administrador:
+        payload['organizacao_descricao'] = 'Administrador'
 
     return jwt.encode(payload=payload, key=DEFAULT_JWT_SECRET, algorithm=DEFAULT_JWT_ALG)
 

@@ -76,8 +76,13 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
   - [X] Login
 
 ## TODO v2.0
-- [ ] Funcionalidade modal `Meu Perfil`
-- [ ] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
 - [ ] Formulários verticais em modal
+- [ ] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
+- [ ] Funcionalidade modal `Meu Perfil`
 - [ ] Upload e download de CSV
 - [ ] Tela "Organização"
+
+## TODO v2.5
+- [ ] Tela de criação de conta
+- [ ] Geração de QR Code p/ chave PIX da organização
+- [ ] Possível integração com Mercado Pago
