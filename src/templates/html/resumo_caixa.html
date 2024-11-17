@@ -1,61 +1,82 @@
 <div class="d-none d-md-block col-sm-12 col-lg-4">
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                Entradas
-            </h3>
-            <div class="ms-auto">
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateVenda">
-                    {{ material_symbol('add') | safe }}
-                    Nova Venda
-                    &nbsp;
-                </button>
-            </div>
-        </div>
         <div class="card-body">
-            <h2>
-                {{ entradas | format_reais }}
-                {{ material_symbol('arrow_downward') | safe }}
-            </h2>
+            <div class="d-flex align-items-center">
+                <div class="subheader">Entradas</div>
+                <div class="ms-auto lh-1">
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateVenda">
+                        {{ material_symbol('add') | safe }}
+                        Nova Venda
+                        &nbsp;
+                    </button>
+                </div>
+            </div>
+            <div class="d-flex align-items-baseline">
+                <div class="h1 mb-0 me-2">
+                    {{ entradas | format_reais }}
+                </div>
+                <div class="me-auto">
+                    <div class="text-green d-inline-flex align-items-center lh-1">
+                        {{ material_symbol('arrow_upward') | safe }}
+                    </div>
+                </div>
+            </div>
             <p class="text-secondary">Soma de todas as <a href="{{url_for('get_vendas_index')}}">Vendas</a></p>
         </div>
     </div>
 </div>
+
 <div class="d-none d-md-block col-sm-12 col-lg-4">
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                Saídas
-            </h3>
-            <div class="ms-auto">
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateEstoque">
-                    {{ material_symbol('add') | safe }}
-                    Nova Compra
-                    &nbsp;
-                </button>
-            </div>
-        </div>
         <div class="card-body">
-            <h2>
-                {{ saidas | format_reais }}
-                {{ material_symbol('arrow_upward') | safe }}
-            </h2>
-            <p class="text-secondary">Soma de todas os <a href="{{url_for('get_estoques_index')}}">Estoques</a></p>
+            <div class="d-flex align-items-center">
+                <div class="subheader">Saídas</div>
+                <div class="ms-auto lh-1">
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateEstoque">
+                        {{ material_symbol('add') | safe }}
+                        Nova Compra
+                        &nbsp;
+                    </button>
+                </div>
+            </div>
+            <div class="d-flex align-items-baseline">
+                <div class="h1 mb-0 me-2">
+                    {{ saidas | format_reais }}
+                </div>
+                <div class="me-auto">
+                    <div class="text-red d-inline-flex align-items-center lh-1">
+                        {{ material_symbol('arrow_downward') | safe }}
+                    </div>
+                </div>
+            </div>
+            <p class="text-secondary">Soma de todas as <a href="{{url_for('get_estoques_index')}}">Movimentações</a></p>
         </div>
     </div>
 </div>
+
 <div class="d-none d-md-block col-sm-12 col-lg-4">
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                Caixa
-            </h3>
-        </div>
         <div class="card-body">
-            <h2>
-                {{ caixa | format_reais }}
-                {{ material_symbol('sync') | safe }}
-            </h2>
+            <div class="d-flex align-items-center">
+                <div class="subheader">Caixa</div>
+                <div class="ms-auto lh-1">
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateEstoque">
+                        {{ material_symbol('add') | safe }}
+                        Nova Compra
+                        &nbsp;
+                    </button>
+                </div>
+            </div>
+            <div class="d-flex align-items-baseline">
+                <div class="h1 mb-0 me-2">
+                    {{ caixa | format_reais }}
+                </div>
+                <div class="me-auto">
+                    <div class="text-primary d-inline-flex align-items-center lh-1">
+                        {{ material_symbol('sync') | safe }}
+                    </div>
+                </div>
+            </div>
             <p class="text-secondary">Estimativa do valor em caixa</p>
         </div>
     </div>

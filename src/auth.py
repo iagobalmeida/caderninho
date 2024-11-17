@@ -39,6 +39,11 @@ def header_authorization(request: Request, Authorization: str = Header(None)) ->
     except Exception as ex:
         print(ex)
 
+    query_params_theme = request.query_params.get('theme')
+    if query_params_theme:
+        request.state.theme = query_params_theme
+        request.cookies.update(theme=query_params_theme)
+
     request.state.user = user
     return user
 

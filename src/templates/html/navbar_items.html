@@ -1,20 +1,12 @@
 {% for navbar_link in navbar.links %}
-    <li class="nav-item">
-        {% with class='nav-link active' if navbar_link.active else 'nav-link' %}
-            <a href="{{ navbar_link.url }}" class="{{class}}" {{'aria-current="page"' if is_active else ''}}>
+    {% with class='nav-item active' if navbar_link.active else 'nav-item' %}
+        <li class="{{class}}">
+            <a href="{{ navbar_link.url }}" class="nav-link" {{'aria-current="page"' if is_active else ''}}>
                 <span class="nav-link-title">
                     {{ navbar_link.symbol | safe }}
                     {{ navbar_link.title }}
                 </span>
             </a>
-        {% endwith %}
-    </li>
+        </li>
+    {% endwith %}
 {% endfor %}
-<li class="nav-item">
-    <a data-bs-toggle="modal" data-bs-target="#modalLogout" class="nav-link cursor-pointer">
-        <span class="nav-link-title">
-            {{ material_symbol('logout') | safe }}
-            Sair
-        </span>
-    </a>
-</li>

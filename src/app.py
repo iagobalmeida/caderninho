@@ -35,7 +35,7 @@ db.init()
 
 @app.get('/', include_in_schema=False)
 async def get_index(request: fastapi.Request, message: str = fastapi.Query(None)):
-    return render(request, 'login.html', context={'message': message})
+    return render(request, 'login.html', context={'message': message, 'data_bs_theme': 'auto'})
 
 
 @app.post('/authenticate')

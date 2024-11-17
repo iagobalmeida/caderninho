@@ -73,3 +73,7 @@ a[disabled="true"] {
     pointer-events: none;
     filter: grayscale(1) contrast(0);
 }
+
+.nav-item.active .nav-link{
+    color: var(--tblr-primary);
+}

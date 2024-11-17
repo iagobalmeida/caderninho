@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caderninho</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
+    <link href="{{ url_for('static', path='/tabler.min.js') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="{{ url_for('static', path='/tabler.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', path='/style.css') }}" rel="stylesheet">
     <style>
       /* @import url('https://rsms.me/inter/inter.css');
@@ -18,7 +18,7 @@
       } */
     </style>
 </head>
-<body class="-theme-dark-auto h-100 auto-scroll">
+<body data-bs-theme="{{data_bs_theme}}">
     {% block layout %}
     {% endblock %}
     <script src="{{ url_for('static', path='/scripts.js') }}"></script>

@@ -1,146 +1,84 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="row row-deck row-cards">
-    <div class="col-sm-12 col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    Entradas
-                </h3>
-                <div class="ms-auto">
-                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateVenda">
-                        {{ material_symbol('add') | safe }}
-                        Nova Venda
-                        &nbsp;
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <h2>
-                    {{ entradas | format_reais }}
-                    {{ material_symbol('arrow_downward') | safe }}
-                </h2>
-                <p class="text-secondary">Soma de todas as <a href="{{url_for('get_vendas_index')}}">Vendas</a></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-12 col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    Saídas
-                </h3>
-                <div class="ms-auto">
-                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateEstoque">
-                        {{ material_symbol('add') | safe }}
-                        Nova Movimentação
-                        &nbsp;
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <h2>
-                    {{ saidas | format_reais }}
-                    {{ material_symbol('arrow_upward') | safe }}
-                </h2>
-                <p class="text-secondary">Soma de todas os <a href="{{url_for('get_estoques_index')}}">Estoques</a></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-12 col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    Caixa
-                </h3>
-            </div>
-            <div class="card-body">
-                <h2>
-                    {{ caixa | format_reais }}
-                    {{ material_symbol('sync') | safe }}
-                </h2>
-                <p class="text-secondary">Estimativa do valor em caixa</p>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-sm-12 col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    {{ material_symbol('shopping_cart') | safe }}
-                    Vendas
-                    <small class="text-secondary ms-auto">{{vendas}} vendas cadastradas</small>
-                </h3>
-            </div>
-            <div class="card-body">
-                <p>
-                    Cadastre as <b>vendas</b> para formalizar as entradas do caixa.
-                </p>
-                <div class="ms-auto" style="width: fit-content;">
-                    <a href="{{ url_for('get_vendas_index') }}" class="btn">Visualizar Vendas</a>
-                </div>
+{% include 'resumo_caixa.html' %}
+
+<div class="col-sm-12 col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ material_symbol('shopping_cart') | safe }}
+                Vendas
+                <small class="text-secondary ms-auto">{{vendas}} vendas cadastradas</small>
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>
+                Cadastre as <b>vendas</b> para formalizar as entradas do caixa.
+            </p>
+            <div class="ms-auto" style="width: fit-content;">
+                <a href="{{ url_for('get_vendas_index') }}" class="btn">Visualizar Vendas</a>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-sm-12 col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    {{ material_symbol('home_storage') | safe }}
-                    Estoque
-                    <small class="text-secondary">{{estoques}} movimentações cadastradas</small>
-                </h3>
-            </div>
-            <div class="card-body">
-                <p>
-                    Cadastre as <b>movimentações de estoque</b> para formalizar compras e/ou uso de <code>Ingredientes</code>.
-                </p>
-                <div class="ms-auto" style="width: fit-content;">
-                    <a href="{{ url_for('get_estoques_index') }}" class="btn">Visualizar Estoque</a>
-                </div>
+<div class="col-sm-12 col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ material_symbol('home_storage') | safe }}
+                Estoque
+                <small class="text-secondary">{{estoques}} movimentações cadastradas</small>
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>
+                Cadastre as <b>movimentações de estoque</b> para formalizar compras e/ou uso de <code>Ingredientes</code>.
+            </p>
+            <div class="ms-auto" style="width: fit-content;">
+                <a href="{{ url_for('get_estoques_index') }}" class="btn">Visualizar Estoque</a>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-sm-12 col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    {{ material_symbol('library_books') | safe }}
-                    Receitas
-                    <small class="text-secondary ms-auto">{{len_receitas}} receita cadastrada</small>
-                </h3>
-            </div>
-            <div class="card-body">
-                <p>
-                    Cadastre <b>receitas</b> selecionando <code>Ingredientes</code> para determinar o preço de venda, lucro e faturamento previsto.
-                </p>
-                <div class="ms-auto" style="width: fit-content;">
-                    <a href="{{ url_for('get_receitas_index') }}" class="btn">Visualizar Receitas</a>
-                </div>
+<div class="col-sm-12 col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ material_symbol('library_books') | safe }}
+                Receitas
+                <small class="text-secondary ms-auto">{{len_receitas}} receita cadastrada</small>
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>
+                Cadastre <b>receitas</b> selecionando <code>Ingredientes</code> para determinar o preço de venda, lucro e faturamento previsto.
+            </p>
+            <div class="ms-auto" style="width: fit-content;">
+                <a href="{{ url_for('get_receitas_index') }}" class="btn">Visualizar Receitas</a>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-sm-12 col-lg-6 d-none">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    {{ material_symbol('package_2') | safe }}
-                    Ingredientes
-                    <small class="text-secondary ms-auto">{{len_ingredientes}} ingrediente cadastrado</small>
-                </h3>
-            </div>
-            <div class="card-body">
-                <p>
-                    Cadastre <b>ingredientes</b> que serão utilizados nas receitas. É possível visualizar o estoque atual de cada ingrediente.
-                </p>
-                <div class="ms-auto" style="width: fit-content;">
-                    <a href="{{ url_for('get_ingredientes_index') }}" class="btn">Visualizar Ingredientes</a>
-                </div>
+<div class="col-sm-12 col-lg-6 d-none">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ material_symbol('package_2') | safe }}
+                Ingredientes
+                <small class="text-secondary ms-auto">{{len_ingredientes}} ingrediente cadastrado</small>
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>
+                Cadastre <b>ingredientes</b> que serão utilizados nas receitas. É possível visualizar o estoque atual de cada ingrediente.
+            </p>
+            <div class="ms-auto" style="width: fit-content;">
+                <a href="{{ url_for('get_ingredientes_index') }}" class="btn">Visualizar Ingredientes</a>
             </div>
         </div>
     </div>

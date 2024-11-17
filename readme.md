@@ -60,6 +60,10 @@ O Sistema conta capacidade para múltiplas contas e organizações e permite ger
 ## TODO v1.8
 - [X] Melhorar `db.py`
 - [X] Modal `Meu Perfil`
+- [ ] Novo layout
+  - [X] Admin
+  - [X] Toggle modo escuro/claro
+  - [ ] Login
 - [ ] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
 - [ ] Formulários verticais em modal
 - [ ] Upload e download de CSV

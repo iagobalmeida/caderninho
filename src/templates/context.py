@@ -35,6 +35,7 @@ class Context(TypedDict):
         label: str
         url: str
 
+    data_bs_theme: str = 'dark'
     title: str = 'Caderninho'
     navbar: Navbar
     header: Header
@@ -86,6 +87,8 @@ BASE_NAVBAR_LINKS = [
 
 
 def get_context(request: Request, session=None, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
+    theme = request.cookies.get('theme', 'light')
+
     base_context = Context(
         title='Caderninho',
         navbar=Context.Navbar(
@@ -99,7 +102,8 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
             title='Home',
             symbol='home'
         ),
-        breadcrumbs=Context.factory_breadcrumbs(request)
+        breadcrumbs=Context.factory_breadcrumbs(request),
+        data_bs_theme=theme
     )
 
     if session:
@@ -120,12 +124,11 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
 
 
 def render(templates: Jinja2Templates, request: Request, template_name: str, session=None, context: dict = None):
-    return templates.TemplateResponse(
+    context = get_context(request=request, session=session, context=context)
+    response = templates.TemplateResponse(
         request=request,
         name=template_name,
-        context=get_context(
-            request=request,
-            session=session,
-            context=context
-        )
+        context=context
     )
+    response.set_cookie('theme', context.get('data_bs_theme', 'light'))
+    return response
