@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+
+{% include 'vendas/modal_edit.html' %}
+{% include 'vendas/modal_delete.html' %}
+{% include 'vendas/modal_create.html' %}
+
+{% include 'ingredientes/modal_create.html' %}
+{% include 'ingredientes/modal_edit.html' %}
+{% include 'ingredientes/modal_delete.html' %}
+
+{% include 'estoques/modal_create.html' %}
+{% include 'estoques/modal_edit.html' %}
+{% include 'estoques/modal_delete.html' %}
+
+
+{% include 'receitas/modal_create.html' %}
+{% include 'modal_perfil.html' %}
+{% include 'modal_logout.html' %}
+
+<div class="page">
+    <!-- Sidebar -->
+    <aside class="navbar navbar-vertical navbar-expand-sm navbar-dark">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <h1 class="navbar-brand navbar-brand-autodark d-none d-md-flex">
+          <a href="{{url_for('get_home')}}">
+            📕 Caderninho
+          </a>
+        </h1>
+        {% if request.state and request.state.user %}
+          <div class="bg-dark p-2 px-4 m-2 d-flex flex-column gap-1 border border-2 border-light rounded-pill text-light">
+            <b class="text-center text-lg">{{request.state.user.organizacao_descricao}}</b>
+            <small class="text-center">{{request.state.user.email}}</small>
+          </div>
+          <div class="d-flex flex-column text-end text-md-center">
+            <h5 class="navbar-brand">
+              Olá, {{request.state.user.nome}}!
+            </h5>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil" data-bs-payload="{{request.state.user | json}}" class="text-primary">Meu perfil</a>
+          </div>
+        {% endif %}
+        <div class="collapse navbar-collapse" id="sidebar-menu">
+          <ul class="navbar-nav pt-lg-3">
+            {% include 'navbar_items.html' %}
+          </ul>
+        </div>
+      </div>
+    </aside>
+    <div class="page-wrapper">
+      <div class="page-body">
+        <div class="container-xl">
+          <div class="row row-deck row-cards">
+            <div class="page-header">
+              <div class="md-row align-items-center">
+                <div class="col">
+                  <div class="page-pretitle">
+                    {{ header.pretitle }}
+                  </div>
+                  <h2 class="page-title">
+                    {{ material_symbol(header.symbol) | safe }}
+                    {{ header.title }}
+                  </h2>
+                  <div class="mb-1">
+                    <ol class="breadcrumb" aria-label="breadcrumbs">
+                      {% for breadcrumb in breadcrumbs %}
+                        <li class="breadcrumb-item">
+                          {% if loop.last %}
+                            <a>{{breadcrumb.label | title}}</a>
+                          {% else %}
+                            <a href="{{breadcrumb.url}}">{{breadcrumb.label | title}}</a>
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ol>
+                  </div>
+                </div>
+                {% if header.buttons %}
+                  <div class="col-auto ms-auto">
+                    <div class="btn-list">
+                      {% for button in header.buttons %}
+                        {% if button.href %}
+                          <span class="d-inline">
+                            <a
+                            href="{{button.href}}"
+                            class="{{button.classname}}"
+                            {% if button.attributes %}
+                              {% for name, value in button.attributes.items() %}
+                                {{name}} = "{{value}}"
+                              {% endfor %}
+                            {% endif %}
+                            >
+                              {% if button.symbol %}
+                                {{ material_symbol(button.symbol) | safe}}
+                              {% endif %}
+                              {{button.content}}
+                            </a>
+                          </span>
+                        {% else %}
+                          <span class="d-inline">
+                            <button
+                            class="{{button.classname}}"
+                            {% if button.attributes %}
+                              {% for name, value in button.attributes.items() %}
+                                {{name}} = "{{value}}"
+                              {% endfor %}
+                            {% endif %}
+                            >
+                              {% if button.symbol %}
+                                {{ material_symbol(button.symbol) | safe}}
+                              {% endif %}
+                              {{button.content}}
+                            </button>
+                          </span>
+                        {% endif %}
+              
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            {% if request.query_params['error'] %}
+              <div class="alert alert-danger alert-dismissible" role="alert">
+                <div class="d-flex">
+                  <div>
+                    <h4 class="alert-title">Ops! Algo deu errado!</h4>
+                    <div class="text-secondary">
+                      {{request.query_params['error'] | safe}}
+                    </div>
+                  </div>
+                </div>
+                <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+              </div>
+            {% endif %}
+            {% block content %}
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+{% endblock %}
