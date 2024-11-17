@@ -78,8 +78,10 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
             )
     else:
         quantidade = float(payload.quantidade_ingrediente) if payload.quantidade_ingrediente else None
-        if payload.descricao != 'Compra':
+        if payload.descricao != 'Compra' and quantidade:
             quantidade = quantidade * -1
+        if payload.descricao == 'Outros' and payload.descricao_customizada:
+            payload.descricao = payload.descricao_customizada
         repository.create_estoque(
             session,
             descricao=payload.descricao,

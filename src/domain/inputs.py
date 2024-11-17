@@ -52,6 +52,7 @@ class VendaAtualizar(VendaCriar):
 
 class EstoqueCriar(BaseModel):
     descricao: Optional[str] = None
+    descricao_customizada: Optional[str] = None
     ingrediente_id: Optional[int] = None
     quantidade_ingrediente: Optional[Union[str, float]] = None
     receita_id: Optional[int] = None
