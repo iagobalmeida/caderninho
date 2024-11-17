@@ -176,7 +176,7 @@ def create_receita_ingrediente(session: Session, receita_id: int, ingrediente_id
 def list_estoques(session: Session, filter_ingrediente_id: int = -1, filter_data_inicio: datetime = None, filter_data_final: datetime = None) -> List[Estoque]:
     query = select(Estoque)
 
-    query = __filter_organization_id(session, query, Receita)
+    query = __filter_organization_id(session, query, Estoque)
 
     if filter_ingrediente_id and filter_ingrediente_id != -1:
         query = query.filter(Estoque.ingrediente_id == filter_ingrediente_id)
