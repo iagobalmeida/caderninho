@@ -21,7 +21,7 @@ def __filter_organization_id(session: Session, query, entity: SQLModel):
 
     if sessao_usuario:
         usuario_administrador = sessao_usuario.get('administrador', False)
-        organizacao_id = sessao_usuario.get('organizacao_id', -1)
+        organizacao_id = int(sessao_usuario.get('organizacao_id', -1))
         if usuario_administrador:
             return query
         log.info(f'organizacao_id: {organizacao_id}')
@@ -111,7 +111,7 @@ def update_estoque(session: Session, id: int, descricao: str, valor_pago: float 
 
 def __create(session: Session, entity):
     sessao_usuario = __user_from_session(session)
-    sessao_usuario_organizacao_id = sessao_usuario.get('organizacao_id', -1)
+    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id', -1))
 
     entity.organizacao_id = sessao_usuario_organizacao_id
 
