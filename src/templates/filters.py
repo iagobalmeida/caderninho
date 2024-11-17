@@ -57,14 +57,15 @@ def templates_filter_format_quantity(input: float):
 
 
 def templates_filter_format_reais(input: float):
-    if input <= 0:
+    if input == 0:
         return '-'
 
     more_decimals = f'{input:.3f}'
+    negative = input < 0
     if more_decimals[-1] != '0':
-        return f'R$ {more_decimals}'
+        return f'R$ {"-" if negative else "" }{more_decimals}'
     else:
-        return f'R$ {input:.2f}'
+        return f'R$ {"-" if negative else "" }{input:.2f}'
 
 
 def templates_filter_json(input: str):
