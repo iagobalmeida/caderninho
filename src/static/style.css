@@ -77,3 +77,7 @@ a[disabled="true"] {
 .nav-item.active .nav-link{
     color: var(--tblr-primary);
 }
+.modal-backdrop {
+    --tblr-backdrop-bg: black;
+    --tblr-backdrop-opacity: 0.5;
+}

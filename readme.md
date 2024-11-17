@@ -1,13 +1,23 @@
-# 📕 CADERNINHO
+![# KDERNIHO](./src/static//logo.svg)
+
+#### SASS para gestão simplificada da sua cozinha independente
 
 ## Introdução
-Esse SAAS foi desenvolvido para auxiliar minha companheira na gestão de sua loja de cookies.
 
-O Sistema conta capacidade para múltiplas contas e organizações e permite gerenciar:
-- Receitas
-- Ingredientes
-- Estoque (Entradas/Saídas)
-- Vendas (Saídas)
+Essa aplicação não seria possível seu a existência de:
+- [Python](https://python.org)
+- [SQLModel](https://github.com/fastapi/sqlmodel)
+- [TablerCSS](https://tabler.io/)
+- [Railwai.app](https://railway.app/)
+
+### Funcionalidades
+
+No lugar de tabelas do excel, você pode usar o KDerninho para:
+- Estimar custo, faturamento e lucro de receitas de forma dinâmica
+- Gerenciar o estoque de seus ingredientes e outros insumos
+- Gerenciar seu fluxo de caixa cadastrando compras, produção de receitas e outros gastos em geral
+- Compartilhar essas informações com outros usuários de sua organização (⚙ Em desenvolvimento)
+- Exportar e importar dados em CSV (⚙ Em desenvolvimento)
 
 ## Como Usar
 
@@ -71,12 +81,3 @@ O Sistema conta capacidade para múltiplas contas e organizações e permite ger
 - [ ] Formulários verticais em modal
 - [ ] Upload e download de CSV
 - [ ] Tela "Organização"
-
-### Anotações
-```
-curl -X 'POST' \
-  'https://web-production-07a3.up.railway.app/scripts/reset_db' \
-  -H 'accept: application/json' \
-  -H 'Authorization: batatafrita' \
-  -d ''
-```
