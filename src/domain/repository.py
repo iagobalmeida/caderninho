@@ -1,10 +1,13 @@
 from datetime import datetime
+from logging import getLogger
 from typing import List, Tuple
 
 from sqlmodel import Session, SQLModel, func, select
 
 from src.domain.entities import (Estoque, Ingrediente, Receita,
                                  ReceitaIngredienteLink, Venda)
+
+log = getLogger(__name__)
 
 
 def __user_from_session(session: Session):
@@ -14,21 +17,24 @@ def __user_from_session(session: Session):
 
 def __filter_organization_id(session: Session, query, entity: SQLModel):
     sessao_usuario = session.info.get('user', {})
+    log.info(f'sessao_usuario: {sessao_usuario}')
 
     if sessao_usuario:
         usuario_administrador = sessao_usuario.get('administrador', False)
-        organizacao_id = sessao_usuario.get('organizacao_id')
+        organizacao_id = sessao_usuario.get('organizacao_id', -1)
         if usuario_administrador:
             return query
+        log.info(f'organizacao_id: {organizacao_id}')
         return query.filter(entity.organizacao_id == organizacao_id)
 
+    log.info(f'organizacao_id: -1')
     return query.filter(entity.organizacao_id == -1)
 
 
 def __delete(session: Session, entity: SQLModel, id: int) -> bool:
     sessao_usuario = __user_from_session(session)
     sessao_usuario_admin = sessao_usuario.get('administrador', False)
-    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id'))
+    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id', -1))
 
     db_entity = session.get(entity, id)
 
@@ -69,7 +75,7 @@ def delete_ingrediente(session: Session, id: int) -> bool:
 def __update(session: Session, entity: SQLModel, id: int, **kwargs) -> SQLModel:
     sessao_usuario = __user_from_session(session)
     sessao_usuario_admin = sessao_usuario.get('administrador', False)
-    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id'))
+    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id', -1))
 
     db_entity = session.get(entity, id)
     if not sessao_usuario_admin and not db_entity.organizacao_id == sessao_usuario_organizacao_id:
