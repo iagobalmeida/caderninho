@@ -3,6 +3,7 @@ import re
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import fastapi
+from fastapi.exceptions import HTTPException
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
@@ -17,7 +18,6 @@ from src.routers.receitas import router as router_receitas
 from src.routers.vendas import router as router_vendas
 from src.scripts import seed
 from src.templates import render
-from src.utils import redirect_url_for
 
 rootlogger.setLevel(logging.WARN)
 
@@ -34,8 +34,8 @@ db.init()
 
 
 @app.get('/', include_in_schema=False)
-async def get_index(request: fastapi.Request, message: str = fastapi.Query(None), session: db.Session = db.SESSION_DEP):
-    return render(session, request, 'login.html', {'message': message})
+async def get_index(request: fastapi.Request, message: str = fastapi.Query(None)):
+    return render(request, 'login.html', context={'message': message})
 
 
 @app.post('/authenticate')
@@ -45,34 +45,22 @@ async def post_authenticate(email: str = fastapi.Form(), senha: str = fastapi.Fo
 
 @app.post('/login', include_in_schema=False)
 async def post_login(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), session: db.Session = db.SESSION_DEP):
-    jwt_token = auth.authenticate(session, email=email, senha=senha)
-    if jwt_token:
-        response = redirect_url_for(request, 'get_home')
-        response.set_cookie('jwt_token', jwt_token)
-    else:
-        url = request.url_for('get_index')
-        url = url.include_query_params(message='Email e/ou senha inválidos!')
-        response = fastapi.responses.RedirectResponse(url, status_code=302)
-        response.delete_cookie('jwt_token')
-    return response
+    return auth.request_login(session, request, email=email, senha=senha)
 
 
 @app.get('/logout', include_in_schema=False)
 async def get_logout(request: fastapi.Request):
-    response = redirect_url_for(request, 'get_index')
-    response.delete_cookie('jwt_token')
-    return response
+    return auth.request_logout(request)
 
 
-@app.get('/home', include_in_schema=False)
-@authorized
+@app.get('/home', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
 async def get_home(request: fastapi.Request, session: db.Session = db.SESSION_DEP):
     db_receitas = repository.list_receitas(session)
     db_ingredientes = repository.get_ingredientes(session)
     db_estoques = repository.list_estoques(session)
     db_vendas = repository.list_vendas(session)
 
-    return render(session, request, 'home.html', {
+    return render(request, 'home.html', session, context={
         'len_receitas': len(db_receitas),
         'len_ingredientes': len(db_ingredientes),
         'estoques': len(db_estoques),
@@ -130,3 +118,8 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex):
     url = urlunparse(parsed_url)
 
     return fastapi.responses.RedirectResponse(url, status_code=302)
+
+
+@app.exception_handler(HTTPException)
+async def http_error_exception_handler(request: fastapi.Request, ex: HTTPException):
+    return await integrity_error_exception_handler(request, ex)

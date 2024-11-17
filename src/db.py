@@ -13,7 +13,10 @@ engine = create_engine(DATABASE_URL, echo=True)
 
 def get_session(request: Request):
     with Session(engine) as session:
-        session.info.update(user=request.state.user)
+        try:
+            session.info.update(user=request.state.user)
+        except:
+            pass
         yield session
     session.close()
 

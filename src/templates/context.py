@@ -85,7 +85,7 @@ BASE_NAVBAR_LINKS = [
 ]
 
 
-def get_context(session, request: Request, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
+def get_context(request: Request, session=None, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
     base_context = Context(
         title='Caderninho',
         navbar=Context.Navbar(
@@ -102,15 +102,16 @@ def get_context(session, request: Request, context: dict = None, navbar_links: l
         breadcrumbs=Context.factory_breadcrumbs(request)
     )
 
-    db_ingredientes = repository.get_ingredientes(session)
-    db_receitas = repository.list_receitas(session)
-    entradas, saidas, caixa = repository.get_fluxo_caixa(session)
+    if session:
+        db_ingredientes = repository.get_ingredientes(session)
+        db_receitas = repository.list_receitas(session)
+        entradas, saidas, caixa = repository.get_fluxo_caixa(session)
 
-    base_context.update(ingredientes=db_ingredientes)
-    base_context.update(receitas=db_receitas)
-    base_context.update(entradas=entradas)
-    base_context.update(saidas=saidas)
-    base_context.update(caixa=caixa)
+        base_context.update(ingredientes=db_ingredientes)
+        base_context.update(receitas=db_receitas)
+        base_context.update(entradas=entradas)
+        base_context.update(saidas=saidas)
+        base_context.update(caixa=caixa)
 
     if context:
         base_context.update(**context)
@@ -118,9 +119,13 @@ def get_context(session, request: Request, context: dict = None, navbar_links: l
     return base_context
 
 
-def render(session, templates: Jinja2Templates, request: Request, template_name: str, context: dict = None):
+def render(templates: Jinja2Templates, request: Request, template_name: str, session=None, context: dict = None):
     return templates.TemplateResponse(
         request=request,
         name=template_name,
-        context=get_context(session, request, context)
+        context=get_context(
+            request=request,
+            session=session,
+            context=context
+        )
     )

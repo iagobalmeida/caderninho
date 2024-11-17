@@ -58,11 +58,12 @@ O Sistema conta capacidade para múltiplas contas e organizações e permite ger
 - [X] Ajustar redirect de erro
 
 ## TODO v1.8
+- [X] Melhorar `db.py`
+- [X] Modal `Meu Perfil`
+- [ ] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
 - [ ] Formulários verticais em modal
 - [ ] Upload e download de CSV
 - [ ] Tela "Organização"
-- [ ] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
-- [ ] Melhorar `db.py`
 
 ### Anotações
 ```

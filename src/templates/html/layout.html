@@ -14,7 +14,9 @@
 {% include 'estoques/modal_edit.html' %}
 {% include 'estoques/modal_delete.html' %}
 
+
 {% include 'receitas/modal_create.html' %}
+{% include 'modal_perfil.html' %}
 {% include 'modal_logout.html' %}
 
 <div class="page">
@@ -24,12 +26,23 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <h1 class="navbar-brand navbar-brand-autodark">
+        <h1 class="navbar-brand navbar-brand-autodark d-none d-md-flex">
           <a href="{{url_for('get_home')}}">
-            {{title}}
+            📕 Caderninho
           </a>
         </h1>
-        <h5 class="navbar-brand">Olá, {{request.state.user.nome}}!</h5>
+        {% if request.state and request.state.user %}
+          <div class="bg-dark p-2 px-4 m-2 d-flex flex-column gap-1 border border-2 border-light rounded-pill text-light">
+            <b class="text-center text-lg">{{request.state.user.organizacao_descricao}}</b>
+            <small class="text-center">{{request.state.user.email}}</small>
+          </div>
+          <div class="d-flex flex-column text-end text-md-center">
+            <h5 class="navbar-brand">
+              Olá, {{request.state.user.nome}}!
+            </h5>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil" data-bs-payload="{{request.state.user | json}}" class="text-primary">Meu perfil</a>
+          </div>
+        {% endif %}
         <div class="collapse navbar-collapse" id="sidebar-menu">
           <ul class="navbar-nav pt-lg-3">
             {% include 'navbar_items.html' %}
