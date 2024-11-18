@@ -21,7 +21,7 @@ class Usuario(RegistroOrganizacao, table=True):
     organizacao: "Organizacao" = Relationship(back_populates="usuarios")
     nome: str
     email: str
-    senha: str
+    senha: Optional[str] = Field(default=None)
     dono: Optional[bool] = Field(default=False)
     administrador: Optional[bool] = Field(default=False)
 

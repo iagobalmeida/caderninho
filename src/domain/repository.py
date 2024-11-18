@@ -4,45 +4,27 @@ from typing import List, Tuple
 
 from sqlmodel import Session, SQLModel, func, select
 
+from src.auth import usuario_de_sessao
 from src.domain.entities import (Estoque, Ingrediente, Receita,
                                  ReceitaIngredienteLink, Venda)
 
 log = getLogger(__name__)
 
 
-def __user_from_session(session: Session):
-    sessao_usuario = session.info.get('user', {})
-    return sessao_usuario
-
-
 def __filter_organization_id(session: Session, query, entity: SQLModel):
-    sessao_usuario = session.info.get('user', {})
-    log.info(f'sessao_usuario: {sessao_usuario}')
-
-    if sessao_usuario:
-        usuario_administrador = sessao_usuario.get('administrador', False)
-        if usuario_administrador:
-            return query
-        organizacao_id = sessao_usuario.get('organizacao_id', -1)
-        organizacao_id = int(organizacao_id) if organizacao_id else -1
-        log.info(f'organizacao_id: {organizacao_id}')
-        return query.filter(entity.organizacao_id == organizacao_id)
-
-    log.info(f'organizacao_id: -1')
-    return query.filter(entity.organizacao_id == -1)
+    sessao_usuario = usuario_de_sessao(session)
+    if sessao_usuario.administrador:
+        return query
+    return query.filter(entity.organizacao_id == sessao_usuario.organizacao_id)
 
 
 def __delete(session: Session, entity: SQLModel, id: int) -> bool:
-    sessao_usuario = __user_from_session(session)
-    sessao_usuario_admin = sessao_usuario.get('administrador', False)
-    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id', -1))
-
     db_entity = session.get(entity, id)
-
     if not db_entity:
         return True
 
-    if not sessao_usuario_admin and not db_entity.organizacao_id == sessao_usuario_organizacao_id:
+    sessao_usuario = usuario_de_sessao(session)
+    if not sessao_usuario.administrador and not db_entity.organizacao_id == sessao_usuario.organizacao_id:
         raise ValueError('Sem permissão para deletar esse registro')
 
     session.delete(db_entity)
@@ -74,18 +56,17 @@ def delete_ingrediente(session: Session, id: int) -> bool:
 
 
 def __update(session: Session, entity: SQLModel, id: int, **kwargs) -> SQLModel:
-    sessao_usuario = __user_from_session(session)
-    sessao_usuario_admin = sessao_usuario.get('administrador', False)
-    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id', -1))
-
     db_entity = session.get(entity, id)
-    if not sessao_usuario_admin and not db_entity.organizacao_id == sessao_usuario_organizacao_id:
+
+    sessao_usuario = usuario_de_sessao(session)
+    if not sessao_usuario.administrador and not db_entity.organizacao_id == sessao_usuario.organizacao_id:
         raise ValueError('Sem permissão para editar esse registro')
 
     for key, value in kwargs.items():
         if not value:
             continue
         db_entity.__setattr__(key, value)
+
     session.commit()
     return db_entity
 
@@ -111,11 +92,8 @@ def update_estoque(session: Session, id: int, descricao: str, valor_pago: float 
 
 
 def __create(session: Session, entity):
-    sessao_usuario = __user_from_session(session)
-    sessao_usuario_organizacao_id = int(sessao_usuario.get('organizacao_id', -1))
-
-    entity.organizacao_id = sessao_usuario_organizacao_id
-
+    sessao_usuario = usuario_de_sessao(session)
+    entity.organizacao_id = sessao_usuario.organizacao_id
     session.add(entity)
     session.commit()
     return entity
@@ -123,6 +101,47 @@ def __create(session: Session, entity):
 
 def create_receita(session: Session, nome: str) -> Receita:
     return __create(session, Receita(nome=nome, peso_unitario=1, porcentagem_lucro=33))
+
+
+def create_ingrediente(session: Session, nome: str, peso: float, custo: float) -> Ingrediente:
+    return __create(session, Ingrediente(
+        nome=nome,
+        peso=peso,
+        custo=custo
+    ))
+
+
+def create_receita_ingrediente(session: Session, receita_id: int, ingrediente_id: int, quantidade: float) -> ReceitaIngredienteLink:
+    return __create(session, ReceitaIngredienteLink(
+        receita_id=receita_id,
+        ingrediente_id=ingrediente_id,
+        quantidade=quantidade
+    ))
+
+
+def create_venda(session: Session, descricao: str, valor: float) -> Venda:
+    return __create(session,  Venda(
+        descricao=descricao,
+        valor=valor
+    ))
+
+
+def create_estoque(session: Session, descricao: str, ingrediente_id: int = None, quantidade: float = None, valor_pago: float = None) -> Estoque:
+    if not ingrediente_id and not quantidade and not valor_pago:
+        return False
+    if ingrediente_id == -1:
+        ingrediente_id = None
+    if not quantidade:
+        quantidade = None
+
+    db_estoque = Estoque(
+        descricao=descricao,
+        ingrediente_id=ingrediente_id,
+        quantidade=quantidade,
+        valor_pago=valor_pago
+    )
+    __create(session, db_estoque)
+    return True
 
 
 def list_receitas(session: Session, filter_nome: str = None) -> List[Receita]:
@@ -133,45 +152,6 @@ def list_receitas(session: Session, filter_nome: str = None) -> List[Receita]:
         query = query.filter(Receita.nome.like(f'%{filter_nome}%'))
     receitas = session.exec(query).all()
     return receitas
-
-
-def get_receita(session: Session, id: int) -> Receita:
-    receita = session.get(Receita, id)
-    return receita
-
-
-def get_ingredientes(session: Session) -> List[Ingrediente]:
-    query = select(Ingrediente)
-    query = __filter_organization_id(session, query, Receita)
-
-    ingredientes = session.exec(query).all()
-    return ingredientes
-
-
-def create_ingrediente(session: Session, nome: str, peso: float, custo: float) -> Ingrediente:
-    organizacao_id = session.info.get('user', {}).get('organizacao_id')
-    novo_ingrediente = Ingrediente(
-        organizacao_id=organizacao_id,
-        nome=nome,
-        peso=peso,
-        custo=custo
-    )
-    session.add(novo_ingrediente)
-    session.commit()
-    return novo_ingrediente
-
-
-def create_receita_ingrediente(session: Session, receita_id: int, ingrediente_id: int, quantidade: float) -> ReceitaIngredienteLink:
-    organizacao_id = session.info.get('user', {}).get('organizacao_id')
-    receita_ingrediente = ReceitaIngredienteLink(
-        organizacao_id=organizacao_id,
-        receita_id=receita_id,
-        ingrediente_id=ingrediente_id,
-        quantidade=quantidade
-    )
-    session.add(receita_ingrediente)
-    session.commit()
-    return receita_ingrediente
 
 
 def list_estoques(session: Session, filter_ingrediente_id: int = -1, filter_data_inicio: datetime = None, filter_data_final: datetime = None) -> List[Estoque]:
@@ -208,18 +188,6 @@ def list_vendas(session: Session, filter_data_inicio: datetime = None, filter_da
     return ret
 
 
-def create_venda(session: Session, descricao: str, valor: float) -> Venda:
-    organizacao_id = session.info.get('user', {}).get('organizacao_id')
-    venda = Venda(
-        organizacao_id=organizacao_id,
-        descricao=descricao,
-        valor=valor
-    )
-    session.add(venda)
-    session.commit()
-    return venda
-
-
 def get_fluxo_caixa(session: Session) -> Tuple[float, float, float]:
     query_entradas = select(func.sum(Venda.valor))
     query_entradas = __filter_organization_id(session, query_entradas, Venda)
@@ -239,19 +207,13 @@ def get_fluxo_caixa(session: Session) -> Tuple[float, float, float]:
     return (entradas, saidas, caixa)
 
 
-def create_estoque(session: Session, descricao: str, ingrediente_id: int = None, quantidade: float = None, valor_pago: float = None) -> Estoque:
-    if not ingrediente_id and not quantidade and not valor_pago:
-        return False
-    if ingrediente_id == -1:
-        ingrediente_id = None
-    if not quantidade:
-        quantidade = None
+def get_receita(session: Session, id: int) -> Receita:
+    receita = session.get(Receita, id)
+    return receita
 
-    db_estoque = Estoque(
-        descricao=descricao,
-        ingrediente_id=ingrediente_id,
-        quantidade=quantidade,
-        valor_pago=valor_pago
-    )
-    __create(session, db_estoque)
-    return True
+
+def get_ingredientes(session: Session) -> List[Ingrediente]:
+    query = select(Ingrediente)
+    query = __filter_organization_id(session, query, Receita)
+    ingredientes = session.exec(query).all()
+    return ingredientes

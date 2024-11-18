@@ -1,7 +1,7 @@
 import jwt
 from fastapi import Depends, Header, Request
-from fastapi.exceptions import HTTPException
 from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from src.domain.entities import Usuario
@@ -9,6 +9,22 @@ from src.utils import redirect_url_for
 
 DEFAULT_JWT_ALG = 'HS256'
 DEFAULT_JWT_SECRET = b'secret'
+
+
+class SessionUser(BaseModel):
+    valid: bool = False
+    nome: str = None
+    email: str = None
+    administrador: bool = False
+    organizacao_id: int = None
+    organizacao_nome: str = None
+
+
+def usuario_de_sessao(session: Session) -> SessionUser:
+    sessao_usuario = session.info.get('user', None)
+    if not sessao_usuario:
+        return SessionUser(valid=False)
+    return SessionUser(**sessao_usuario, valid=True)
 
 
 def authenticate(session: Session, email: str, senha: str) -> str:
