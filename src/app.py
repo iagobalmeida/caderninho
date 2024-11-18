@@ -74,7 +74,7 @@ async def get_sobre(request: fastapi.Request, session: db.Session = db.SESSION_D
 
 
 @app.post('/perfil', dependencies=[auth.HEADER_AUTH])
-async def post_perfil(request: fastapi.Request, payload: inputs.UsuarioAtualizar,  session: db.Session = db.SESSION_DEP):
+async def post_perfil(request: fastapi.Request, payload: inputs.UsuarioAtualizar = fastapi.Form(),  session: db.Session = db.SESSION_DEP):
     repository.update_usuario(session, id=payload.id, nome=payload.nome, email=payload.email)
     return redirect_back(request)
 
