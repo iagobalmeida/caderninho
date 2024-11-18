@@ -9,75 +9,61 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="datagrid">
-            <div class="datagrid-item">
-              <div class="datagrid-title">Descricao</div>
-              <select name="descricao" class="form-select">
-                <option value="Compra">Compra</option>
-                <option value="Consumo Ingrediente">Consumo Ingrediente</option>
-                <option value="Uso em Receita">Uso em Receita</option>
-                <option value="Outros">Outros</option>
-              </select>
-            </div>
-            <div class="datagrid-item">
-              <div class="datagrid-title">Valor Pago</div>
-              <div class="datagrid-content">
-                <div class="input-group input-group-flat">
-                  <span class="input-group-text"> R$ </span>
-                  <input name="valor_pago" required type="number" step="any" class="form-control text-end" min="1" />
-                </div>
-              </div>
-            </div>
+          <div class="mb-3">
+            <label for="descricao" class="form-label required">Tipo</label>
+            <select name="descricao" class="form-select">
+              <option value="Compra">Compra</option>
+              <option value="Consumo Ingrediente">Consumo Ingrediente</option>
+              <option value="Uso em Receita">Uso em Receita</option>
+              <option value="Outros">Outros</option>
+            </select>
           </div>
           <hr>
-          <div class="datagrid" id="datagrid-ingrediente">
-            <div class="datagrid-item">
-              <div class="datagrid-title">Ingrediente</div>
-              <div class="datagrid-content">
-                <select class="form-select" name="ingrediente_id">
-                  <option selected value="-1">Selecionar</option>
-                  {% for ingrediente in ingredientes %}
-                    <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
-                  {% endfor %}
-                </select>
-                <a data-bs-toggle="modal" data-bs-target="#modalCreateIngrediente" style="display: block; margin-top: 8px" class=" cursor-pointer" id="ingrediente_custo_p_grama">Novo Ingrediente</a>
-              </div>
+          <div class="mb-3" id="fieldset-valor_pago">
+            <label for="valor_pago" class="form-label required">Valor Pago</label>
+            <div class="input-group input-group-flat">
+              <span class="input-group-text"> R$ </span>
+              <input name="valor_pago" required type="number" step="any" class="form-control text-end" min="1" />
             </div>
-            <div class="datagrid-item">
-              <div class="datagrid-title">Quantidade (g)</div>
-              <div class="datagrid-content">
-                <div class="input-group input-group-flat">
-                  <input type="number" step="any" name="quantidade_ingrediente" class="form-control pe-0" min="1" />
-                  <span class="input-group-text"> g </span>
-                </div>
+          </div>
+          <div id="datagrid-ingrediente">
+            <div class="mb-3">
+              <label for="ingrediente_id" class="form-label required">Ingrediente</label>
+              <select class="form-select" name="ingrediente_id">
+                <option selected value="-1">Selecionar</option>
+                {% for ingrediente in ingredientes %}
+                  <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3" id="fieldset-quantidade-ingrediente" style="display: none;">
+              <label for="quantidade_ingrediente" class="form-label required">Quantidade</label>
+              <div class="input-group input-group-flat">
+                <input type="number" step="any" name="quantidade_ingrediente" class="form-control pe-0" min="1" />
+                <span class="input-group-text"> g </span>
               </div>
             </div>
           </div>
-          <div class="datagrid" id="datagrid-receita" style="display: none">
-            <div class="datagrid-item">
-              <div class="datagrid-title">Receita</div>
-              <div class="datagrid-content">
-                <select class="form-select" name="receita_id">
-                  <option selected value="-1">Selecionar</option>
-                  {% for receita in receitas %}
-                    <option value="{{receita.id}}" data-custo_p_grama="{{receita.custo_p_grama}}">{{receita.nome | title}}</option>
-                  {% endfor %}
-                </select>
-              </div>
+          <div id="datagrid-receita" style="display: none;">
+            <div class="mb-3">
+              <label for="receita_id" class="form-label required">Receita</label>
+              <select class="form-select" name="receita_id">
+                <option selected value="-1">Selecionar</option>
+                {% for receita in receitas %}
+                  <option value="{{receita.id}}" data-custo_p_grama="{{receita.custo_p_grama}}">{{receita.nome | title}}</option>
+                {% endfor %}
+              </select>
             </div>
-            <div class="datagrid-item">
-              <div class="datagrid-title">Quantidade (Receitas Feitas)</div>
-              <div class="datagrid-content">
-                <input class="form-control" type="number" step="any" name="quantidade_receita">
-              </div>
+            <div class="mb-3" id="fieldset-quantidade-receita" style="display: none;">
+              <label for="quantidade_receita" class="form-label required">Quantidade</label>
+              <input class="form-control" type="number" step="any" name="quantidade_receita">
+              <small class="text-muted text-sm">Quantas receitas foram feitas?</small>
             </div>
           </div>
-          <div class="datagrid" id="datagrid-descricao-customizada" style="display: none">
-            <div class="datagrid-item">
-              <div class="datagrid-title">Descrição</div>
-              <div class="datagrid-content">
-                <input type="text" name="descricao_customizada" class="form-control pe-0" min="1" />
-              </div>
+          <div id="datagrid-descricao-customizada" style="display: none;">
+            <div class="mb-3">
+              <label for="descricao_customizada" class="form-label required">Descrição</label>
+              <input type="text" name="descricao_customizada" class="form-control pe-0" min="1" />
             </div>
           </div>
         </div>
@@ -90,12 +76,32 @@
   </div>
 
 <script>
-  const inputValorPago = document.querySelector('input[name="valor_pago"]');
+  const fieldSetQuantidadeIngrediente = document.querySelector('#fieldset-quantidade-ingrediente')
+  const fieldSetQuantidadeReceita = document.querySelector('#fieldset-quantidade-receita')
+  const fieldSetValorPago = document.querySelector('#fieldset-valor_pago');
   const datagridReceita = document.querySelector('#datagrid-receita');
   const datagridIngrediente = document.querySelector('#datagrid-ingrediente');
   const datagridDesricaoCustomizada = document.querySelector('#datagrid-descricao-customizada');
 
-  document.querySelector('select[name="descricao"]').addEventListener('change', function (e) {
+  document.querySelector('#modalCreateEstoque select[name="ingrediente_id"]').addEventListener('change', function(e) {
+    console.log(this.value);
+    if(this.value != -1) {
+      fieldSetQuantidadeIngrediente.style.display = 'block';
+    } else {
+      fieldSetQuantidadeIngrediente.style.display = 'none';
+    }
+  });
+
+  document.querySelector('#modalCreateEstoque select[name="receita_id"]').addEventListener('change', function(e) {
+    console.log(this.value);
+    if(this.value != -1) {
+      fieldSetQuantidadeReceita.style.display = 'block';
+    } else {
+      fieldSetQuantidadeReceita.style.display = 'none';
+    }
+  });
+
+  document.querySelector('#modalCreateEstoque select[name="descricao"]').addEventListener('change', function (e) {
     if(this.value == 'Uso em Receita') {
       datagridReceita.style.display = 'grid';
       datagridIngrediente.style.display = 'none';
@@ -111,9 +117,9 @@
     }
 
     if(this.value == 'Compra' || this.value == 'Outros') {
-      inputValorPago.removeAttribute('readonly');
+      fieldSetValorPago.style.display = 'block';
     } else {
-      inputValorPago.setAttribute('readonly', true);
+      fieldSetValorPago.style.display = 'none';
     }
   });
 </script>

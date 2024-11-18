@@ -11,21 +11,17 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                  <div class="datagrid">
-                      <div class="datagrid-item">
-                      <div class="datagrid-title">Descrição</div>
-                        <input required type="text" class="form-control" name="descricao"/>
-                      </div>
-                      <div class="datagrid-item">
-                        <div class="datagrid-title">Valor</div>
-                        <div class="datagrid-content">
-                            <div class="input-group input-group-flat">
-                            <span class="input-group-text"> R$ </span>
-                            <input name="valor" required type="number" step="any" class="form-control text-end" min="1" />
-                            </div>
-                        </div>
-                      </div>
-                  </div>
+                <div class="mb-3">
+                    <label class="form-label required" for="descricao">Descrição</label>
+                    <input required type="text" class="form-control" name="descricao"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label required" for="valor">Valor</label>
+                    <div class="input-group input-group-flat">
+                        <span class="input-group-text"> R$ </span>
+                        <input name="valor" required type="number" step="any" class="form-control text-end" min="1" />
+                    </div>
+                </div>
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>

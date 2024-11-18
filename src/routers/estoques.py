@@ -1,14 +1,14 @@
 import fastapi
 from sqlmodel import Session
 
+from src import auth
 from src.db import SESSION_DEP
-from src.decorators.auth import authorized
 from src.domain import inputs, repository
 from src.templates import render
 from src.templates.context import Button, Context
 from src.utils import redirect_back
 
-router = fastapi.APIRouter(prefix='/estoques')
+router = fastapi.APIRouter(prefix='/estoques', dependencies=[auth.HEADER_AUTH])
 context_header = Context.Header(
     pretitle='Registros',
     title='Estoque',
@@ -39,7 +39,6 @@ context_header = Context.Header(
 
 
 @router.get('/', include_in_schema=False)
-@authorized
 async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = SESSION_DEP):
     db_estoques = repository.list_estoques(session, filter_ingrediente_id, filter_data_inicio, filter_data_final)
     db_ingredientes = repository.get_ingredientes(session)
@@ -63,7 +62,6 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
 
 
 @router.post('/', include_in_schema=False)
-@authorized
 async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = SESSION_DEP):
     if payload.descricao == 'Uso em Receita' and payload.receita_id:
         db_receita = repository.get_receita(session, payload.receita_id)
@@ -93,7 +91,6 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
 
 
 @router.post('/excluir', include_in_schema=False)
-@authorized
 async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = SESSION_DEP):
     if selecionados_ids:
         for id in selecionados_ids.split(','):
@@ -102,7 +99,6 @@ async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str 
 
 
 @router.post('/atualizar', include_in_schema=False)
-@authorized
 async def post_estoques_atualizar(request: fastapi.Request, payload: inputs.EstoqueAtualizar = fastapi.Form(), session: Session = SESSION_DEP):
     repository.update_estoque(session, id=payload.id, descricao=payload.descricao, quantidade=payload.quantidade, valor_pago=payload.valor_pago)
     return redirect_back(request)

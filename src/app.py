@@ -10,18 +10,18 @@ from sqlalchemy.log import rootlogger
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from src import auth, db
-from src.decorators.auth import authorized
-from src.domain import repository
+from src.domain import inputs, repository
 from src.routers.estoques import router as router_estoques
 from src.routers.ingredientes import router as router_ingredientes
 from src.routers.receitas import router as router_receitas
 from src.routers.vendas import router as router_vendas
 from src.scripts import seed
 from src.templates import render
+from src.utils import redirect_back
 
 rootlogger.setLevel(logging.WARN)
 
-app = fastapi.FastAPI(dependencies=[auth.AUTH_DEP])
+app = fastapi.FastAPI()
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 
 app.include_router(router_receitas)
@@ -66,6 +66,17 @@ async def get_home(request: fastapi.Request, session: db.Session = db.SESSION_DE
         'estoques': len(db_estoques),
         'vendas': len(db_vendas),
     })
+
+
+@app.get('/sobre', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
+async def get_sobre(request: fastapi.Request, session: db.Session = db.SESSION_DEP):
+    return render(request, 'sobre.html', session)
+
+
+@app.post('/perfil', dependencies=[auth.HEADER_AUTH])
+async def post_perfil(request: fastapi.Request, payload: inputs.UsuarioAtualizar,  session: db.Session = db.SESSION_DEP):
+    repository.update_usuario(session, id=payload.id, nome=payload.nome, email=payload.email)
+    return redirect_back(request)
 
 
 @app.post('/scripts/seed', tags=['Scripts'])

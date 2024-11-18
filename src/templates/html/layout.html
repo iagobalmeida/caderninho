@@ -7,8 +7,6 @@
 {% include 'vendas/modal_create.html' %}
 
 {% include 'ingredientes/modal_create.html' %}
-{% include 'ingredientes/modal_edit.html' %}
-{% include 'ingredientes/modal_delete.html' %}
 
 {% include 'estoques/modal_create.html' %}
 {% include 'estoques/modal_edit.html' %}
@@ -63,11 +61,25 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                   <!-- <a href="#" class="dropdown-item">Status</a> -->
-                  <a data-bs-toggle="modal" data-bs-target="#modalPerfil" data-bs-payload="{{request.state.user | json}}" class="dropdown-item curosr-pointer">Meu pefil</a>
+                  <a data-bs-toggle="modal" data-bs-target="#modalPerfil" data-bs-payload="{{request.state.user | json}}" class="dropdown-item cursor-pointer">
+                    {{ material_symbol('account_circle') | safe }}
+                    &nbsp;
+                    Meu pefil
+                  </a>
                   <!-- <a href="#" class="dropdown-item">Feedback</a> -->
                   <div class="dropdown-divider"></div>
+                  <a href="{{url_for('get_sobre')}}" class="dropdown-item cursor-pointer">
+                    {{ material_symbol('info') | safe }}
+                    &nbsp;
+                    Sobre o Kderninho
+                  </a>
+                  <div class="dropdown-divider"></div>
                   <!-- <a href="./settings.html" class="dropdown-item">Settings</a> -->
-                  <a data-bs-toggle="modal" data-bs-target="#modalLogout" class="dropdown-item curosr-pointer text-danger">Sair</a>
+                  <a data-bs-toggle="modal" data-bs-target="#modalLogout" class="dropdown-item cursor-pointer text-danger">
+                    {{ material_symbol('logout') | safe }}
+                    &nbsp;
+                    Sair
+                  </a>
                 </div>
               </div>
             </div>

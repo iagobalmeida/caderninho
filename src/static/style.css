@@ -5,9 +5,9 @@
     --tblr-datagrid-item-width: 8rem !important;
 }
 .input-group:has(input[readonly]),
-.datagrid-item:has(input[readonly]),
+.mb-3:has(input[readonly]),
 .input-group:has(select[readonly]),
-.datagrid-item:has(select[readonly])
+.mb-3:has(select[readonly])
  {
     opacity: 85%;
     filter: contrast(0.9);
@@ -25,10 +25,12 @@ h5:has(> .material-symbols-outlined),
 h2:has(> .material-symbols-outlined),
 h3:has(> .material-symbols-outlined)
 {
+    &:not(.no-space) {
+        gap: .5rem;
+    }
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: .5rem;
 }
 .datagrid-content .badge {
     font-size: 14px;

@@ -65,3 +65,9 @@ class EstoqueAtualizar(BaseModel):
     descricao: str
     valor_pago: float
     quantidade: float
+
+
+class UsuarioAtualizar(BaseModel):
+    id: int
+    nome: str
+    email: str

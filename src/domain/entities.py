@@ -25,6 +25,17 @@ class Usuario(RegistroOrganizacao, table=True):
     dono: Optional[bool] = Field(default=False)
     administrador: Optional[bool] = Field(default=False)
 
+    def dict(self):
+        base_dict = self.model_dump()
+        del base_dict['senha']
+        if self.administrador:
+            base_dict.update(organizacao_descricao='Administrador')
+        elif self.organizacao:
+            base_dict.update(organizacao_descricao=self.organizacao.descricao)
+        else:
+            base_dict.update(organizacao_descricao='-')
+        return base_dict
+
 
 class ReceitaIngredienteLink(RegistroOrganizacao, table=True):
     quantidade: float
@@ -55,11 +66,21 @@ class Estoque(RegistroOrganizacao, table=True):
     quantidade: Optional[float] = Field(default=0)
     valor_pago: Optional[float] = Field(default=0)
 
+    def dict(self):
+        base_dict = self.model_dump()
+        base_dict['data_criacao'] = self.data_criacao.strftime('%Y-%m-%d')
+        return base_dict
+
 
 class Venda(RegistroOrganizacao, table=True):
     data_criacao: datetime = Field(default=datetime.now(), nullable=False)
     descricao: str
     valor: float
+
+    def dict(self):
+        base_dict = self.model_dump()
+        base_dict['data_criacao'] = self.data_criacao.strftime('%Y-%m-%d')
+        return base_dict
 
 
 class Ingrediente(RegistroOrganizacao, table=True):
@@ -68,6 +89,10 @@ class Ingrediente(RegistroOrganizacao, table=True):
     custo: float
     receita_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='ingrediente')
     estoque_links: List['Estoque'] = Relationship(back_populates='ingrediente')
+
+    def dict(self):
+        base_dict = self.model_dump()
+        return base_dict
 
     @property
     def custo_p_grama_medio(self):

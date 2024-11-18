@@ -1,7 +1,7 @@
 {% for navbar_link in navbar.links %}
     {% with class='nav-item active' if navbar_link.active else 'nav-item' %}
-        <li class="{{class}}">
-            <a href="{{ navbar_link.url }}" class="nav-link" {{'aria-current="page"' if is_active else ''}}>
+        <li class="{{class}} cursor-pointer">
+            <a href="{{ navbar_link.url }}" class="nav-link cursor-pointer" {{'aria-current="page"' if is_active else ''}}>
                 <span class="nav-link-title">
                     {{ navbar_link.symbol | safe }}
                     {{ navbar_link.title }}

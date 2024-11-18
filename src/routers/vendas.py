@@ -1,14 +1,14 @@
 import fastapi
 from sqlmodel import Session
 
+from src import auth
 from src.db import SESSION_DEP
-from src.decorators.auth import authorized
 from src.domain import inputs, repository
 from src.templates import render
 from src.templates.context import Button, Context
 from src.utils import redirect_back
 
-router = fastapi.APIRouter(prefix='/vendas')
+router = fastapi.APIRouter(prefix='/vendas', dependencies=[auth.HEADER_AUTH])
 context_header = Context.Header(
     pretitle='Registros',
     title='Vendas',
@@ -39,7 +39,6 @@ context_header = Context.Header(
 
 
 @router.get('/', include_in_schema=False)
-@authorized
 async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = SESSION_DEP):
     db_vendas = repository.list_vendas(session, filter_data_inicio, filter_data_final)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
@@ -60,14 +59,12 @@ async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = N
 
 
 @router.post('/', include_in_schema=False)
-@authorized
 async def post_vendas_index(request: fastapi.Request, payload: inputs.VendaCriar = fastapi.Form(), session: Session = SESSION_DEP):
     repository.create_venda(session, descricao=payload.descricao, valor=payload.valor)
     return redirect_back(request)
 
 
 @router.post('/excluir', include_in_schema=False)
-@authorized
 async def post_vendas_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = SESSION_DEP):
     if selecionados_ids:
         for id in selecionados_ids.split(','):
@@ -76,7 +73,6 @@ async def post_vendas_excluir(request: fastapi.Request, selecionados_ids: str = 
 
 
 @router.post('/atualizar', include_in_schema=False)
-@authorized
 async def post_vendas_atualizar(request: fastapi.Request, payload: inputs.VendaAtualizar = fastapi.Form(), session: Session = SESSION_DEP):
     repository.update_venda(session, id=payload.id, descricao=payload.descricao, valor=payload.valor)
     return redirect_back(request)

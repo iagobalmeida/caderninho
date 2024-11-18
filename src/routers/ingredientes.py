@@ -1,14 +1,14 @@
 import fastapi
 from sqlmodel import Session
 
+from src import auth
 from src.db import SESSION_DEP
-from src.decorators.auth import authorized
 from src.domain import inputs, repository
 from src.templates import render
 from src.templates.context import Button, Context
 from src.utils import redirect_back
 
-router = fastapi.APIRouter(prefix='/ingredientes')
+router = fastapi.APIRouter(prefix='/ingredientes', dependencies=[auth.HEADER_AUTH])
 context_header = Context.Header(
     pretitle='Registros',
     title='Ingredientes',
@@ -39,7 +39,6 @@ context_header = Context.Header(
 
 
 @router.get('/', include_in_schema=False)
-@authorized
 async def get_ingredientes_index(request: fastapi.Request, session: Session = SESSION_DEP):
     db_ingredientes = repository.get_ingredientes(session)
     return render(
@@ -54,21 +53,18 @@ async def get_ingredientes_index(request: fastapi.Request, session: Session = SE
 
 
 @router.post('/', include_in_schema=False)
-@authorized
 async def post_ingredientes_index(request: fastapi.Request, payload: inputs.IngredienteCriar = fastapi.Form(), session: Session = SESSION_DEP):
     repository.create_ingrediente(session, nome=payload.nome, peso=payload.peso, custo=payload.custo)
     return redirect_back(request)
 
 
 @router.post('/atualizar', include_in_schema=False)
-@authorized
 async def post_ingredientes_atualizar(request: fastapi.Request, payload: inputs.IngredienteAtualizar = fastapi.Form(), session: Session = SESSION_DEP):
     repository.update_ingrediente(session, id=id, nome=payload.nome, peso=payload.peso, custo=payload.custo)
     return redirect_back(request)
 
 
 @router.post('/excluir', include_in_schema=False)
-@authorized
 async def post_ingredientes_excluir(request: fastapi.Request, id: int = fastapi.Form(), session: Session = SESSION_DEP):
     repository.delete_ingrediente(session, id=id)
     return redirect_back(request)

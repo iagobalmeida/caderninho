@@ -13,61 +13,51 @@
         <div class="modal-body">
           <input required type="hidden" class="form-control pe-0" value="{{receita.id}}" name="receita_id" />
           <input required type="hidden" class="form-control pe-0"  name="id" />
-          <div class="datagrid">
-            <div class="datagrid-item">
-              <label class="datagrid-title form-label">Ingrediente</label>
-              <div class="datagrid-content">
-                <select required readonly class="form-select" name="ingrediente_id">
-                  <option selected value="-1">Selecionar</option>
-                  {% for ingrediente in ingredientes %}
-                  <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>
-            <div class="datagrid-item">
-              <label class="datagrid-title form-label">Quantidade Utilizada</label>
-              <div class="datagrid-content">
-                <div class="input-group input-group-flat">
-                  <input required type="number" step="any" class="form-control pe-0" value="0" min="1" name="quantidade" />
-                  <span class="input-group-text"> g </span>
-                </div>
-              </div>
+          <div class="mb-3">
+            <label class="form-label required">Ingrediente</label>
+            <select required readonly class="form-select" name="ingrediente_id">
+              <option selected value="-1">Selecionar</option>
+              {% for ingrediente in ingredientes %}
+              <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required">Quantidade Utilizada</label>
+            <div class="input-group input-group-flat">
+              <input required type="number" step="any" class="form-control pe-0" value="0" min="1" name="quantidade" />
+              <span class="input-group-text"> g </span>
             </div>
           </div>
-          <hr>
-          <h5>Editar Ingrediente</h5>
-          <div class="datagrid">
-            <div class="datagrid-item">
-              <div class="datagrid-title">
-                Nome
-              </div>
-              <div class="datagrid-content">
-                <input type="text" class="form-control" name="ingrediente_nome" placeholder="Preencha para alterar o nome desse ingrediente">
-              </div>
+        </div>
+        <div class="modal-header cursor-pointer d-flex flex-column align-items-start" data-bs-toggle="collapse" data-bs-target="#collapseEditarIngrediente">
+          <h5 class="modal-title no-space">
+            {{ material_symbol('edit') | safe }}
+            Editar Ingrediente
+          </h5>
+          <span class="text-muted text-sm">Clique para expandir</span>
+        </div>
+        <div class="modal-body collapse" id="collapseEditarIngrediente">
+          <div class="mb-3">
+            <label for="ingrediente_nome" class="form-label required">
+              Nome
+            </label>
+            <input type="text" class="form-control" name="ingrediente_nome" placeholder="Preencha para alterar o nome desse ingrediente">
+          </div>
+          <div class="mb-3">
+            <label for="ingrediente_custo" class="form-label required">
+              Custo
+            </label>
+            <div class="input-group input-group-flat">
+              <span class="input-group-text"> R$ </span>
+              <input name="ingrediente_custo" required type="number" step="any" class="form-control text-end" min="1" />
             </div>
           </div>
-          <br>
-          <div class="datagrid">
-            <div class="datagrid-item">
-              <div class="datagrid-title">
-                Custo
-              </div>
-              <div class="datagrid-content">
-                <div class="input-group input-group-flat">
-                  <span class="input-group-text"> R$ </span>
-                  <input name="ingrediente_custo" required type="number" step="any" class="form-control text-end" min="1" />
-                </div>
-              </div>
-            </div>
-            <div class="datagrid-item">
-              <div class="datagrid-title">
-                Peso (por pacote)
-              </div>
-              <div class="datagrid-content">
-                <input type="number" class="form-control" name="ingrediente_peso">
-              </div>
-            </div>
+          <div class="mb-3">
+            <label for="ingrediente_peso" class="form-label required">
+              Peso (por pacote)
+            </label>
+            <input type="number" class="form-control" name="ingrediente_peso">
           </div>
         </div>
         <div class="modal-footer">

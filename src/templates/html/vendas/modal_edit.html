@@ -10,26 +10,19 @@
         </div>
         <input required readonly type="hidden" class="form-control" name="id" />
         <div class="modal-body">
-          <div class="datagrid">
-            <div class="datagrid-item">
-              <div class="datagrid-title">Data</div>
-              <input required readonly type="datetime-local" class="form-control" name="data_criacao" />
-            </div>
+          <div class="mb-3">
+            <label class="form-label required" for="data_criacao">Data</label>
+            <input required readonly type="datetime-local" class="form-control" name="data_criacao" />
           </div>
-          <hr>
-          <div class="datagrid">
-            <div class="datagrid-item">
-              <div class="datagrid-title">Descricao</div>
-              <input required type="text" class="form-control" name="descricao" />
-            </div>
-            <div class="datagrid-item">
-              <div class="datagrid-title">Valor</div>
-              <div class="datagrid-content">
-                <div class="input-group input-group-flat">
-                  <span class="input-group-text"> R$ </span>
-                  <input name="valor" required type="number" step="any" class="form-control text-end" min="1" />
-                </div>
-              </div>
+          <div class="mb-3">
+            <label class="form-label required" for="descricao">Descricao</label>
+            <input required type="text" class="form-control" name="descricao" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label required" for="valor">Valor</label>
+            <div class="input-group input-group-flat">
+              <span class="input-group-text"> R$ </span>
+              <input name="valor" required type="number" step="any" class="form-control text-end" min="1" />
             </div>
           </div>
         </div>

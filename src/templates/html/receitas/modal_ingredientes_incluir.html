@@ -7,39 +7,31 @@
             <span class="material-symbols-outlined"> package_2 </span>
             Incluir Ingrediente
           </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <input type="hidden" name="receita_id" value="{{receita.id}}">
-            <div class="datagrid">
-              <div class="datagrid-item">
-                <label class="datagrid-title form-label">Ingrediente</label>
-                <div class="datagrid-content">
-                  <select required class="form-select" name="ingrediente_id">
-                    <option selected value="">Selecionar</option>
-                    {% for ingrediente in ingredientes %}
-                      <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
-                    {% endfor %}
-                  </select>
-                  <a data-bs-toggle="modal" data-bs-target="#modalCreateIngrediente" style="display: block; margin-top: 8px" class=" cursor-pointer" id="ingrediente_custo_p_grama">Novo Ingrediente</a>
-                </div>
-              </div>
-              <div class="datagrid-item">
-                <label class="datagrid-title form-label">Quantidade</label>
-                <div class="datagrid-content">
-                  <div class="input-group input-group-flat">
-                    <input required type="number" step="any" class="form-control pe-0" min="0" name="quantidade" />
-                    <span class="input-group-text"> g </span>
-                  </div>
-                  <small style="display: block; margin-top: 8px" class="text-secondary" id="ingediente_custo_final">Insira uma quantidade</small>
-                </div>
-              </div>
-              <div class="datagrid-item">
-                <label class="datagrid-title form-label">Incluir</label>
-                <div class="datagrid-content">
-                  <button class="btn">Incluir</button>
-                </div>
-              </div>
+            <div class="mb-3">
+              <label class="form-label required">Ingrediente</label>
+              <select required class="form-select" name="ingrediente_id">
+                <option selected value="">Selecionar</option>
+                {% for ingrediente in ingredientes %}
+                  <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
+                {% endfor %}
+              </select>
+              <a data-bs-toggle="modal" data-bs-target="#modalCreateIngrediente" style="display: block; margin-top: 8px" class=" cursor-pointer" id="ingrediente_custo_p_grama">Novo Ingrediente</a>
             </div>
+            <div class="mb-3">
+              <label class="form-label required">Quantidade</label>
+              <div class="input-group input-group-flat">
+                <input required type="number" step="any" class="form-control pe-0" min="0" name="quantidade" />
+                <span class="input-group-text"> g </span>
+              </div>
+              <small style="display: block; margin-top: 8px" class="text-secondary" id="ingediente_custo_final">Insira uma quantidade</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success">Incluir</button>
           </div>
       </div>
     </form>

@@ -20,7 +20,10 @@ document.querySelectorAll('.modal').forEach(modal => {
             e.preventDefault();
             return
         }
-        const payload_json = e.relatedTarget.getAttribute('data-bs-payload');
+        let payload_json = e.relatedTarget.getAttribute('data-bs-payload');
+        if(!payload_json) {
+            payload_json = e.relatedTarget.parentElement.getAttribute('data-bs-payload');
+        }
         const payload = JSON.parse(payload_json);
         if(!payload) return;
         Object.keys(payload).forEach(payload_key => {

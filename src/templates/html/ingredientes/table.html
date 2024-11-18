@@ -53,8 +53,8 @@
             <td>{{ ingrediente.estoque_atual | format_stock | safe }}</td>
             <td>
               <div class="btn-group">
-                <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalUpdateIngrediente" data-bs-payload="{{ingrediente.model_dump_json()}}">Editar</a>
-                <a class="btn btn-sm btn-ghost-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteIngrediente" data-bs-payload="{{ingrediente.model_dump_json()}}">Excluir</a>
+                <a class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalUpdateIngrediente" data-bs-payload="{{ingrediente.dict() | json }}">Editar</a>
+                <a class="btn btn-sm btn-ghost-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteIngrediente" data-bs-payload="{{ingrediente.dict() | json }}">Excluir</a>
               </div>
             </td>
           </tr>

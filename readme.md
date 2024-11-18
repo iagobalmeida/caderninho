@@ -36,7 +36,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 4. Use a conta `usuario@emai.com` com a senha `123` para acessar como usuário
 5. Use a conta `admin@email.com` com a senha `admin` para acessar como admin
 
-## TODO v1.0
+## TODO vb1.0
 - [X] Separar `scripts.js`
 - [X] Ajustar exibição de datas em modais
 - [X] Permitir valores quebrados em inputs
@@ -57,7 +57,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
         - [X] Listagem
         - [X] Ingredientes
 
-## TODO v1.1
+## TODO vb1.1
 - [X] Melhorar UX para mobile
 - [X] Bloquear acesso sem login (decorator)
 - [X] Padronizar botão `Ações` contendo `Criar` e `Apagar`
@@ -67,7 +67,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Autenticação em fluxos de `seed`
 - [X] Ajustar redirect de erro
 
-## TODO v1.8
+## TODO vb1.8
 - [X] Melhorar `db.py`
 - [X] Modal `Meu Perfil`
 - [X] Novo layout
@@ -75,14 +75,22 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
   - [X] Toggle modo escuro/claro
   - [X] Login
 
-## TODO v2.0
-- [ ] Formulários verticais em modal
-- [ ] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
-- [ ] Funcionalidade modal `Meu Perfil`
-- [ ] Upload e download de CSV
-- [ ] Tela "Organização"
+## TODO vb2.0
+- [X] Formulários verticais em modal
+- [X] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
+  - [X] Atualizar JS para pegar `data-bs-payload` de `tr` ao clicar em `td`
+  - [X] Padronizar formatação de YYYY-MM-DD
+- [X] Aperfeiçoar ainda mais modal e criação e edição de Estoque
+- [X] Funcionalidade modal `Meu Perfil`
+- [X] Padronizar uso de `HEADER_AUTH` em vez de decorator
+  - [X] Apagar decorator
+- [-] Upload e download de CSV (Próxima versão)
+- [-] Tela "Organização" (Próxima versão)
 
-## TODO v2.5
+## TODO vb2.5
+- [X] Tela "sobre a aplicação"
 - [ ] Tela de criação de conta
 - [ ] Geração de QR Code p/ chave PIX da organização
 - [ ] Possível integração com Mercado Pago
+- [ ] Upload e download de CSV (Próxima versão)
+- [ ] Tela "Organização" (Próxima versão)

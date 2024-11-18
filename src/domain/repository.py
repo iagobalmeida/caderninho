@@ -6,7 +6,7 @@ from sqlmodel import Session, SQLModel, func, select
 
 from src.auth import usuario_de_sessao
 from src.domain.entities import (Estoque, Ingrediente, Receita,
-                                 ReceitaIngredienteLink, Venda)
+                                 ReceitaIngredienteLink, Usuario, Venda)
 
 log = getLogger(__name__)
 
@@ -89,6 +89,10 @@ def update_venda(session: Session, id: int, descricao: str, valor: float) -> Ven
 
 def update_estoque(session: Session, id: int, descricao: str, valor_pago: float = None, quantidade: float = None, ingrediente_id: float = None) -> Estoque:
     return __update(session, Estoque, id, descricao=descricao, valor_pago=valor_pago, quantidade=quantidade, ingrediente_id=ingrediente_id)
+
+
+def update_usuario(session: Session, id: int, nome: str, email: str):
+    return __update(Session, Usuario, id, nome=nome, email=email)
 
 
 def __create(session: Session, entity):

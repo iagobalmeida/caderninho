@@ -58,15 +58,15 @@
         </thead>
         <tbody>
           {% for estoque in estoques %}
-            <tr class="cursor-pointer">
+            <tr class="cursor-pointer" data-bs-payload="{{estoque.dict() | json }}">
               <td class="w-1">
                 <input type="checkbox" name="checkbox_{{estoque.id}}" id="checkbox_{{estoque.id}}" data-id="{{estoque.id}}">
               </td>
-              <td data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque">{{ estoque.data_criacao | strftime }}</td>
-              <td data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque">{{ estoque.descricao }}</td>
-              <td data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque">{{ estoque.ingrediente.nome }}</td>
-              <td data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque">{{ estoque.quantidade | format_stock_movement | safe}}</td>
-              <td data-bs-toggle="modal" data-bs-payload="{{estoque.model_dump_json()}}" data-bs-target="#modalEditEstoque" class="text-danger"><b>{{ estoque.valor_pago | format_reais }}</b></td>
+              <td data-bs-toggle="modal" data-bs-target="#modalEditEstoque">{{ estoque.data_criacao | strftime }}</td>
+              <td data-bs-toggle="modal" data-bs-target="#modalEditEstoque">{{ estoque.descricao }}</td>
+              <td data-bs-toggle="modal" data-bs-target="#modalEditEstoque">{{ estoque.ingrediente.nome }}</td>
+              <td data-bs-toggle="modal" data-bs-target="#modalEditEstoque">{{ estoque.quantidade | format_stock_movement | safe}}</td>
+              <td data-bs-toggle="modal" data-bs-target="#modalEditEstoque" class="text-danger"><b>{{ estoque.valor_pago | format_reais }}</b></td>
             </tr>
           {% else %}
             <tr>

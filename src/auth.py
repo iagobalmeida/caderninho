@@ -1,5 +1,5 @@
 import jwt
-from fastapi import Depends, Header, Request
+from fastapi import Depends, Header, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from sqlmodel import Session, select
@@ -37,14 +37,7 @@ def authenticate(session: Session, email: str, senha: str) -> str:
     if not senha_valida:
         return False
 
-    payload = db_usuario.model_dump()
-    del payload['senha']
-
-    if db_usuario.organizacao:
-        payload['organizacao_descricao'] = db_usuario.organizacao.descricao
-    elif db_usuario.administrador:
-        payload['organizacao_descricao'] = 'Administrador'
-
+    payload = db_usuario.dict()
     return jwt.encode(payload=payload, key=DEFAULT_JWT_SECRET, algorithm=DEFAULT_JWT_ALG)
 
 
@@ -57,7 +50,10 @@ def header_authorization(request: Request, Authorization: str = Header(None)) ->
     try:
         user = jwt.decode(Authorization, key=DEFAULT_JWT_SECRET, algorithms=[DEFAULT_JWT_ALG])
     except Exception as ex:
-        print(ex)
+        pass
+
+    if not user:
+        raise HTTPException(401, 'Não autorizado!')
 
     query_params_theme = request.query_params.get('theme')
     if query_params_theme:
@@ -88,4 +84,3 @@ def request_logout(request: Request) -> RedirectResponse:
 
 
 HEADER_AUTH = Depends(header_authorization)
-AUTH_DEP = Depends(header_authorization)

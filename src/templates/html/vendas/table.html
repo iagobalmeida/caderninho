@@ -45,13 +45,13 @@
         </thead>
         <tbody>
           {% for venda in vendas %}
-          <tr class="cursor-pointer">
+          <tr class="cursor-pointer" data-bs-payload="{{venda.dict() | json }}">
             <td class="w-1">
               <input type="checkbox" name="checkbox_{{venda.id}}" id="checkbox_{{venda.id}}" data-id="{{venda.id}}">
             </td>
-            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}">{{ venda.data_criacao | strftime }}</td>
-            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}">{{ venda.descricao }}</td>
-            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda" data-bs-payload="{{venda.model_dump_json()}}"><b class="text-success">{{ venda.valor | format_reais }}</b></td>
+            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda">{{ venda.data_criacao | strftime }}</td>
+            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda">{{ venda.descricao }}</td>
+            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda"><b class="text-success">{{ venda.valor | format_reais }}</b></td>
           </tr>
           {% else %}
             <tr>
