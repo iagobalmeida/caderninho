@@ -45,7 +45,7 @@ async def get_criar_conta(request: fastapi.Request, message: str = fastapi.Query
 
 
 @app.post('/registrar', include_in_schema=False)
-async def post_criar_conta(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.Session = db.SESION_DEP):
+async def post_criar_conta(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.Session = db.SESSION_DEP):
     template_name = 'login.html'
     message = None
     if payload.senha != payload.confirmar_senha:
