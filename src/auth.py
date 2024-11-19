@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta
+from typing import Dict
+from uuid import uuid4
+
 import jwt
 from fastapi import Depends, Header, HTTPException, Request
 from fastapi.responses import RedirectResponse
@@ -13,46 +17,81 @@ DEFAULT_JWT_SECRET = b'secret'
 
 class SessionUser(BaseModel):
     valid: bool = False
+    id: int = None
     nome: str = None
     email: str = None
     administrador: bool = False
     organizacao_id: int = None
-    organizacao_nome: str = None
+    organizacao_descricao: str = None
+    expires: datetime = None
+
+    def dict(self):
+        base_dict = self.model_dump()
+        del base_dict['expires']
+        return base_dict
+
+    def update(self, session: Session, nome: str, email: str):
+        db_usuario = session.exec(select(Usuario).where(Usuario.id == self.id)).first()
+        self.nome = nome
+        db_usuario.nome = nome
+        self.email = email
+        db_usuario.email = email
+        session.commit()
+        return True
 
 
-def usuario_de_sessao(session: Session) -> SessionUser:
-    sessao_usuario = session.info.get('user', None)
-    if not sessao_usuario:
-        return SessionUser(valid=False)
-    return SessionUser(**sessao_usuario, valid=True)
+AUTHENTICATED_SESSIONS: Dict[str, SessionUser] = {}
+
+
+def atualizar_sessao(session: Session, nome: str, email: str):
+    sessao_usuario = session.info.get('auth_uuid', None)
+    if not sessao_usuario or not AUTHENTICATED_SESSIONS.get(sessao_usuario, False):
+        return False
+    return AUTHENTICATED_SESSIONS[sessao_usuario].update(session, nome, email)
+
+
+def criar_sessao(payload: SessionUser):
+    global AUTHENTICATED_SESSIONS
+    auth_uuid = str(uuid4())
+    payload.update(expires=datetime.now() + timedelta(hours=1))
+    payload.update(valid=True)
+    AUTHENTICATED_SESSIONS[auth_uuid] = SessionUser(**payload)
+    return auth_uuid
+
+
+def usuario_de_sessao_db(session: Session) -> SessionUser:
+    sessao_usuario = session.info.get('auth_uuid', None)
+    if not sessao_usuario or not AUTHENTICATED_SESSIONS.get(sessao_usuario, False):
+        raise HTTPException(401, 'Sua sessão expirou')
+    return AUTHENTICATED_SESSIONS[sessao_usuario]
 
 
 def authenticate(session: Session, email: str, senha: str) -> str:
     db_usuario = session.exec(select(Usuario).where(Usuario.email == email)).first()
-
     if not db_usuario:
         return False
+
     senha_valida = str(senha).strip().lower() == str(db_usuario.senha).strip().lower()
 
     if not senha_valida:
         return False
 
-    payload = db_usuario.dict()
-    return jwt.encode(payload=payload, key=DEFAULT_JWT_SECRET, algorithm=DEFAULT_JWT_ALG)
+    auth_uuid = criar_sessao(payload=db_usuario.dict())
+    return jwt.encode(payload={'auth_uuid': auth_uuid}, key=DEFAULT_JWT_SECRET, algorithm=DEFAULT_JWT_ALG)
 
 
 def header_authorization(request: Request, Authorization: str = Header(None)) -> str:
-    user = None
+    jwt_payload = None
 
     if not Authorization:
         Authorization = request.cookies.get('jwt_token', None)
 
     try:
-        user = jwt.decode(Authorization, key=DEFAULT_JWT_SECRET, algorithms=[DEFAULT_JWT_ALG])
+        jwt_payload = jwt.decode(Authorization, key=DEFAULT_JWT_SECRET, algorithms=[DEFAULT_JWT_ALG])
     except Exception as ex:
         pass
 
-    if not user:
+    if not jwt_payload or not jwt_payload.get('auth_uuid', False):
         raise HTTPException(401, 'Não autorizado!')
 
     query_params_theme = request.query_params.get('theme')
@@ -60,8 +99,7 @@ def header_authorization(request: Request, Authorization: str = Header(None)) ->
         request.state.theme = query_params_theme
         request.cookies.update(theme=query_params_theme)
 
-    request.state.user = user
-    return user
+    request.state.auth_uuid = jwt_payload.get('auth_uuid', None)
 
 
 def request_login(session: Session, request: Request, email: str, senha: str) -> RedirectResponse:

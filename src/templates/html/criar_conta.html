@@ -16,9 +16,12 @@
           </svg>
         </a>
       </div>
-      <div class="card card-md">
+      <div class="card card-md" style="position: relative;">
+        <div style="position: absolute;top:0;left:0;right:0;bottom:0;background:#00000075;color:white;z-index:99;display:flex;align-items: center;justify-content: center;font-size: 32px;">
+          Em desenvolvimento
+        </div>
         <div class="card-body">
-          <h2 class="h2 text-center mb-4">Bem vindo!</h2>
+          <h2 class="h2 text-center mb-4">Criar Conta</h2>
           {% if message %}
             <h4 class="text-danger text-center mb-3">{{message | safe}}</h4>
           {% endif %}
@@ -30,12 +33,14 @@
               <label class="form-label">Email</label>
               <input type="email" name="email" class="form-control" placeholder="seu@email.com" autocomplete="off">
             </div>
+            <div class="mb-3">
+              <label class="form-label">Nome da sua Organização</label>
+              <input type="text" name="organizacao" class="form-control" placeholder="Minha Cozinha" autocomplete="off">
+            </div>
+            <hr>
             <div class="mb-2">
               <label class="form-label">
                 Senha
-                <!-- <span class="form-label-description">
-                  <a href="./forgot-password.html" tabindex="99">Esqueci minha senha</a>
-                </span> -->
               </label>
               <div class="input-group input-group-flat">
                 <input type="password" name="senha" class="form-control" placeholder="Sua senha" autocomplete="off">
@@ -47,19 +52,26 @@
               </div>
             </div>
             <div class="mb-2">
-              <label class="form-check">
-                <input type="checkbox" class="form-check-input">
-                <span class="form-check-label">Lembrar minha conta neste dispositivo</span>
+              <label class="form-label">
+                Confirmar Senha
               </label>
+              <div class="input-group input-group-flat">
+                <input type="password" name="confirmar_senha" class="form-control" placeholder="Sua senha" autocomplete="off">
+                <span class="input-group-text ps-2">
+                  <a href="#" class="link-secondary" onclick="togglePassword()"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>
+                  </a>
+                </span>
+              </div>
             </div>
             <div class="form-footer">
-              <button type="submit" class="btn btn-primary w-100">Entrar</button>
+              <button type="submit" class="btn btn-primary w-100">Criar Conta</button>
             </div>
           </form>
         </div>
       </div>
       <div class="text-center text-secondary mt-3">
-        Não tem uma conta ainda? <a href="{{ url_for('get_criar_conta') }}" tabindex="-1">Criar conta</a>
+        Já tem uma conta? <a href="{{url_for('get_index')}}" tabindex="-1">Entrar na sua conta</a>
       </div>
     </div>
   </div>

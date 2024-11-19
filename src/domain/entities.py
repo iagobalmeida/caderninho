@@ -5,6 +5,8 @@ from typing import List, Optional
 from sqlalchemy.orm import validates
 from sqlmodel import Field, Relationship, SQLModel
 
+STRFTIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+
 
 class Organizacao(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -68,7 +70,7 @@ class Estoque(RegistroOrganizacao, table=True):
 
     def dict(self):
         base_dict = self.model_dump()
-        base_dict['data_criacao'] = self.data_criacao.strftime('%Y-%m-%d')
+        base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
         return base_dict
 
 
@@ -79,7 +81,7 @@ class Venda(RegistroOrganizacao, table=True):
 
     def dict(self):
         base_dict = self.model_dump()
-        base_dict['data_criacao'] = self.data_criacao.strftime('%Y-%m-%d')
+        base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
         return base_dict
 
 

@@ -14,7 +14,7 @@ engine = create_engine(DATABASE_URL, echo=True)
 def get_session(request: Request):
     with Session(engine) as session:
         try:
-            session.info.update(user=request.state.user)
+            session.info.update(auth_uuid=request.state.auth_uuid)
         except:
             pass
         yield session

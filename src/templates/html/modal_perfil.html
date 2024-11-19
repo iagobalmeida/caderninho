@@ -1,31 +1,29 @@
 <div class="modal" id="modalPerfil" tabindex="-1">
-    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_perfil') }}">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title ">
-                    {{ material_symbol('account_circle') | safe }}
-                      Meu Perfil
-                  </h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <div class="mb-3">
-                      <label for="nome" class="form-label required">Nome</label>
-                      <input required type="text" class="form-control" name="nome"/>
-                  </div>
-                  <div class="mb-3">
-                      <label for="email" class="form-label required">Email</label>
-                      <input required type="text" class="form-control" name="email"/>
-                  </div>
-                  <div class="mb-3">
-                      <label for="organizacao_descricao" class="form-label required">Organizacao</label>
-                      <input disabled required type="text" class="form-control" name="organizacao_descricao"/>
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-ghost-danger me-auto">Desativar Conta</button>
-                  <button type="submit" class="btn btn-success">Atualizar</button>
-              </div>
-          </div>
-    </form>
+  <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_perfil') }}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ material_symbol('account_circle') | safe }} Meu Perfil</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="id" />
+        <div class="mb-3">
+          <label for="nome" class="form-label required">Nome</label>
+          <input required type="text" class="form-control" name="nome" />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label required">Email</label>
+          <input required type="text" class="form-control" name="email" />
+        </div>
+        <div class="mb-3">
+          <label for="organizacao_descricao" class="form-label required">Organizacao</label>
+          <input disabled required type="text" class="form-control" name="organizacao_descricao" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost-danger me-auto">Desativar Conta</button>
+        <button type="submit" class="btn btn-success">Atualizar</button>
+      </div>
+    </div>
+  </form>
 </div>

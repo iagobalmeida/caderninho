@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 from sqlmodel import Session, SQLModel, func, select
 
-from src.auth import usuario_de_sessao
+from src.auth import usuario_de_sessao_db
 from src.domain.entities import (Estoque, Ingrediente, Receita,
                                  ReceitaIngredienteLink, Usuario, Venda)
 
@@ -12,7 +12,7 @@ log = getLogger(__name__)
 
 
 def __filter_organization_id(session: Session, query, entity: SQLModel):
-    sessao_usuario = usuario_de_sessao(session)
+    sessao_usuario = usuario_de_sessao_db(session)
     if sessao_usuario.administrador:
         return query
     return query.filter(entity.organizacao_id == sessao_usuario.organizacao_id)
@@ -23,7 +23,7 @@ def __delete(session: Session, entity: SQLModel, id: int) -> bool:
     if not db_entity:
         return True
 
-    sessao_usuario = usuario_de_sessao(session)
+    sessao_usuario = usuario_de_sessao_db(session)
     if not sessao_usuario.administrador and not db_entity.organizacao_id == sessao_usuario.organizacao_id:
         raise ValueError('Sem permissão para deletar esse registro')
 
@@ -58,7 +58,7 @@ def delete_ingrediente(session: Session, id: int) -> bool:
 def __update(session: Session, entity: SQLModel, id: int, **kwargs) -> SQLModel:
     db_entity = session.get(entity, id)
 
-    sessao_usuario = usuario_de_sessao(session)
+    sessao_usuario = usuario_de_sessao_db(session)
     if not sessao_usuario.administrador and not db_entity.organizacao_id == sessao_usuario.organizacao_id:
         raise ValueError('Sem permissão para editar esse registro')
 
@@ -92,11 +92,11 @@ def update_estoque(session: Session, id: int, descricao: str, valor_pago: float 
 
 
 def update_usuario(session: Session, id: int, nome: str, email: str):
-    return __update(Session, Usuario, id, nome=nome, email=email)
+    return __update(session, Usuario, id, nome=nome, email=email)
 
 
 def __create(session: Session, entity):
-    sessao_usuario = usuario_de_sessao(session)
+    sessao_usuario = usuario_de_sessao_db(session)
     entity.organizacao_id = sessao_usuario.organizacao_id
     session.add(entity)
     session.commit()

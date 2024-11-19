@@ -68,6 +68,8 @@ def templates_filter_format_reais(input: float):
 
 
 def templates_filter_json(input: str):
+    if not input:
+        return None
     return json.dumps(input)
 
 

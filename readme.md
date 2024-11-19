@@ -89,7 +89,11 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 
 ## TODO vb2.5
 - [X] Tela "sobre a aplicação"
-- [ ] Tela de criação de conta
+- [X] Corrigir modal de perfil
+- [X] Corrigir inputs de data
+- [X] Tela de criação de conta
+  - [ ] Funcionalidade criação de conta + organização
+- [ ] Funcionalidade esqueci minha senha
 - [ ] Geração de QR Code p/ chave PIX da organização
 - [ ] Possível integração com Mercado Pago
 - [ ] Upload e download de CSV (Próxima versão)

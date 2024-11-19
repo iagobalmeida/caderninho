@@ -7,6 +7,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
+from starlette.datastructures import URL
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from src import auth, db
@@ -34,8 +35,13 @@ db.init()
 
 
 @app.get('/', include_in_schema=False)
-async def get_index(request: fastapi.Request, message: str = fastapi.Query(None)):
-    return render(request, 'login.html', context={'message': message, 'data_bs_theme': 'auto'})
+async def get_index(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
+    return render(request, 'login.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
+
+
+@app.get('/registrar', include_in_schema=False)
+async def get_criar_conta(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
+    return render(request, 'criar_conta.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.post('/authenticate')
@@ -76,6 +82,7 @@ async def get_sobre(request: fastapi.Request, session: db.Session = db.SESSION_D
 @app.post('/perfil', dependencies=[auth.HEADER_AUTH])
 async def post_perfil(request: fastapi.Request, payload: inputs.UsuarioAtualizar = fastapi.Form(),  session: db.Session = db.SESSION_DEP):
     repository.update_usuario(session, id=payload.id, nome=payload.nome, email=payload.email)
+    auth.atualizar_sessao(session, nome=payload.nome, email=payload.email)
     return redirect_back(request)
 
 
@@ -97,8 +104,12 @@ async def post_scripts_reset_db(Authorization: str = fastapi.Header(None)):
 
 
 @app.exception_handler(IntegrityError)
-async def integrity_error_exception_handler(req: fastapi.Request, ex):
-    parsed_url = urlparse(req.headers['referer'])
+async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
+    if not redirect_to:
+        redirect_to = str(request.headers['referer'])
+
+    parsed_url = urlparse(url=str(redirect_to))
+
     query_params = parse_qs(parsed_url.query)
 
     detalhe = re.search(r'\.(\w+)$', str(ex.orig))
@@ -110,15 +121,18 @@ async def integrity_error_exception_handler(req: fastapi.Request, ex):
 
     new_query = urlencode(query_params, doseq=True)
     parsed_url = parsed_url._replace(query=new_query)
-    url = urlunparse(parsed_url)
+    redirect_to = urlunparse(parsed_url)
 
-    return fastapi.responses.RedirectResponse(url, status_code=302)
+    return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
 
 
 @app.exception_handler(ValueError)
-async def integrity_error_exception_handler(request: fastapi.Request, ex):
-    url = str(request.headers['referer'])
-    parsed_url = urlparse(url)
+async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
+    if not redirect_to:
+        redirect_to = str(request.headers['referer'])
+
+    parsed_url = urlparse(url=str(redirect_to))
+
     query_params = parse_qs(parsed_url.query)
 
     query_params['error'] = f'&nbsp;&nbsp;<span>{ex}</span>'
@@ -126,11 +140,11 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex):
     new_query = urlencode(query_params, doseq=True)
     parsed_url = parsed_url._replace(query=new_query)
 
-    url = urlunparse(parsed_url)
+    redirect_to = urlunparse(parsed_url)
 
-    return fastapi.responses.RedirectResponse(url, status_code=302)
+    return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
 
 
 @app.exception_handler(HTTPException)
 async def http_error_exception_handler(request: fastapi.Request, ex: HTTPException):
-    return await integrity_error_exception_handler(request, ex)
+    return await integrity_error_exception_handler(request, ex, redirect_to=request.url_for('get_index'))

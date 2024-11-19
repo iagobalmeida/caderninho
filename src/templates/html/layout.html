@@ -52,16 +52,16 @@
               <div class="nav-item dropdown">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
                   <span class="avatar avatar-sm bg-warning text-white">
-                    {{request.state.user.organizacao_descricao[0]}}
+                    {{usuario.organizacao_descricao[0]}}
                   </span>
                   <div class="d-none d-xl-block ps-2">
-                    <div>{{request.state.user.nome}}</div>
-                    <div class="mt-1 small text-secondary">{{request.state.user.organizacao_descricao}}</div>
+                    <div>{{usuario.nome}}</div>
+                    <div class="mt-1 small text-secondary">{{usuario.organizacao_descricao}}</div>
                   </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                   <!-- <a href="#" class="dropdown-item">Status</a> -->
-                  <a data-bs-toggle="modal" data-bs-target="#modalPerfil" data-bs-payload="{{request.state.user | json}}" class="dropdown-item cursor-pointer">
+                  <a data-bs-toggle="modal" data-bs-target="#modalPerfil" data-bs-payload="{{usuario.dict() | json}}" class="dropdown-item cursor-pointer">
                     {{ material_symbol('account_circle') | safe }}
                     &nbsp;
                     Meu pefil
