@@ -2,10 +2,11 @@ from datetime import datetime
 from logging import getLogger
 from typing import List, Tuple
 
+from fastapi import HTTPException
 from sqlmodel import Session, SQLModel, func, select
 
 from src.auth import usuario_de_sessao_db
-from src.domain.entities import (Estoque, Ingrediente, Receita,
+from src.domain.entities import (Estoque, Ingrediente, Organizacao, Receita,
                                  ReceitaIngredienteLink, Usuario, Venda)
 
 log = getLogger(__name__)
@@ -101,6 +102,14 @@ def __create(session: Session, entity):
     session.add(entity)
     session.commit()
     return entity
+
+
+def create_usuario(session: Session, nome: str, email: str, senha: str, organizacao_nome: str):
+    db_organizacao = select(Organizacao).where(Organizacao.descricao == organizacao_nome).first()
+    if db_organizacao:
+        raise HTTPException(422, 'Já existe uma organização com essse nome! Peça ao administrador para se juntar')
+    db_organizacao = __create(session, Organizacao(descricao=organizacao_nome))
+    return __create(session, Usuario(nome=nome, email=email, senha=senha, organizacao_id=db_organizacao.id))
 
 
 def create_receita(session: Session, nome: str) -> Receita:

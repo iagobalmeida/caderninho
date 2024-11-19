@@ -44,6 +44,23 @@ async def get_criar_conta(request: fastapi.Request, message: str = fastapi.Query
     return render(request, 'criar_conta.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
+@app.post('/registrar', include_in_schema=False)
+async def post_criar_conta(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.Session = db.SESION_DEP):
+    template_name = 'login.html'
+    message = None
+    if payload.senha != payload.confirmar_senha:
+        template_name = 'criar_conta.html'
+        error = 'As senhas não batem'
+    try:
+        repository.create_usuario(session, nome=payload.nome, email=payload.email, senha=payload.senha, organizacao_nome=payload.organizacao_nome)
+        message = 'Conta criada com sucesso'
+    except Exception as ex:
+        template_name = 'criar_conta.html'
+        error = str(ex)
+
+    return render(request, template_name, context={'error': error, 'message': message, 'data_bs_theme': 'auto'})
+
+
 @app.post('/authenticate')
 async def post_authenticate(email: str = fastapi.Form(), senha: str = fastapi.Form(), session: db.Session = db.SESSION_DEP):
     return auth.authenticate(session, email=email, senha=senha)

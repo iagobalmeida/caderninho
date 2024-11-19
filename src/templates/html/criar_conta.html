@@ -16,10 +16,10 @@
           </svg>
         </a>
       </div>
-      <div class="card card-md" style="position: relative;">
-        <div style="position: absolute;top:0;left:0;right:0;bottom:0;background:#00000075;color:white;z-index:99;display:flex;align-items: center;justify-content: center;font-size: 32px;">
+      <div class="card card-md">
+        <!-- <div style="position: absolute;top:0;left:0;right:0;bottom:0;background:#00000075;color:white;z-index:99;display:flex;align-items: center;justify-content: center;font-size: 32px;">
           Em desenvolvimento
-        </div>
+        </div> -->
         <div class="card-body">
           <h2 class="h2 text-center mb-4">Criar Conta</h2>
           {% if message %}
@@ -28,7 +28,11 @@
           {% if error %}
               <h4 class="text-danger text-center mb-3">{{error | safe}}</h4>
           {% endif %}
-          <form action="{{ url_for('post_login') }}" method="POST" autocomplete="off" novalidate="">
+          <form action="{{ url_for('post_criar_conta') }}" method="POST" autocomplete="off" novalidate="">
+            <div class="mb-3">
+              <label class="form-label">Nome</label>
+              <input type="text" name="nome" class="form-control" placeholder="Seu nome" autocomplete="off">
+            </div>
             <div class="mb-3">
               <label class="form-label">Email</label>
               <input type="email" name="email" class="form-control" placeholder="seu@email.com" autocomplete="off">

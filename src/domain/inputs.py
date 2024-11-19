@@ -71,3 +71,11 @@ class UsuarioAtualizar(BaseModel):
     id: int
     nome: str
     email: str
+
+
+class UsuarioCriar(BaseModel):
+    nome: str
+    email: str
+    senha: str
+    senha_confirmar: str
+    organizacao_nome: str

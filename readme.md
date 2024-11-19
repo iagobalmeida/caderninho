@@ -92,7 +92,8 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Corrigir modal de perfil
 - [X] Corrigir inputs de data
 - [X] Tela de criação de conta
-  - [ ] Funcionalidade criação de conta + organização
+  - [X] Funcionalidade criação de conta + organização
+  - [X] Bloqueio organizações com mesmo nome
 - [ ] Funcionalidade esqueci minha senha
 - [ ] Geração de QR Code p/ chave PIX da organização
 - [ ] Possível integração com Mercado Pago
