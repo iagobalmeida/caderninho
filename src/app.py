@@ -14,6 +14,7 @@ from src import auth, db
 from src.domain import inputs, repository
 from src.routers.estoques import router as router_estoques
 from src.routers.ingredientes import router as router_ingredientes
+from src.routers.organizacao import router as router_organizacao
 from src.routers.receitas import router as router_receitas
 from src.routers.vendas import router as router_vendas
 from src.scripts import seed
@@ -29,6 +30,7 @@ app.include_router(router_receitas)
 app.include_router(router_ingredientes)
 app.include_router(router_estoques)
 app.include_router(router_vendas)
+app.include_router(router_organizacao)
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 db.init()
@@ -36,27 +38,28 @@ db.init()
 
 @app.get('/', include_in_schema=False)
 async def get_index(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
-    return render(request, 'login.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
+    return render(request, 'autenticacao/login.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.get('/registrar', include_in_schema=False)
 async def get_criar_conta(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
-    return render(request, 'criar_conta.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
+    return render(request, 'autenticacao/criar_conta.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.post('/registrar', include_in_schema=False)
 async def post_criar_conta(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.Session = db.SESSION_DEP):
-    template_name = 'login.html'
+    template_name = 'autenticacao/login.html'
     message = None
-    if payload.senha != payload.confirmar_senha:
-        template_name = 'criar_conta.html'
+    if payload.senha != payload.senha_confirmar:
+        template_name = 'autenticacao/criar_conta.html'
         error = 'As senhas não batem'
-    try:
-        repository.create_usuario(session, nome=payload.nome, email=payload.email, senha=payload.senha, organizacao_nome=payload.organizacao_nome)
-        message = 'Conta criada com sucesso'
-    except Exception as ex:
-        template_name = 'criar_conta.html'
-        error = str(ex)
+    else:
+        try:
+            repository.create_usuario(session, nome=payload.nome, email=payload.email, senha=payload.senha, organizacao_descricao=payload.organizacao_descricao, dono=True)
+            message = 'Conta criada com sucesso'
+        except Exception as ex:
+            template_name = 'autenticacao/criar_conta.html'
+            error = str(ex)
 
     return render(request, template_name, context={'error': error, 'message': message, 'data_bs_theme': 'auto'})
 
@@ -74,6 +77,17 @@ async def post_login(request: fastapi.Request, email: str = fastapi.Form(), senh
 @app.get('/logout', include_in_schema=False)
 async def get_logout(request: fastapi.Request):
     return auth.request_logout(request)
+
+
+@app.post('/alterar_senha', include_in_schema=False)
+async def post_alterar_senha(request: fastapi.Request, payload: inputs.AlterarSenha = fastapi.Form(),  session: db.Session = db.SESSION_DEP):
+    repository.update_usuario_senha(session, id=payload.id, senha_atual=payload.senha_atual, senha=payload.senha, senha_confirmar=payload.senha_confirmar)
+    return redirect_back(request)
+
+
+@app.get('/recuperar_senha', include_in_schema=False)
+async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
+    return render(request, 'autenticacao/recuperar_senha.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.get('/home', include_in_schema=False, dependencies=[auth.HEADER_AUTH])

@@ -84,6 +84,7 @@ BASE_NAVBAR_LINKS = [
     ('Vendas', 'shopping_cart', 'get_vendas_index'),
     ('Estoque', 'inventory_2', 'get_estoques_index'),
     ('Receitas', 'library_books', 'get_receitas_index'),
+    ('Organização', 'groups', 'get_organizacao_index'),
     # ('Ingredientes', 'package_2', 'get_ingredientes_index')
 ]
 

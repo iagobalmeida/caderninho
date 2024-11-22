@@ -12,10 +12,17 @@
 {% include 'estoques/modal_edit.html' %}
 {% include 'estoques/modal_delete.html' %}
 
+{% include 'organizacao/modal_delete_usuario.html' %}
+
 
 {% include 'receitas/modal_create.html' %}
-{% include 'modal_perfil.html' %}
-{% include 'modal_logout.html' %}
+{% include 'autenticacao/modal_perfil.html' %}
+{% include 'autenticacao/modal_logout.html' %}
+{% include 'autenticacao/modal_alterar_senha.html' %}
+
+{% include 'organizacao/modal_create_usuario.html' %}
+{% include 'organizacao/modal_delete_usuario.html' %}
+{% include 'organizacao/modal_edit_usuario.html' %}
 
   {% block layout %}
     <div class="page">
@@ -65,6 +72,11 @@
                     {{ material_symbol('account_circle') | safe }}
                     &nbsp;
                     Meu pefil
+                  </a>
+                  <a data-bs-toggle="modal" data-bs-target="#modalAlterarSenha" data-bs-payload="{{usuario.dict() | json}}" class="dropdown-item cursor-pointer">
+                    {{ material_symbol('password') | safe }}
+                    &nbsp;
+                    Alterar Senha
                   </a>
                   <!-- <a href="#" class="dropdown-item">Feedback</a> -->
                   <div class="dropdown-divider"></div>

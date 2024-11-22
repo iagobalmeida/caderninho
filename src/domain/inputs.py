@@ -78,4 +78,21 @@ class UsuarioCriar(BaseModel):
     email: str
     senha: str
     senha_confirmar: str
-    organizacao_nome: str
+    organizacao_id:  Optional[int] = False
+    organizacao_descricao: Optional[str] = False
+    dono: bool = False
+
+
+class UsuarioEditar(BaseModel):
+    id: int
+    nome: str
+    email: str
+    nova_senha: str = None
+    dono: bool = False
+
+
+class AlterarSenha(BaseModel):
+    id: int
+    senha_atual: str
+    senha: str
+    senha_confirmar: str

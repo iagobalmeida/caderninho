@@ -16,91 +16,84 @@
         <h3>Como Incentivar</h3>
         <p>Esse é um projeto independente que ainda está em fase de testes, e é sustentado pelos seus criadores e os assitantes Premium.</p>
         <p>Estamos abertos a conversar sobre possíveis interesses comerciais através do email <a href="miscere.contato@gmail.com">miscere.contato@gmail.com</a>.</p>
+        <h3>Versão Atual:&nbsp;<code>Beta v2.5.4</code></h3>
         <h3>Atualizações</h3>
-        <kbd>Versão b2.5</kbd> <b>Em Desenvolvimento</b>
-        <ul>
-            <li>Tela "sobre a aplicação"</li>
-            <li>Tela de criação de conta</li>
-            <li>Geração de QR Code p/ chave PIX da organização</li>
-            <li>Possível integração com Mercado Pago</li>
-            <li>Upload e download de CSV (Próxima versão)</li>
-            <li>Tela "Organização" (Próxima versão)</li>
-        </ul>
-        <kbd>Versão b2.0</kbd> <b>Atual</b>
-        <ul>
-            <li> Formulários verticais em modal</li>
-            <li> Padronizar método `dict()` em entidades para preencher `data-bs-payload`
-                <ul>
-                    <li> Atualizar JS para pegar `data-bs-payload` de `tr` ao clicar em `td`</li>
-                    <li> Padronizar formatação de YYYY-MM-DD</li>
-                </ul>
-            </li>
-            <li> Aperfeiçoar ainda mais modal e criação e edição de Estoque</li>
-            <li> Funcionalidade modal `Meu Perfil`</li>
-            <li> Padronizar uso de `HEADER_AUTH` em vez de decorator
-                <ul>
-                    <li> Apagar decorator</li>
-                </ul>
-            </li>
-        </ul>
-        <kbd>Versão b1.8</kbd>
-        <ul>
-            <li>Melhorar `db.py`</li>
-            <li>Modal `Meu Perfil`</li>
-            <li>Novo layout
-                <ul>
-                    <li>Admin</li>
-                    <li>Toggle modo escuro/claro</li>
-                    <li>Login</li>
-                </ul>
-            </li>
-        </ul>
-        <kbd>Versão b1.1</kbd>
-        <ul>
-            <li>Melhorar UX para mobile</li>
-            <li>Bloquear acesso sem login (decorator)</li>
-            <li>Padronizar botão `Ações` contendo `Criar` e `Apagar`</li>
-            <li>Adicionar confirmação para sair</li>
-            <li>Encontrar lugar para editar nome de ingrediente</li>
-            <li>Maior robustes em delete/update para garantir organization_id</li>
-            <li>Autenticação em fluxos de `seed`</li>
-            <li>Ajustar redirect de erro</li>
-        </ul>
-        <kbd>Versão b1.0</kbd>
-        <ul>
-            <li>Separar `scripts.js`</li>
-            <li>Ajustar exibição de datas em modais</li>
-            <li>Permitir valores quebrados em inputs</li>
-            <li>Cadastrar movimentação de estoque a partir de `receita_id` e `quantidade_produzida`</li>
-            <li>Cadastrar quantidade positiva/negativa em estoque a partir de descrição</li>
-            <li>Remover tela `Ingredientes` (confusa)</li>
-            <li>Usar clique em linha em vez de `editar/excluir`</li>
-            <li>
-                Adicionar checkbox com delete massivo em tabelas
-                <ul>
-                    <li>Vendas</li>
-                    <li>Estoques</li>
-                    <li>Receitas
-                        <ul>
-                            <li>Listagem</li>
-                            <li>Ingredientes</li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-            <li>Adicionar opção excluir em modal de `editar`
-                <ul>
-                    <li>Vendas</li>
-                    <li>Estoque</li>
-                    <li>Receitas
-                        <ul>
-                            <li>Listagem</li>
-                            <li>Ingredientes</li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <pre>
+## vb2.5
+- [X] Tela "sobre a aplicação"
+- [X] Corrigir modal de perfil
+- [X] Corrigir inputs de data
+- [X] Tela de criação de conta
+    - [X] Funcionalidade criação de conta + organização
+    - [X] Bloqueio organizações com mesmo nome
+- [X] Tela "Organização"
+    - [X] Alterar nome da organização
+    - [X] Criar usuário
+    - [X] Apagar usuário
+    - [X] Criar usuário dono
+    - [X] Limitar ações para apenas donos
+    - [ ] Editar usuário
+    - [ ] Modal
+    - [X] Funcionalidade
+    - [ ] Alterar senha
+    - [ ] Modal
+    - [X] Funcionalidade
+- [ ] Funcionalidade esqueci minha senha
+- [ ] Geração de QR Code p/ chave PIX da organização
+- [ ] Possível integração com Mercado Pago
+- [ ] Upload e download de CSV
+
+## vb2.0
+- [X] Formulários verticais em modal
+- [X] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
+    - [X] Atualizar JS para pegar `data-bs-payload` de `tr` ao clicar em `td`
+    - [X] Padronizar formatação de YYYY-MM-DD
+- [X] Aperfeiçoar ainda mais modal e criação e edição de Estoque
+- [X] Funcionalidade modal `Meu Perfil`
+- [X] Padronizar uso de `HEADER_AUTH` em vez de decorator
+    - [X] Apagar decorator
+- [-] Upload e download de CSV (Próxima versão)
+- [-] Tela "Organização" (Próxima versão)
+
+## vb1.8
+- [X] Melhorar `db.py`
+- [X] Modal `Meu Perfil`
+- [X] Novo layout
+    - [X] Admin
+    - [X] Toggle modo escuro/claro
+    - [X] Login
+
+## vb1.1
+- [X] Melhorar UX para mobile
+- [X] Bloquear acesso sem login (decorator)
+- [X] Padronizar botão `Ações` contendo `Criar` e `Apagar`
+- [X] Adicionar confirmação para sair
+- [X] Encontrar lugar para editar nome de ingrediente
+- [X] Maior robustes em delete/update para garantir organization_id
+- [X] Autenticação em fluxos de `seed`
+- [X] Ajustar redirect de erro
+
+## vb1.0
+- [X] Separar `scripts.js`
+- [X] Ajustar exibição de datas em modais
+- [X] Permitir valores quebrados em inputs
+- [X] Cadastrar movimentação de estoque a partir de `receita_id` e `quantidade_produzida`
+- [X] Cadastrar quantidade positiva/negativa em estoque a partir de descrição
+- [X] Remover tela `Ingredientes` (confusa)
+- [X] Usar clique em linha em vez de `editar/excluir`
+- [X] Adicionar checkbox com delete massivo em tabelas
+    - [X] Vendas
+    - [X] Estoques
+    - [X] Receitas
+        - [X] Listagem
+        - [X] Ingredientes
+- [X] Adicionar opção excluir em modal de `editar`
+    - [X] Vendas
+    - [X] Estoque
+    - [X] Receitas
+        - [X] Listagem
+        - [X] Ingredientes
+        </pre>
     </div>
   </div>
 </div>

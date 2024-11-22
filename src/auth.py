@@ -20,6 +20,7 @@ class SessionUser(BaseModel):
     id: int = None
     nome: str = None
     email: str = None
+    dono: bool = None
     administrador: bool = False
     organizacao_id: int = None
     organizacao_descricao: str = None

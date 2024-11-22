@@ -94,8 +94,22 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Tela de criação de conta
   - [X] Funcionalidade criação de conta + organização
   - [X] Bloqueio organizações com mesmo nome
+- [X] Tela "Organização"
+  - [X] Alterar nome da organização
+  - [X] Criar usuário
+  - [X] Apagar usuário
+  - [X] Criar usuário dono
+  - [X] Limitar ações para apenas donos
+  - [X] Editar usuário
+    - [X] Modal
+    - [X] Funcionalidade
+- [X] Alterar senha
+  - [X] Modal
+  - [X] Funcionalidade
+- [ ] Melhorar `repository.py`
+  - [ ] Unificar verificacao de permissões
+  - [ ] Unificar fluxos repetitivos
 - [ ] Funcionalidade esqueci minha senha
 - [ ] Geração de QR Code p/ chave PIX da organização
 - [ ] Possível integração com Mercado Pago
-- [ ] Upload e download de CSV (Próxima versão)
-- [ ] Tela "Organização" (Próxima versão)
+- [ ] Upload e download de CSV

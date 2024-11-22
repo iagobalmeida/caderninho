@@ -31,6 +31,9 @@ document.querySelectorAll('.modal').forEach(modal => {
                 if(el.type == 'datetime-local') {
                     const value = payload[payload_key].substring(0, 16);
                     el.value = value;
+                }
+                else if(el.type == 'checkbox') {
+                    el.checked = Boolean(payload[payload_key]);
                 } else {
                     el.value = payload[payload_key];
                 }

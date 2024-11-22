@@ -33,6 +33,10 @@ def __delete(session: Session, entity: SQLModel, id: int) -> bool:
     return True
 
 
+def delete_usuario(session: Session, id: int) -> bool:
+    return __delete(session, Usuario, id)
+
+
 def delete_receita(session: Session, id: int) -> bool:
     return __delete(session, Receita, id)
 
@@ -72,6 +76,13 @@ def __update(session: Session, entity: SQLModel, id: int, **kwargs) -> SQLModel:
     return db_entity
 
 
+def update_organizacao(session: Session, id: int, descricao: str):
+    db_organizacao = session.get(Organizacao, id)
+    db_organizacao.descricao = descricao
+    session.commit()
+    return db_organizacao
+
+
 def update_receita(session: Session, id: int, nome: str, peso_unitario: float, porcentagem_lucro: float) -> Receita:
     return __update(session, Receita, id, nome=nome, peso_unitario=peso_unitario, porcentagem_lucro=porcentagem_lucro)
 
@@ -92,8 +103,27 @@ def update_estoque(session: Session, id: int, descricao: str, valor_pago: float 
     return __update(session, Estoque, id, descricao=descricao, valor_pago=valor_pago, quantidade=quantidade, ingrediente_id=ingrediente_id)
 
 
-def update_usuario(session: Session, id: int, nome: str, email: str):
-    return __update(session, Usuario, id, nome=nome, email=email)
+def update_usuario(session: Session, id: int, nome: str, email: str, dono: bool, senha: str = None):
+    if senha:
+        return __update(session, Usuario, id, nome=nome, email=email, dono=dono, senha=senha)
+    else:
+        return __update(session, Usuario, id, nome=nome, email=email, dono=dono)
+
+
+def update_usuario_senha(session: Session, id: int, senha_atual: str, senha: str, senha_confirmar: str):
+    usuario = session.exec(select(Usuario).where(Usuario.id == id)).first()
+    if not usuario:
+        raise HTTPException(422, 'Usuário não encontrado')
+
+    if usuario.senha != senha_atual:
+        raise HTTPException(422, 'Senha atual inválida')
+
+    if senha != senha_confirmar:
+        raise HTTPException(422, 'As senhas não batem')
+
+    usuario.senha = senha
+    session.commit()
+    return usuario
 
 
 def __create(session: Session, entity):
@@ -104,12 +134,26 @@ def __create(session: Session, entity):
     return entity
 
 
-def create_usuario(session: Session, nome: str, email: str, senha: str, organizacao_nome: str):
-    db_organizacao = select(Organizacao).where(Organizacao.descricao == organizacao_nome).first()
-    if db_organizacao:
-        raise HTTPException(422, 'Já existe uma organização com essse nome! Peça ao administrador para se juntar')
-    db_organizacao = __create(session, Organizacao(descricao=organizacao_nome))
-    return __create(session, Usuario(nome=nome, email=email, senha=senha, organizacao_id=db_organizacao.id))
+def create_usuario(session: Session, nome: str, email: str, senha: str, organizacao_descricao: str = None, organizacao_id: int = None, dono: bool = False):
+    '''Envie `organizacao_nome` para criar uma nova organização / Envie `organizacao_id` para associar o usuário a uma organização existente'''
+    db_organizacao_id = None
+
+    if organizacao_id:
+        db_organizacao = session.exec(select(Organizacao).where(Organizacao.id == organizacao_id)).first()
+    elif organizacao_descricao:
+        db_organizacao = session.exec(select(Organizacao).where(Organizacao.descricao == organizacao_descricao)).first()
+        if db_organizacao:
+            raise HTTPException(422, 'Já existe uma organização com essse nome! Peça ao administrador para se juntar')
+        db_organizacao = Organizacao(descricao=organizacao_descricao)
+        session.add(db_organizacao)
+        session.commit()
+
+    db_organizacao_id = db_organizacao.id
+
+    db_usuario = Usuario(nome=nome, email=email, senha=senha, organizacao_id=db_organizacao_id, dono=dono)
+    session.add(db_usuario)
+    session.commit()
+    return db_usuario
 
 
 def create_receita(session: Session, nome: str) -> Receita:
@@ -230,3 +274,16 @@ def get_ingredientes(session: Session) -> List[Ingrediente]:
     query = __filter_organization_id(session, query, Receita)
     ingredientes = session.exec(query).all()
     return ingredientes
+
+
+def get_usuarios(session: Session) -> List[Usuario]:
+    query = select(Usuario)
+    query = __filter_organization_id(session, query, Usuario)
+    usuarios = session.exec(query).all()
+    return usuarios
+
+
+def get_organizacao(session: Session, id: int) -> Organizacao:
+    query = select(Organizacao).where(Organizacao.id == id)
+    organizacao = session.exec(query).first()
+    return organizacao

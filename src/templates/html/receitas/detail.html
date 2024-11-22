@@ -14,8 +14,8 @@
   <div class="card">
     <div class="card-header">
       <h5 class="card-title">
-        <span class="material-symbols-outlined"> library_books </span>
-         {{receita.nome}}
+        {{ material_symbol('library_books') | safe }}
+        {{receita.nome}}
       </h5>
       <div class="dropdown ms-auto">
         <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
@@ -140,7 +140,7 @@
   <div class="card" id="cardIngredientes">
     <div class="card-header">
       <h5 class="card-title">
-        <span class="material-symbols-outlined"> package_2 </span>
+        {{ material_symbol('package_2') | safe }}
         Ingredientes
       </h5>
       <div class="dropdown ms-auto">
