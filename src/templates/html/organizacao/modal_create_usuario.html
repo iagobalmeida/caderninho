@@ -1,0 +1,44 @@
+<div class="modal" id="modalCreateUsuario" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_organizacao_usuarios_criar') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ material_symbol('account_circle') | safe }} Criar Usuário</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="organizacao_id" value="{{usuario.organizacao_id}}" />
+          <div class="mb-3">
+            <label for="nome" class="form-label required">Nome</label>
+            <input required type="text" class="form-control" name="nome" />
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label required">Email</label>
+            <input required type="text" class="form-control" name="email" />
+          </div>
+          <div class="mb-3">
+            <label for="organizacao_descricao" class="form-label required">Organizacao</label>
+            <input readonly required type="text" class="form-control" name="organizacao_descricao" value="{{usuario.organizacao_descricao}}" />
+          </div>
+          <div class="mb-3">
+            <div class="form-label">Configurações</div>
+            <label class="form-check form-switch">
+              <input name="dono" class="form-check-input" type="checkbox">
+              <span class="form-check-label">Dono (pode criar usuários)</span>
+            </label>
+          </div>
+          <div class="mb-3">
+            <label for="senha" class="form-label required">Senha</label>
+            <input required type="text" class="form-control" name="senha" />
+          </div>
+          <div class="mb-3">
+            <label for="senha_confirmar" class="form-label required">Confirmar Senha</label>
+            <input required type="text" class="form-control" name="senha_confirmar" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Criar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  

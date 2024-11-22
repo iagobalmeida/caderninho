@@ -1,0 +1,115 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">
+              {{ material_symbol('groups') | safe }}
+              {{organizacao.descricao}}
+            </h5>
+        </div>
+        {% if usuario.dono %}
+            <div class="card-body">
+                <form action="{{url_for('post_organizacao_index')}}" class="datagrid" method="POST">
+                    <input type="hidden" name="id" value="{{organizacao.id}}">
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">Descrição</div>
+                        <input class="form-control" type="text" name="descricao" required value="{{organizacao.descricao}}">
+                    </div>
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">Atualizar</div>
+                        <div class="datagrid-content">
+                            <button type="submit" class="btn">Atualizar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <div class="card-body">
+                <div class="datagrid" method="POST">
+                    <input type="hidden" name="id" value="{{organizacao.id}}">
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">Descrição</div>
+                        <input disabled class="form-control" type="text" name="descricao" required value="{{organizacao.descricao}}">
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">
+                {{ material_symbol('account_circle') | safe }}
+                Usuários
+            </h5>
+            {% if usuario.dono %}
+                <div class="dropdown ms-auto">
+                <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item" id="btn-apagar-selecionados" data-bs-toggle="modal" data-bs-target="#modalCreateUsuario">
+                    {{material_symbol('chevron_left') | safe }}
+                    Adicionar Usuário
+                    </button>
+                    <button class="dropdown-item" id="btn-apagar-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalDeleteUsuario">
+                    {{material_symbol('remove') | safe }}
+                    Remover Selecionados
+                    </button>
+                </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table table-vcenter table-striped table-hover">
+                <thead class="sticky-top">
+                    <tr>
+                        {% if usuario.dono %}
+                            <th class="w-1"></th>
+                        {% endif %}
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Dono</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% with main_usuario = usuario %}
+                        {% for usuario in usuarios %}
+                                {% if main_usuario.dono %}
+                                    {% if main_usuario.id == usuario.id %}
+                                        <tr class="cursor-pointer">
+                                            <td class="w-1"></td>
+                                            <td>{{usuario.nome}} (você)</td>
+                                            <td>{{usuario.email}}</td>
+                                            <td>{{'✔' if usuario.dono else '✖'}}</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr class="cursor-pointer" data-bs-payload="{{usuario.dict() | json}}">
+                                            <td class="w-1">
+                                                <input type="checkbox" name="checkbox_{{usuario.id}}" id="checkbox_{{usuario.id}}" data-id="{{usuario.id}}">
+                                            </td>
+                                            <td data-bs-toggle="modal" data-bs-target="#modalEditUsuario">{{usuario.nome}}</td>
+                                            <td data-bs-toggle="modal" data-bs-target="#modalEditUsuario">{{usuario.email}}</td>
+                                            <td data-bs-toggle="modal" data-bs-target="#modalEditUsuario">
+                                                {{'✔' if usuario.dono else '✖'}}
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% else %}
+                                    <tr class="cursor-pointer">
+                                        <td>{{usuario.nome}}</td>
+                                        <td>{{usuario.email}}</td>
+                                        <td>{{'✔' if usuario.dono else '✖'}}</td>
+                                    </tr>
+                                {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

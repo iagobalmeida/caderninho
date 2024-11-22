@@ -1,0 +1,41 @@
+<div class="modal" id="modalEditUsuario" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_organizacao_usuarios_editar') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ material_symbol('account_circle') | safe }} Atualizar Usuário</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" />
+          <div class="mb-3">
+            <label for="nome" class="form-label required">Nome</label>
+            <input required type="text" class="form-control" name="nome" />
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label required">Email</label>
+            <input required type="text" class="form-control" name="email" />
+          </div>
+          <div class="mb-3">
+            <label for="organizacao_descricao" class="form-label required">Organizacao</label>
+            <input disabled required type="text" class="form-control" name="organizacao_descricao" />
+          </div>
+          <div class="mb-3">
+            <div class="form-label">Configurações</div>
+            <label class="form-check form-switch">
+              <input name="dono" class="form-check-input" type="checkbox" >
+              <span class="form-check-label">Dono (pode criar usuários)</span>
+            </label>
+          </div>
+          <div class="mb-3">
+            <label for="nova_senha" class="form-label">Redefinir Senha</label>
+            <input type="text" class="form-control" name="nova_senha" placeholder="Preencha para altera a senha do usuário" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost-danger me-auto">Desativar Conta</button>
+          <button type="submit" class="btn btn-success">Atualizar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  
