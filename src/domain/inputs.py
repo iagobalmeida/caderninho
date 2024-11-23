@@ -71,6 +71,7 @@ class UsuarioAtualizar(BaseModel):
     id: int
     nome: str
     email: str
+    dono: bool
 
 
 class UsuarioCriar(BaseModel):

@@ -62,8 +62,11 @@ def delete_ingrediente(session: Session, id: int) -> bool:
 
 def __update(session: Session, entity: SQLModel, id: int, **kwargs) -> SQLModel:
     db_entity = session.get(entity, id)
+    if not db_entity:
+        raise ValueError(f'{entity.__name__} com id {id} não encontrado')
 
     sessao_usuario = usuario_de_sessao_db(session)
+
     if not sessao_usuario.administrador and not db_entity.organizacao_id == sessao_usuario.organizacao_id:
         raise ValueError('Sem permissão para editar esse registro')
 
@@ -78,6 +81,11 @@ def __update(session: Session, entity: SQLModel, id: int, **kwargs) -> SQLModel:
 
 def update_organizacao(session: Session, id: int, descricao: str):
     db_organizacao = session.get(Organizacao, id)
+    sessao_usuario = usuario_de_sessao_db(session)
+
+    if not (sessao_usuario.dono and sessao_usuario.organizacao_id == db_organizacao.id):
+        raise ValueError('Sem permissão para editar a organização')
+
     db_organizacao.descricao = descricao
     session.commit()
     return db_organizacao
@@ -103,7 +111,7 @@ def update_estoque(session: Session, id: int, descricao: str, valor_pago: float 
     return __update(session, Estoque, id, descricao=descricao, valor_pago=valor_pago, quantidade=quantidade, ingrediente_id=ingrediente_id)
 
 
-def update_usuario(session: Session, id: int, nome: str, email: str, dono: bool, senha: str = None):
+def update_organizacao_usuario(session: Session, id: int, nome: str, email: str, dono: bool, senha: str = None):
     if senha:
         return __update(session, Usuario, id, nome=nome, email=email, dono=dono, senha=senha)
     else:
@@ -112,14 +120,19 @@ def update_usuario(session: Session, id: int, nome: str, email: str, dono: bool,
 
 def update_usuario_senha(session: Session, id: int, senha_atual: str, senha: str, senha_confirmar: str):
     usuario = session.exec(select(Usuario).where(Usuario.id == id)).first()
+    sessao_usuario = usuario_de_sessao_db(session)
+
+    if usuario.id != sessao_usuario.id:
+        raise ValueError('Sem permissão para alterar a senha desse usuário')
+
     if not usuario:
-        raise HTTPException(422, 'Usuário não encontrado')
+        raise ValueError('Usuário não encontrado')
 
     if usuario.senha != senha_atual:
-        raise HTTPException(422, 'Senha atual inválida')
+        raise ValueError('Senha atual inválida')
 
     if senha != senha_confirmar:
-        raise HTTPException(422, 'As senhas não batem')
+        raise ValueError('As senhas não batem')
 
     usuario.senha = senha
     session.commit()
@@ -141,9 +154,6 @@ def create_usuario(session: Session, nome: str, email: str, senha: str, organiza
     if organizacao_id:
         db_organizacao = session.exec(select(Organizacao).where(Organizacao.id == organizacao_id)).first()
     elif organizacao_descricao:
-        db_organizacao = session.exec(select(Organizacao).where(Organizacao.descricao == organizacao_descricao)).first()
-        if db_organizacao:
-            raise HTTPException(422, 'Já existe uma organização com essse nome! Peça ao administrador para se juntar')
         db_organizacao = Organizacao(descricao=organizacao_descricao)
         session.add(db_organizacao)
         session.commit()
@@ -265,20 +275,19 @@ def get_fluxo_caixa(session: Session) -> Tuple[float, float, float]:
 
 
 def get_receita(session: Session, id: int) -> Receita:
-    receita = session.get(Receita, id)
+    query = __filter_organization_id(session, select(Receita).where(Receita.id == id), Receita)
+    receita = session.exec(query).first()
     return receita
 
 
 def get_ingredientes(session: Session) -> List[Ingrediente]:
-    query = select(Ingrediente)
-    query = __filter_organization_id(session, query, Receita)
+    query = __filter_organization_id(session, select(Ingrediente), Receita)
     ingredientes = session.exec(query).all()
     return ingredientes
 
 
 def get_usuarios(session: Session) -> List[Usuario]:
-    query = select(Usuario)
-    query = __filter_organization_id(session, query, Usuario)
+    query = __filter_organization_id(session, select(Usuario), Usuario)
     usuarios = session.exec(query).all()
     return usuarios
 

@@ -56,9 +56,9 @@ async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inp
 @router.post('/usuarios/editar', include_in_schema=False)
 async def post_organizacao_usuarios_editar(request: fastapi.Request, payload: inputs.UsuarioEditar = fastapi.Form(), session: Session = SESSION_DEP):
     if payload.nova_senha:
-        repository.update_usuario(session, id=payload.id, nome=payload.nome, email=payload.email, senha=payload.nova_senha, dono=payload.dono)
+        repository.update_organizacao_usuario(session, id=payload.id, nome=payload.nome, email=payload.email, senha=payload.nova_senha, dono=payload.dono)
     else:
-        repository.update_usuario(session, id=payload.id, nome=payload.nome, email=payload.email, dono=payload.dono)
+        repository.update_organizacao_usuario(session, id=payload.id, nome=payload.nome, email=payload.email, dono=payload.dono)
     return redirect_back(request)
 
 

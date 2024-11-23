@@ -26,6 +26,10 @@ class SessionUser(BaseModel):
     organizacao_descricao: str = None
     expires: datetime = None
 
+    @property
+    def expired(self):
+        return self.expires <= datetime.now()
+
     def dict(self):
         base_dict = self.model_dump()
         del base_dict['expires']
@@ -61,10 +65,17 @@ def criar_sessao(payload: SessionUser):
 
 
 def usuario_de_sessao_db(session: Session) -> SessionUser:
-    sessao_usuario = session.info.get('auth_uuid', None)
-    if not sessao_usuario or not AUTHENTICATED_SESSIONS.get(sessao_usuario, False):
-        raise HTTPException(401, 'Sua sessão expirou')
-    return AUTHENTICATED_SESSIONS[sessao_usuario]
+    sessao_usuario_uuid = session.info.get('auth_uuid', None)
+    sessao_usuario = AUTHENTICATED_SESSIONS.get(sessao_usuario_uuid, False)
+
+    if not sessao_usuario_uuid or not sessao_usuario:
+        raise HTTPException(401, 'É necessário se autenticar')
+
+    if sessao_usuario.expired:
+        del AUTHENTICATED_SESSIONS[sessao_usuario_uuid]
+        raise HTTPException(401, 'Sua sessão expirou, autentique-se novamente')
+
+    return sessao_usuario
 
 
 def authenticate(session: Session, email: str, senha: str) -> str:

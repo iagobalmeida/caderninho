@@ -36,7 +36,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 4. Use a conta `usuario@emai.com` com a senha `123` para acessar como usuário
 5. Use a conta `admin@email.com` com a senha `admin` para acessar como admin
 
-## TODO vb1.0
+## vb1.0
 - [X] Separar `scripts.js`
 - [X] Ajustar exibição de datas em modais
 - [X] Permitir valores quebrados em inputs
@@ -57,7 +57,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
         - [X] Listagem
         - [X] Ingredientes
 
-## TODO vb1.1
+## vb1.1
 - [X] Melhorar UX para mobile
 - [X] Bloquear acesso sem login (decorator)
 - [X] Padronizar botão `Ações` contendo `Criar` e `Apagar`
@@ -67,7 +67,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Autenticação em fluxos de `seed`
 - [X] Ajustar redirect de erro
 
-## TODO vb1.8
+## vb1.8
 - [X] Melhorar `db.py`
 - [X] Modal `Meu Perfil`
 - [X] Novo layout
@@ -75,7 +75,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
   - [X] Toggle modo escuro/claro
   - [X] Login
 
-## TODO vb2.0
+## vb2.0
 - [X] Formulários verticais em modal
 - [X] Padronizar método `dict()` em entidades para preencher `data-bs-payload`
   - [X] Atualizar JS para pegar `data-bs-payload` de `tr` ao clicar em `td`
@@ -87,7 +87,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [-] Upload e download de CSV (Próxima versão)
 - [-] Tela "Organização" (Próxima versão)
 
-## TODO vb2.5
+## vb2.5
 - [X] Tela "sobre a aplicação"
 - [X] Corrigir modal de perfil
 - [X] Corrigir inputs de data
@@ -106,6 +106,11 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Alterar senha
   - [X] Modal
   - [X] Funcionalidade
+- [X] Reorganizar rotas
+- [X] Expiração de Sessão login
+- [X] Redirecionamento de acordo com status_code
+- [X] Permitindo organizações com mesmo nome
+- [ ] "Lembrar de mim neste dispositivo"
 - [ ] Melhorar `repository.py`
   - [ ] Unificar verificacao de permissões
   - [ ] Unificar fluxos repetitivos

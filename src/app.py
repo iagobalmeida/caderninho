@@ -3,21 +3,22 @@ import re
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import fastapi
-from fastapi.exceptions import HTTPException
+from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
-from starlette.datastructures import URL
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from src import auth, db
+from src import db
 from src.domain import inputs, repository
+from src.routers.autenticacao import router as router_autenticacao
 from src.routers.estoques import router as router_estoques
 from src.routers.ingredientes import router as router_ingredientes
 from src.routers.organizacao import router as router_organizacao
+from src.routers.paginas import router as router_paginas
 from src.routers.receitas import router as router_receitas
+from src.routers.scripts import router as router_scripts
 from src.routers.vendas import router as router_vendas
-from src.scripts import seed
 from src.templates import render
 from src.utils import redirect_back
 
@@ -31,6 +32,9 @@ app.include_router(router_ingredientes)
 app.include_router(router_estoques)
 app.include_router(router_vendas)
 app.include_router(router_organizacao)
+app.include_router(router_scripts)
+app.include_router(router_autenticacao)
+app.include_router(router_paginas)
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 db.init()
@@ -42,41 +46,35 @@ async def get_index(request: fastapi.Request, message: str = fastapi.Query(None)
 
 
 @app.get('/registrar', include_in_schema=False)
-async def get_criar_conta(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
+async def get_registrar(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
     return render(request, 'autenticacao/criar_conta.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.post('/registrar', include_in_schema=False)
-async def post_criar_conta(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.Session = db.SESSION_DEP):
+async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.Session = db.SESSION_DEP):
     template_name = 'autenticacao/login.html'
     message = None
-    if payload.senha != payload.senha_confirmar:
+    try:
+        if payload.senha != payload.senha_confirmar:
+            raise Exception('As senhas não batem')
+
+        repository.create_usuario(session, nome=payload.nome, email=payload.email, senha=payload.senha, organizacao_descricao=payload.organizacao_descricao, dono=True)
+        message = 'Conta criada com sucesso'
+    except Exception as ex:
         template_name = 'autenticacao/criar_conta.html'
-        error = 'As senhas não batem'
-    else:
-        try:
-            repository.create_usuario(session, nome=payload.nome, email=payload.email, senha=payload.senha, organizacao_descricao=payload.organizacao_descricao, dono=True)
-            message = 'Conta criada com sucesso'
-        except Exception as ex:
-            template_name = 'autenticacao/criar_conta.html'
-            error = str(ex)
+        error = str(ex)
 
     return render(request, template_name, context={'error': error, 'message': message, 'data_bs_theme': 'auto'})
 
 
-@app.post('/authenticate')
-async def post_authenticate(email: str = fastapi.Form(), senha: str = fastapi.Form(), session: db.Session = db.SESSION_DEP):
-    return auth.authenticate(session, email=email, senha=senha)
+@app.get('/recuperar_senha', include_in_schema=False)
+async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
+    return render(request, 'autenticacao/recuperar_senha.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
-@app.post('/login', include_in_schema=False)
-async def post_login(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), session: db.Session = db.SESSION_DEP):
-    return auth.request_login(session, request, email=email, senha=senha)
-
-
-@app.get('/logout', include_in_schema=False)
-async def get_logout(request: fastapi.Request):
-    return auth.request_logout(request)
+@app.post('/recuperar_senha', include_in_schema=False)
+async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
+    return render(request, 'autenticacao/login.html', context={'message': f'Senha enviada para: {email}', 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.post('/alterar_senha', include_in_schema=False)
@@ -85,59 +83,10 @@ async def post_alterar_senha(request: fastapi.Request, payload: inputs.AlterarSe
     return redirect_back(request)
 
 
-@app.get('/recuperar_senha', include_in_schema=False)
-async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
-    return render(request, 'autenticacao/recuperar_senha.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
-
-
-@app.get('/home', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
-async def get_home(request: fastapi.Request, session: db.Session = db.SESSION_DEP):
-    db_receitas = repository.list_receitas(session)
-    db_ingredientes = repository.get_ingredientes(session)
-    db_estoques = repository.list_estoques(session)
-    db_vendas = repository.list_vendas(session)
-
-    return render(request, 'home.html', session, context={
-        'len_receitas': len(db_receitas),
-        'len_ingredientes': len(db_ingredientes),
-        'estoques': len(db_estoques),
-        'vendas': len(db_vendas),
-    })
-
-
-@app.get('/sobre', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
-async def get_sobre(request: fastapi.Request, session: db.Session = db.SESSION_DEP):
-    return render(request, 'sobre.html', session)
-
-
-@app.post('/perfil', dependencies=[auth.HEADER_AUTH])
-async def post_perfil(request: fastapi.Request, payload: inputs.UsuarioAtualizar = fastapi.Form(),  session: db.Session = db.SESSION_DEP):
-    repository.update_usuario(session, id=payload.id, nome=payload.nome, email=payload.email)
-    auth.atualizar_sessao(session, nome=payload.nome, email=payload.email)
-    return redirect_back(request)
-
-
-@app.post('/scripts/seed', tags=['Scripts'])
-async def post_scripts_seed(Authorization: str = fastapi.Header(None)):
-    if not Authorization == 'batatafrita':
-        raise fastapi.HTTPException(401, 'Não autorizado')
-    seed.main()
-    return True
-
-
-@app.post('/scripts/reset_db', tags=['Scripts'])
-async def post_scripts_reset_db(Authorization: str = fastapi.Header(None)):
-    if not Authorization == 'batatafrita':
-        raise fastapi.HTTPException(401, 'Não autorizado')
-    db.reset()
-    seed.main()
-    return True
-
-
 @app.exception_handler(IntegrityError)
 async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     if not redirect_to:
-        redirect_to = str(request.headers['referer'])
+        redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
 
     parsed_url = urlparse(url=str(redirect_to))
 
@@ -146,9 +95,9 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
     detalhe = re.search(r'\.(\w+)$', str(ex.orig))
     if detalhe:
         detalhe = detalhe.group(1)
-        query_params['error'] = f'&nbsp;&nbsp;<b>{parsed_url.path}</b>&nbsp;-&nbsp;<span>Campo&nbsp;<code>{detalhe}</code>&nbsp;inválido</span>'
+        query_params['error'] = f'<b>{parsed_url.path}</b>&nbsp;-&nbsp;<span>Campo&nbsp;<code>{detalhe}</code>&nbsp;inválido'
     else:
-        query_params['error'] = f'&nbsp;&nbsp;<b>{parsed_url.path}</b>&nbsp;-&nbsp;<span>Verifique os campos preenchidos</span>'
+        query_params['error'] = f'<b>{parsed_url.path}</b>&nbsp;-&nbsp;<span>Verifique os campos preenchidos'
 
     new_query = urlencode(query_params, doseq=True)
     parsed_url = parsed_url._replace(query=new_query)
@@ -160,13 +109,13 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
 @app.exception_handler(ValueError)
 async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     if not redirect_to:
-        redirect_to = str(request.headers['referer'])
+        redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
 
     parsed_url = urlparse(url=str(redirect_to))
 
     query_params = parse_qs(parsed_url.query)
 
-    query_params['error'] = f'&nbsp;&nbsp;<span>{ex}</span>'
+    query_params['error'] = str(ex)
 
     new_query = urlencode(query_params, doseq=True)
     parsed_url = parsed_url._replace(query=new_query)
@@ -178,4 +127,26 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
 
 @app.exception_handler(HTTPException)
 async def http_error_exception_handler(request: fastapi.Request, ex: HTTPException):
-    return await integrity_error_exception_handler(request, ex, redirect_to=request.url_for('get_index'))
+    redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
+    if ex.status_code == 401:
+        redirect_to = request.url_for('get_index')
+
+    return await integrity_error_exception_handler(request, ex, redirect_to=redirect_to)
+
+
+@app.exception_handler(RequestValidationError)
+async def generic_exception_handler(request: fastapi.Request, ex: Exception):
+    redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
+
+    parsed_url = urlparse(url=str(redirect_to))
+
+    query_params = parse_qs(parsed_url.query)
+
+    query_params['error'] = ex.errors()[0]["msg"]
+
+    new_query = urlencode(query_params, doseq=True)
+    parsed_url = parsed_url._replace(query=new_query)
+
+    redirect_to = urlunparse(parsed_url)
+
+    return fastapi.responses.RedirectResponse(redirect_to, status_code=302)

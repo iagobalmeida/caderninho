@@ -25,7 +25,7 @@
           {% if error %}
               <h4 class="text-danger text-center mb-3">{{error | safe}}</h4>
           {% endif %}
-          <form action="{{ url_for('post_criar_conta') }}" method="POST" autocomplete="off" novalidate="">
+          <form action="{{ url_for('post_registrar') }}" method="POST" autocomplete="off" novalidate="">
             <div class="mb-3">
               <label class="form-label">Nome</label>
               <input required type="text" name="nome" class="form-control" placeholder="Seu nome" autocomplete="off">

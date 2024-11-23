@@ -189,6 +189,30 @@
           <div class="page-body mt-1">
             <div class="container-xl">
               <div class="row row-deck row-cards">
+                {% if request.query_params['error'] %}
+                  <div class="alert alert-danger alert-dismissible" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                      {{material_symbol('error') | safe}}
+                      <div>
+                        <h4 class="alert-title">Ops! Algo deu errado!</h4>
+                        <div class="text-sencodary">{{request.query_params['error'] | safe}}</div>
+                      </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                  </div>
+                {% endif %}
+                {% if request.query_params['message'] %}
+                  <div class="alert alert-primary alert-dismissible" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                      {{material_symbol('info') | safe}}
+                      <div>
+                        <h4 class="alert-title">Ei, olhe aqui!</h4>
+                        <div class="text-sencodary">{{request.query_params['message'] | safe}}</div>
+                      </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                  </div>
+                {% endif %}
                 <!-- Content here -->
                 {% block content %}
                 {% endblock %}
