@@ -5,7 +5,7 @@ import fastapi.security
 
 
 def url_incluir_query_params(url: str, **params):
-    parsed_url = urlparse(url=url)
+    parsed_url = urlparse(url=str(url))
     query_params = parse_qs(parsed_url.query)
     query_params.update(**params)
     new_query = urlencode(query_params, doseq=True)

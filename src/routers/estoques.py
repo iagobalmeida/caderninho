@@ -1,3 +1,5 @@
+import json
+
 import fastapi
 from sqlmodel import Session
 
@@ -9,33 +11,6 @@ from src.templates.context import Button, Context
 from src.utils import redirect_back
 
 router = fastapi.APIRouter(prefix='/estoques', dependencies=[auth.HEADER_AUTH])
-context_header = Context.Header(
-    pretitle='Registros',
-    title='Estoque',
-    symbol='inventory_2',
-    buttons=[
-        Button(
-            content='Excluír Selecionados',
-            classname='btn',
-            symbol='delete',
-            attributes={
-                'disabled': 'true',
-                'data-bs-toggle': 'modal',
-                'data-bs-target': '#modalDeleteEstoque',
-                'id': 'btn-excluir-selecionados'
-            }
-        ),
-        Button(
-            content='Criar Movimentação',
-            classname='btn btn-success',
-            symbol='add',
-            attributes={
-                'data-bs-toggle': 'modal',
-                'data-bs-target': '#modalCreateEstoque'
-            }
-        )
-    ]
-)
 
 
 @router.get('/', include_in_schema=False)
@@ -43,6 +18,37 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
     db_estoques = repository.list_estoques(session, filter_ingrediente_id, filter_data_inicio, filter_data_final)
     db_ingredientes = repository.get_ingredientes(session)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
+    context_header = Context.Header(
+        pretitle='Registros',
+        title='Estoque',
+        symbol='inventory_2',
+        buttons=[
+            Button(
+                content='Excluír Selecionados',
+                classname='btn',
+                symbol='delete',
+                attributes={
+                    'id': 'btn-excluir-selecionados',
+                    'disabled': 'true',
+                    'data-bs-toggle': 'modal',
+                    'data-bs-target': '#modalDelete',
+                    'data-bs-payload': json.dumps({
+                        'action': str(request.url_for('post_estoques_excluir')),
+                        '.text-secondary': 'Excluir movimentações selecionadas?'
+                    })
+                }
+            ),
+            Button(
+                content='Criar Movimentação',
+                classname='btn btn-success',
+                symbol='add',
+                attributes={
+                    'data-bs-toggle': 'modal',
+                    'data-bs-target': '#modalCreateEstoque'
+                }
+            )
+        ]
+    )
     return render(
         session=session,
         request=request,

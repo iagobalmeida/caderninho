@@ -1,7 +1,6 @@
 {% extends 'layout.html' %}
 
 {% include 'receitas/modal_create.html' %}
-{% include 'receitas/modal_delete.html' %}
 
 {% include 'receitas/modal_ingredientes_incluir.html' %}
 {% include 'receitas/modal_ingredientes_remover.html' %}
@@ -146,11 +145,11 @@
       <div class="dropdown ms-auto">
         <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
-          <button class="dropdown-item" id="btn-excluir-selecionados" data-bs-toggle="modal" data-bs-target="#inserirReceitaIngredienteModal">
+          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaIngredienteModal">
             {{material_symbol('chevron_left') | safe }}
             Incluir Ingrediente
           </button>
-          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#excluirSelecionados">
+          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalDelete" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_ingredientes_remover')}}", ".text-secondary": "Remover ingredientes selecionados?"}'>
             {{material_symbol('remove') | safe }}
             Remover Selecionados
           </button>

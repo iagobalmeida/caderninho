@@ -1,18 +1,15 @@
 {% extends 'base.html' %}
 
-
+{% include 'modal_delete.html' %}
 
 {% include 'vendas/modal_edit.html' %}
-{% include 'vendas/modal_delete.html' %}
 {% include 'vendas/modal_create.html' %}
 
 {% include 'ingredientes/modal_create.html' %}
 
 {% include 'estoques/modal_create.html' %}
 {% include 'estoques/modal_edit.html' %}
-{% include 'estoques/modal_delete.html' %}
 
-{% include 'organizacao/modal_delete_usuario.html' %}
 
 
 {% include 'receitas/modal_create.html' %}
@@ -21,7 +18,6 @@
 {% include 'autenticacao/modal_atualizar_senha.html' %}
 
 {% include 'organizacao/modal_create_usuario.html' %}
-{% include 'organizacao/modal_delete_usuario.html' %}
 {% include 'organizacao/modal_edit_usuario.html' %}
 
   {% block layout %}
@@ -188,31 +184,33 @@
           <!-- Page body -->
           <div class="page-body mt-1">
             <div class="container-xl">
+              {% if request.query_params['error'] %}
+                <div class="alert alert-danger " role="alert">
+                  <div class="d-flex align-items-center gap-2">
+                    {{material_symbol('error') | safe}}
+                    <div>
+                      <div class="text-sencodary">{{request.query_params['error'] | safe}}</div>
+                    </div>
+                    <a class="ms-auto cursor-pointer text-secondary" data-bs-dismiss="alert" aria-label="close">
+                      {{material_symbol('close') | safe}}
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+              {% if request.query_params['message'] %}
+                <div class="alert alert-primary " role="alert">
+                  <div class="d-flex align-items-center gap-2">
+                    {{material_symbol('info') | safe}}
+                    <div>
+                      <div class="text-sencodary">{{request.query_params['message'] | safe}}</div>
+                    </div>
+                    <a class="ms-auto cursor-pointer text-secondary" data-bs-dismiss="alert" aria-label="close">
+                      {{material_symbol('close') | safe}}
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
               <div class="row row-deck row-cards">
-                {% if request.query_params['error'] %}
-                  <div class="alert alert-danger alert-dismissible" role="alert">
-                    <div class="d-flex align-items-center gap-2">
-                      {{material_symbol('error') | safe}}
-                      <div>
-                        <h4 class="alert-title">Ops! Algo deu errado!</h4>
-                        <div class="text-sencodary">{{request.query_params['error'] | safe}}</div>
-                      </div>
-                    </div>
-                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-                  </div>
-                {% endif %}
-                {% if request.query_params['message'] %}
-                  <div class="alert alert-primary alert-dismissible" role="alert">
-                    <div class="d-flex align-items-center gap-2">
-                      {{material_symbol('info') | safe}}
-                      <div>
-                        <h4 class="alert-title">Ei, olhe aqui!</h4>
-                        <div class="text-sencodary">{{request.query_params['message'] | safe}}</div>
-                      </div>
-                    </div>
-                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-                  </div>
-                {% endif %}
                 <!-- Content here -->
                 {% block content %}
                 {% endblock %}

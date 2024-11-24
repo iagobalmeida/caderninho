@@ -50,11 +50,11 @@
                 <div class="dropdown ms-auto">
                 <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
                 <div class="dropdown-menu">
-                    <button class="dropdown-item" id="btn-excluir-selecionados" data-bs-toggle="modal" data-bs-target="#modalCreateUsuario">
+                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalCreateUsuario">
                     {{material_symbol('chevron_left') | safe }}
                     Adicionar Usuário
                     </button>
-                    <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalDeleteUsuario">
+                    <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalDelete" data-bs-payload='{"action": "{{url_for('post_organizacao_usuarios_excluir')}}", ".text-secondary": "Excluir usuários selecionados?"}'>
                     {{material_symbol('remove') | safe }}
                     Remover Selecionados
                     </button>

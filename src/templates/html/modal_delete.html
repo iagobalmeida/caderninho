@@ -1,6 +1,6 @@
 
-<div class="modal" id="modalDeleteReceita" tabindex="-1">
-  <form class="modal-dialog modal-sm" role="document" method="POST" action="{{ url_for('post_receita_deletar') }}">
+<div class="modal" id="modalDelete" tabindex="-1">
+  <form class="modal-dialog modal-sm" role="document" method="POST" action="{{ url_for('post_estoques_excluir') }}">
     <div class="modal-content">
       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       <div class="modal-status bg-danger"></div>
@@ -11,7 +11,8 @@
           <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
         </svg>
         <h3>Confirmar Ação</h3>
-        <div class="text-secondary">Excluír receitas selecionadas?</div>
+        <div class="text-secondary">Excluír movimentações selecionadas?</div>
+        <input readonly type="hidden" name="receita_id">
         <input required readonly type="hidden" class="form-control" name="selecionados_ids" />
       </div>
       <div class="modal-footer">

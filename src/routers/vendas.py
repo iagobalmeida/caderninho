@@ -1,3 +1,5 @@
+import json
+
 import fastapi
 from sqlmodel import Session
 
@@ -9,39 +11,43 @@ from src.templates.context import Button, Context
 from src.utils import redirect_back
 
 router = fastapi.APIRouter(prefix='/vendas', dependencies=[auth.HEADER_AUTH])
-context_header = Context.Header(
-    pretitle='Registros',
-    title='Vendas',
-    symbol='shopping_cart',
-    buttons=[
-        Button(
-            content='Excluír Selecionados',
-            classname='btn',
-            symbol='delete',
-            attributes={
-                'disabled': 'true',
-                'data-bs-toggle': 'modal',
-                'data-bs-target': '#modalDeleteVenda',
-                'id': 'btn-excluir-selecionados'
-            }
-        ),
-        Button(
-            content='Criar Venda',
-            classname='btn btn-success',
-            symbol='add',
-            attributes={
-                'data-bs-toggle': 'modal',
-                'data-bs-target': '#modalCreateVenda'
-            }
-        )
-    ]
-)
 
 
 @router.get('/', include_in_schema=False)
 async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
     db_vendas = repository.list_vendas(session, filter_data_inicio, filter_data_final)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
+    context_header = Context.Header(
+        pretitle='Registros',
+        title='Vendas',
+        symbol='shopping_cart',
+        buttons=[
+            Button(
+                content='Excluír Selecionados',
+                classname='btn',
+                symbol='delete',
+                attributes={
+                    'disabled': 'true',
+                    'data-bs-toggle': 'modal',
+                    'id': 'btn-excluir-selecionados',
+                    'data-bs-target': '#modalDelete',
+                    'data-bs-payload': json.dumps({
+                        'action': str(request.url_for('post_vendas_excluir')),
+                        '.text-secondary': 'Excluir vendas selecionadas?'
+                    }),
+                }
+            ),
+            Button(
+                content='Criar Venda',
+                classname='btn btn-success',
+                symbol='add',
+                attributes={
+                    'data-bs-toggle': 'modal',
+                    'data-bs-target': '#modalCreateVenda'
+                }
+            )
+        ]
+    )
     return render(
         session=session,
         request=request,

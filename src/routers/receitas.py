@@ -1,3 +1,5 @@
+import json
+
 import fastapi
 from sqlmodel import Session
 
@@ -9,33 +11,6 @@ from src.templates.context import Button, Context
 from src.utils import redirect_back, redirect_url_for
 
 router = fastapi.APIRouter(prefix='/receitas', dependencies=[auth.HEADER_AUTH])
-context_header = Context.Header(
-    pretitle='Registros',
-    title='Receitas',
-    symbol='library_books',
-    buttons=[
-        Button(
-            content='Excluír Selecionados',
-            classname='btn',
-            symbol='delete',
-            attributes={
-                'disabled': 'true',
-                'data-bs-toggle': 'modal',
-                'data-bs-target': '#modalDeleteReceita',
-                'id': 'btn-excluir-selecionados'
-            }
-        ),
-        Button(
-            content='Criar Receita',
-            classname='btn btn-success',
-            symbol='add',
-            attributes={
-                'data-bs-toggle': 'modal',
-                'data-bs-target': '#modalCreateReceita'
-            }
-        )
-    ]
-)
 
 
 @router.post('/', include_in_schema=False)
@@ -47,6 +22,37 @@ async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form
 @router.get('/', include_in_schema=False)
 async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, session: Session = DBSESSAO_DEP):
     db_receitas = repository.list_receitas(session, filter_nome)
+    context_header = Context.Header(
+        pretitle='Registros',
+        title='Receitas',
+        symbol='library_books',
+        buttons=[
+            Button(
+                content='Excluír Selecionados',
+                classname='btn',
+                symbol='delete',
+                attributes={
+                    'id': 'btn-excluir-selecionados',
+                    'disabled': 'true',
+                    'data-bs-toggle': 'modal',
+                    'data-bs-target': '#modalDelete',
+                    'data-bs-payload': json.dumps({
+                        'action': str(request.url_for('post_receita_deletar')),
+                        '.text-secondary': 'Excluir receitas selecionadas?'
+                    }),
+                }
+            ),
+            Button(
+                content='Criar Receita',
+                classname='btn btn-success',
+                symbol='add',
+                attributes={
+                    'data-bs-toggle': 'modal',
+                    'data-bs-target': '#modalCreateReceita'
+                }
+            )
+        ]
+    )
     return render(
         session=session,
         request=request,
@@ -65,14 +71,18 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
     if not db_receita:
         raise ValueError(f'Receita com id {id} não encontrada')
     db_ingredientes = repository.get_ingredientes(session)
-    header = context_header.copy()
-    header['buttons'] = []
+    context_header = Context.Header(
+        pretitle='Registros',
+        title='Receitas',
+        symbol='library_books',
+        buttons=[]
+    )
     return render(
         session=session,
         request=request,
         template_name='receitas/detail.html',
         context={
-            'header': header,
+            'header': context_header,
             'receita': db_receita,
             'ingredientes': db_ingredientes
         }

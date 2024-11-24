@@ -37,13 +37,25 @@ document.querySelectorAll('.modal').forEach(modal => {
                 } else {
                     el.value = payload[payload_key];
                 }
-            })
+            });
             modal.querySelectorAll(`select[name="${payload_key}"]`).forEach(el => {
                 el.value = payload[payload_key];
-            })
+            });
             modal.querySelectorAll('[data-bs-payload]').forEach(el => {
                 el.setAttribute('data-bs-payload', payload_json);
-            })
+            });
+            // 'action': 'http://google.com.br' => <form action="http://google.com.br">
+            if(payload_key == 'action') {
+                modal.querySelector('form').setAttribute('action', payload[payload_key]);
+            }
+            // '#test':'foo' => <... id="test">foo</...>
+            // '.test':'foo' => <... class="test">foo</...>
+            if(payload_key.includes('#') || payload_key.includes('.')){
+                const target = modal.querySelector(payload_key)
+                if(target) {
+                    target.innerHTML = payload[payload_key];
+                }
+            }
         });
     });
 });
@@ -53,9 +65,9 @@ let checkboxesLastValue = true;
 const updateDeleteAllButton = () => {
     const checkeds = Array.from(document.querySelectorAll('td input[type="checkbox"]:checked')).map(el => el.getAttribute('data-id'));
     if(checkeds.length) {
-        document.querySelector('#btn-excluir-selecionados').removeAttribute("disabled")
+        document.querySelector('#btn-excluir-selecionados').removeAttribute("disabled");
     } else {
-        document.querySelector('#btn-excluir-selecionados').setAttribute("disabled", true)
+        document.querySelector('#btn-excluir-selecionados').setAttribute("disabled", true);
     }
     if(inputSelecionados) inputSelecionados.forEach(el => el.value = checkeds);
 }

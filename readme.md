@@ -114,12 +114,12 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Reestruturar sesão autorizada de banco de dados
 - [X] Alertas de sucesso
 - [X] Padronização de termos (criar, atualizar, excluír, incluir e remover)
-- [ ] Unificar modal "deleteSelecionados"
+- [X] Unificar modal "deleteSelecionados"
+- [X] Funcionalidade esqueci minha senha
 - [ ] "Lembrar de mim neste dispositivo"
 - [ ] Melhorar `repository.py`
   - [ ] Unificar verificacao de permissões
   - [ ] Unificar fluxos repetitivos
-- [ ] Funcionalidade esqueci minha senha
 - [ ] Geração de QR Code p/ chave PIX da organização
 - [ ] Possível integração com Mercado Pago
 - [ ] Upload e download de CSV
