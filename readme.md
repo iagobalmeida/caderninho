@@ -110,6 +110,11 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Expiração de Sessão login
 - [X] Redirecionamento de acordo com status_code
 - [X] Permitindo organizações com mesmo nome
+- [X] Refatorar `auth.py`
+- [X] Reestruturar sesão autorizada de banco de dados
+- [X] Alertas de sucesso
+- [X] Padronização de termos (criar, atualizar, excluír, incluir e remover)
+- [ ] Unificar modal "deleteSelecionados"
 - [ ] "Lembrar de mim neste dispositivo"
 - [ ] Melhorar `repository.py`
   - [ ] Unificar verificacao de permissões

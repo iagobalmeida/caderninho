@@ -2,7 +2,7 @@ import fastapi
 from sqlmodel import Session
 
 from src import auth
-from src.db import SESSION_DEP
+from src.db import DBSESSAO_DEP
 from src.domain import inputs, repository
 from src.templates import render
 from src.templates.context import Button, Context
@@ -15,14 +15,14 @@ context_header = Context.Header(
     symbol='library_books',
     buttons=[
         Button(
-            content='Apagar Selecionados',
+            content='Excluír Selecionados',
             classname='btn',
             symbol='delete',
             attributes={
                 'disabled': 'true',
                 'data-bs-toggle': 'modal',
                 'data-bs-target': '#modalDeleteReceita',
-                'id': 'btn-apagar-selecionados'
+                'id': 'btn-excluir-selecionados'
             }
         ),
         Button(
@@ -39,13 +39,13 @@ context_header = Context.Header(
 
 
 @router.post('/', include_in_schema=False)
-async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     db_receita = repository.create_receita(session, nome)
     return redirect_url_for(request, 'get_receita', id=db_receita.id)
 
 
 @router.get('/', include_in_schema=False)
-async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, session: Session = SESSION_DEP):
+async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, session: Session = DBSESSAO_DEP):
     db_receitas = repository.list_receitas(session, filter_nome)
     return render(
         session=session,
@@ -60,7 +60,7 @@ async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, 
 
 
 @router.get('/{id}', include_in_schema=False)
-async def get_receita(request: fastapi.Request, id: int, session: Session = SESSION_DEP):
+async def get_receita(request: fastapi.Request, id: int, session: Session = DBSESSAO_DEP):
     db_receita = repository.get_receita(session, id)
     if not db_receita:
         raise ValueError(f'Receita com id {id} não encontrada')
@@ -80,7 +80,7 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = SESS
 
 
 @router.post('/atualizar', include_in_schema=False)
-async def post_receita_atualizar(request: fastapi.Request, payload: inputs.ReceitaAtualizar = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_receita_atualizar(request: fastapi.Request, payload: inputs.ReceitaAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.update_receita(
         session,
         id=payload.id,
@@ -88,11 +88,11 @@ async def post_receita_atualizar(request: fastapi.Request, payload: inputs.Recei
         peso_unitario=payload.peso_unitario,
         porcentagem_lucro=payload.porcentagem_lucro
     )
-    return redirect_back(request)
+    return redirect_back(request, message='Receita atualizada com sucesso!')
 
 
 @router.post('/deletar', include_in_schema=False)
-async def post_receita_deletar(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_receita_deletar(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if selecionados_ids:
         for id in selecionados_ids.split(','):
             repository.delete_receita(session, id=id)
@@ -100,13 +100,13 @@ async def post_receita_deletar(request: fastapi.Request, selecionados_ids: str =
 
 
 @router.post('/ingredientes/incluir', include_in_schema=False)
-async def post_receita_ingredientes_incluir(request: fastapi.Request, payload: inputs.ReceitaIngredienteAdicionar = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_receita_ingredientes_incluir(request: fastapi.Request, payload: inputs.ReceitaIngredienteAdicionar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.create_receita_ingrediente(session, receita_id=payload.receita_id, ingrediente_id=payload.ingrediente_id, quantidade=payload.quantidade)
     return redirect_url_for(request, 'get_receita', id=payload.receita_id)
 
 
 @router.post('/ingredientes/atualizar', include_in_schema=False)
-async def post_receita_ingredientes_atualizar(request: fastapi.Request, payload: inputs.ReceitaIngredienteAtualizar = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_receita_ingredientes_atualizar(request: fastapi.Request, payload: inputs.ReceitaIngredienteAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.update_receita_ingrediente(session, id=payload.id, quantidade=payload.quantidade)
     if payload.ingrediente_nome:
         repository.update_ingrediente(session, id=payload.ingrediente_id, nome=payload.ingrediente_nome, custo=payload.ingrediente_custo, peso=payload.ingrediente_peso)
@@ -114,7 +114,7 @@ async def post_receita_ingredientes_atualizar(request: fastapi.Request, payload:
 
 
 @router.post('/ingredientes/remover', include_in_schema=False)
-async def post_receita_ingredientes_remover(request: fastapi.Request, payload: inputs.ReceitaIngredienteRemover = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_receita_ingredientes_remover(request: fastapi.Request, payload: inputs.ReceitaIngredienteRemover = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if payload.selecionados_ids:
         for id in payload.selecionados_ids.split(','):
             repository.delete_receita_ingrediente(session, id=int(id))

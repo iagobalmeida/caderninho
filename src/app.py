@@ -1,16 +1,19 @@
 import logging
+import random
 import re
-from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import fastapi
+import fastapi.security
 from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from src import db
+from src import auth, db
 from src.domain import inputs, repository
+from src.modules import send_email
 from src.routers.autenticacao import router as router_autenticacao
 from src.routers.estoques import router as router_estoques
 from src.routers.ingredientes import router as router_ingredientes
@@ -20,12 +23,15 @@ from src.routers.receitas import router as router_receitas
 from src.routers.scripts import router as router_scripts
 from src.routers.vendas import router as router_vendas
 from src.templates import render
-from src.utils import redirect_back
+from src.utils import url_incluir_query_params
+
+SESSION_SECRET_KEY = 'SESSION_SECRET_KEY'
 
 rootlogger.setLevel(logging.WARN)
 
 app = fastapi.FastAPI()
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
+app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY, https_only=False)
 
 app.include_router(router_receitas)
 app.include_router(router_ingredientes)
@@ -51,7 +57,7 @@ async def get_registrar(request: fastapi.Request, message: str = fastapi.Query(N
 
 
 @app.post('/registrar', include_in_schema=False)
-async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.Session = db.SESSION_DEP):
+async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: auth.DBSessaoAutenticada = db.DBSESSAO_DEP):
     template_name = 'autenticacao/login.html'
     message = None
     try:
@@ -73,14 +79,21 @@ async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Q
 
 
 @app.post('/recuperar_senha', include_in_schema=False)
-async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
-    return render(request, 'autenticacao/login.html', context={'message': f'Senha enviada para: {email}', 'error': error, 'data_bs_theme': 'auto'})
+async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: auth.DBSessaoAutenticada = db.DBSESSAO_DEP):
+    db_usuario = repository.get_usuario_por_email(session, email)
+    if not db_usuario:
+        raise ValueError('Não foi encontrado usuário com esse email')
 
+    nova_senha = random.randint(int('1'*9), int('9'*9))
+    db_usuario.senha = nova_senha
+    session.commit()
 
-@app.post('/alterar_senha', include_in_schema=False)
-async def post_alterar_senha(request: fastapi.Request, payload: inputs.AlterarSenha = fastapi.Form(),  session: db.Session = db.SESSION_DEP):
-    repository.update_usuario_senha(session, id=payload.id, senha_atual=payload.senha_atual, senha=payload.senha, senha_confirmar=payload.senha_confirmar)
-    return redirect_back(request)
+    send_email.enviar(
+        assunto='KDerninho - Recuperar Senha',
+        corpo=f'Sua nova senha temporária é {nova_senha}',
+        para=[db_usuario.email]
+    )
+    return render(request, 'autenticacao/login.html', context={'message': f'Senha enviada para: {db_usuario.email}', 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.exception_handler(IntegrityError)
@@ -88,21 +101,13 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
     if not redirect_to:
         redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
 
-    parsed_url = urlparse(url=str(redirect_to))
-
-    query_params = parse_qs(parsed_url.query)
-
+    error = f'<span>Verifique os campos preenchidos'
     detalhe = re.search(r'\.(\w+)$', str(ex.orig))
     if detalhe:
         detalhe = detalhe.group(1)
-        query_params['error'] = f'<b>{parsed_url.path}</b>&nbsp;-&nbsp;<span>Campo&nbsp;<code>{detalhe}</code>&nbsp;inválido'
-    else:
-        query_params['error'] = f'<b>{parsed_url.path}</b>&nbsp;-&nbsp;<span>Verifique os campos preenchidos'
+        error = f'<span>Campo&nbsp;<code>{detalhe}</code>&nbsp;inválido'
 
-    new_query = urlencode(query_params, doseq=True)
-    parsed_url = parsed_url._replace(query=new_query)
-    redirect_to = urlunparse(parsed_url)
-
+    redirect_to = url_incluir_query_params(redirect_to, error=error)
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
 
 
@@ -110,18 +115,7 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
 async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     if not redirect_to:
         redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
-
-    parsed_url = urlparse(url=str(redirect_to))
-
-    query_params = parse_qs(parsed_url.query)
-
-    query_params['error'] = str(ex)
-
-    new_query = urlencode(query_params, doseq=True)
-    parsed_url = parsed_url._replace(query=new_query)
-
-    redirect_to = urlunparse(parsed_url)
-
+    redirect_to = url_incluir_query_params(redirect_to, error=str(ex))
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
 
 
@@ -129,6 +123,7 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
 async def http_error_exception_handler(request: fastapi.Request, ex: HTTPException):
     redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
     if ex.status_code == 401:
+        request.session.clear()
         redirect_to = request.url_for('get_index')
 
     return await integrity_error_exception_handler(request, ex, redirect_to=redirect_to)
@@ -137,16 +132,5 @@ async def http_error_exception_handler(request: fastapi.Request, ex: HTTPExcepti
 @app.exception_handler(RequestValidationError)
 async def generic_exception_handler(request: fastapi.Request, ex: Exception):
     redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
-
-    parsed_url = urlparse(url=str(redirect_to))
-
-    query_params = parse_qs(parsed_url.query)
-
-    query_params['error'] = ex.errors()[0]["msg"]
-
-    new_query = urlencode(query_params, doseq=True)
-    parsed_url = parsed_url._replace(query=new_query)
-
-    redirect_to = urlunparse(parsed_url)
-
+    redirect_to = url_incluir_query_params(redirect_to, error=ex.errors()[0]["msg"])
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)

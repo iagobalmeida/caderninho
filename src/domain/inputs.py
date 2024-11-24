@@ -92,7 +92,7 @@ class UsuarioEditar(BaseModel):
     dono: bool = False
 
 
-class AlterarSenha(BaseModel):
+class AtualizarSenha(BaseModel):
     id: int
     senha_atual: str
     senha: str

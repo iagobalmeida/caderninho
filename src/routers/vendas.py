@@ -2,7 +2,7 @@ import fastapi
 from sqlmodel import Session
 
 from src import auth
-from src.db import SESSION_DEP
+from src.db import DBSESSAO_DEP
 from src.domain import inputs, repository
 from src.templates import render
 from src.templates.context import Button, Context
@@ -15,14 +15,14 @@ context_header = Context.Header(
     symbol='shopping_cart',
     buttons=[
         Button(
-            content='Apagar Selecionados',
+            content='Excluír Selecionados',
             classname='btn',
             symbol='delete',
             attributes={
                 'disabled': 'true',
                 'data-bs-toggle': 'modal',
                 'data-bs-target': '#modalDeleteVenda',
-                'id': 'btn-apagar-selecionados'
+                'id': 'btn-excluir-selecionados'
             }
         ),
         Button(
@@ -39,7 +39,7 @@ context_header = Context.Header(
 
 
 @router.get('/', include_in_schema=False)
-async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = SESSION_DEP):
+async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
     db_vendas = repository.list_vendas(session, filter_data_inicio, filter_data_final)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
     return render(
@@ -59,20 +59,20 @@ async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = N
 
 
 @router.post('/', include_in_schema=False)
-async def post_vendas_index(request: fastapi.Request, payload: inputs.VendaCriar = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_vendas_index(request: fastapi.Request, payload: inputs.VendaCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.create_venda(session, descricao=payload.descricao, valor=payload.valor)
-    return redirect_back(request)
+    return redirect_back(request, message='Venda criada com sucesso!')
 
 
 @router.post('/excluir', include_in_schema=False)
-async def post_vendas_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_vendas_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if selecionados_ids:
         for id in selecionados_ids.split(','):
             repository.delete_venda(session, id=int(id))
-    return redirect_back(request)
+    return redirect_back(request, message='Venda excluída com sucesso!')
 
 
 @router.post('/atualizar', include_in_schema=False)
-async def post_vendas_atualizar(request: fastapi.Request, payload: inputs.VendaAtualizar = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_vendas_atualizar(request: fastapi.Request, payload: inputs.VendaAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.update_venda(session, id=payload.id, descricao=payload.descricao, valor=payload.valor)
-    return redirect_back(request)
+    return redirect_back(request, message='Venda atualizada com sucesso!')

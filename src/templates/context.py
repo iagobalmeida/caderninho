@@ -3,7 +3,7 @@ from typing import Dict, List, TypedDict
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from src.auth import SessionUser, usuario_de_sessao_db
+from src.auth import SessaoAutenticada
 from src.domain import repository
 from src.templates.filters import \
     templates_global_material_symbol as material_symbol
@@ -41,7 +41,7 @@ class Context(TypedDict):
     navbar: Navbar
     header: Header
     breadcrumbs: List[Breadcrumb]
-    usuario: SessionUser = None
+    usuario: SessaoAutenticada = None
 
     @classmethod
     def factory_navbar_link(self, request: Request, title: str, symbol_name: str, url_name: str):
@@ -109,8 +109,8 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
         data_bs_theme=theme
     )
 
-    if session:
-        base_context.update(usuario=usuario_de_sessao_db(session))
+    if session and session.sessao_autenticada:
+        base_context.update(usuario=session.sessao_autenticada)
 
         db_ingredientes = repository.get_ingredientes(session)
         db_receitas = repository.list_receitas(session)

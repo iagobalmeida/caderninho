@@ -1,7 +1,9 @@
 import os
 
 from fastapi import Depends, Request
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import SQLModel, create_engine
+
+from src.auth import DBSessaoAutenticada
 
 sqlite_nome_arquivo = "database.db"
 sqlite_url = f"sqlite:///{sqlite_nome_arquivo}"
@@ -12,11 +14,7 @@ engine = create_engine(DATABASE_URL, echo=True)
 
 
 def get_session(request: Request):
-    with Session(engine) as session:
-        try:
-            session.info.update(auth_uuid=request.state.auth_uuid)
-        except:
-            pass
+    with DBSessaoAutenticada(engine, request=request) as session:
         yield session
     session.close()
 
@@ -31,4 +29,4 @@ def reset():
     return True
 
 
-SESSION_DEP = Depends(get_session)
+DBSESSAO_DEP = Depends(get_session)

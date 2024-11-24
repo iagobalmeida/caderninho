@@ -18,7 +18,7 @@
 {% include 'receitas/modal_create.html' %}
 {% include 'autenticacao/modal_perfil.html' %}
 {% include 'autenticacao/modal_logout.html' %}
-{% include 'autenticacao/modal_alterar_senha.html' %}
+{% include 'autenticacao/modal_atualizar_senha.html' %}
 
 {% include 'organizacao/modal_create_usuario.html' %}
 {% include 'organizacao/modal_delete_usuario.html' %}
@@ -73,10 +73,10 @@
                     &nbsp;
                     Meu pefil
                   </a>
-                  <a data-bs-toggle="modal" data-bs-target="#modalAlterarSenha" data-bs-payload="{{usuario.dict() | json}}" class="dropdown-item cursor-pointer">
+                  <a data-bs-toggle="modal" data-bs-target="#modalAtualizarSenha" data-bs-payload="{{usuario.dict() | json}}" class="dropdown-item cursor-pointer">
                     {{ material_symbol('password') | safe }}
                     &nbsp;
-                    Alterar Senha
+                    Atualizar Senha
                   </a>
                   <!-- <a href="#" class="dropdown-item">Feedback</a> -->
                   <div class="dropdown-divider"></div>

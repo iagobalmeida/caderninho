@@ -2,7 +2,7 @@ import fastapi
 from sqlmodel import Session
 
 from src import auth
-from src.db import SESSION_DEP
+from src.db import DBSESSAO_DEP
 from src.domain import inputs, repository
 from src.templates import render
 from src.templates.context import Button, Context
@@ -15,14 +15,14 @@ context_header = Context.Header(
     symbol='inventory_2',
     buttons=[
         Button(
-            content='Apagar Selecionados',
+            content='Excluír Selecionados',
             classname='btn',
             symbol='delete',
             attributes={
                 'disabled': 'true',
                 'data-bs-toggle': 'modal',
                 'data-bs-target': '#modalDeleteEstoque',
-                'id': 'btn-apagar-selecionados'
+                'id': 'btn-excluir-selecionados'
             }
         ),
         Button(
@@ -39,7 +39,7 @@ context_header = Context.Header(
 
 
 @router.get('/', include_in_schema=False)
-async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = SESSION_DEP):
+async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
     db_estoques = repository.list_estoques(session, filter_ingrediente_id, filter_data_inicio, filter_data_final)
     db_ingredientes = repository.get_ingredientes(session)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
@@ -62,7 +62,7 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
 
 
 @router.post('/', include_in_schema=False)
-async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if payload.descricao == 'Uso em Receita' and payload.receita_id:
         db_receita = repository.get_receita(session, payload.receita_id)
         for ingrediente_link in db_receita.ingrediente_links:
@@ -87,18 +87,18 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
             quantidade=quantidade,
             valor_pago=float(payload.valor_pago) if payload.valor_pago else 0
         )
-    return redirect_back(request)
+    return redirect_back(request, message='Movimentação criada com sucesso!')
 
 
 @router.post('/excluir', include_in_schema=False)
-async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = SESSION_DEP):
-    if selecionados_ids:
-        for id in selecionados_ids.split(','):
-            repository.delete_estoque(session, id=int(id))
-    return redirect_back(request)
+async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    selecionados_ids = selecionados_ids.split(',')
+    for id in selecionados_ids:
+        repository.delete_estoque(session, id=int(id))
+    return redirect_back(request, message=f'{len(selecionados_ids)} registros excluídos com sucesso!')
 
 
 @router.post('/atualizar', include_in_schema=False)
-async def post_estoques_atualizar(request: fastapi.Request, payload: inputs.EstoqueAtualizar = fastapi.Form(), session: Session = SESSION_DEP):
+async def post_estoques_atualizar(request: fastapi.Request, payload: inputs.EstoqueAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.update_estoque(session, id=payload.id, descricao=payload.descricao, quantidade=payload.quantidade, valor_pago=payload.valor_pago)
-    return redirect_back(request)
+    return redirect_back(request, message='Movimentação atualizada com sucesso!')

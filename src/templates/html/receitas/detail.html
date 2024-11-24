@@ -23,7 +23,7 @@
           <!-- <a href="#" class="dropdown-item">Exportar CSV</a> -->
           <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteReceita">
             {{ material_symbol('delete') | safe }}
-            Apagar
+            Excluír
           </a>
         </div>
       </div>
@@ -146,11 +146,11 @@
       <div class="dropdown ms-auto">
         <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
-          <button class="dropdown-item" id="btn-apagar-selecionados" data-bs-toggle="modal" data-bs-target="#inserirReceitaIngredienteModal">
+          <button class="dropdown-item" id="btn-excluir-selecionados" data-bs-toggle="modal" data-bs-target="#inserirReceitaIngredienteModal">
             {{material_symbol('chevron_left') | safe }}
             Incluir Ingrediente
           </button>
-          <button class="dropdown-item" id="btn-apagar-selecionados" disabled data-bs-toggle="modal" data-bs-target="#apagarSelecionados">
+          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#excluirSelecionados">
             {{material_symbol('remove') | safe }}
             Remover Selecionados
           </button>
