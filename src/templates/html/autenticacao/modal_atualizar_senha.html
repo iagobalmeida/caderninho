@@ -1,0 +1,28 @@
+<div class="modal" id="modalAtualizarSenha" tabindex="-1">
+  <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_atualizar_senha') }}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ material_symbol('password') | safe }} Atualizar Senha</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="id" />
+        <div class="mb-3">
+          <label for="senha_atual" class="form-label required">Senha Atual</label>
+          <input required type="text" class="form-control" name="senha_atual" placeholder="Sua senha atual"/>
+        </div>
+        <div class="mb-3">
+          <label for="senha" class="form-label required">Nova Senha</label>
+          <input required type="text" class="form-control" name="senha" placeholder="A nova senha"/>
+        </div>
+        <div class="mb-3">
+          <label for="senha_confirmar" class="form-label required">Confirmar Nova Senha</label>
+          <input required type="text" class="form-control" name="senha_confirmar" placeholder="Repita a nova senha"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Atualizar</button>
+      </div>
+    </div>
+  </form>
+</div>
