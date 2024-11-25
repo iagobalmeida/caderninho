@@ -122,9 +122,14 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
   - [X] Unificar fluxos repetitivos
 
 # v1.0
-- [ ] Geração de QR Code p/ chave PIX da organização
+- [X] Geração de QR Code p/ chave PIX da organização
   - [X] Geração de QR Code PIX com valor da venda
-  - [ ] Campos `cidade` e `chave_pix` em Organização
-  - [ ] Geração de QR Code PIX de organização
-  - [ ] Geração de QR Code PIX com valor customizado
+  - [X] Campos `cidade` e `chave_pix` em Organização
+    - [X] Atualização dos campos a partir de tela `/organização`
+    - [X] Geração de QR Code última venda com dados da organização
+- [ ] Campo `paga` em venda
+- [ ] Ação `marcar como paga` em vendas
+- [ ] Ação `marcar como paga` em home
+- [ ] Geração de QR Code PIX de organização
+- [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV

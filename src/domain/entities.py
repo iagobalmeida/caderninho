@@ -13,6 +13,8 @@ STRFTIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 class Organizacao(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     descricao: str
+    cidade: str
+    chave_pix: str
     usuarios: List['Usuario'] = Relationship(back_populates='organizacao')
 
 

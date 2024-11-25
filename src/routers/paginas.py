@@ -19,7 +19,7 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
 
     pix_qr_code = None
     if db_vendas:
-        pix_qr_code = db_vendas[-1].gerar_qr_code('Iago B. Almeida', 'Caxias do Sul', '347.753.508-11')
+        pix_qr_code = repository.venda_gerar_qr_code(session, db_vendas[-1].id)
 
     return render(request, 'home.html', session, context={
         'len_receitas': len(db_receitas),

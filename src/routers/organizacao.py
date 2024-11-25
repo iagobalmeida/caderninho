@@ -38,8 +38,8 @@ async def get_organizacao_index(request: fastapi.Request, session: auth.DBSessao
 
 
 @router.post('/', include_in_schema=False)
-async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.Form(), descricao: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.update_organizacao(session, id, descricao)
+async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.Form(), descricao: str = fastapi.Form(), cidade: str = fastapi.Form(), chave_pix: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    repository.update_organizacao(session, id, descricao, cidade, chave_pix)
     return redirect_back(request, message='Organização atualizada com sucesso!')
 
 

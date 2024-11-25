@@ -78,7 +78,7 @@ def __update(session: DBSessaoAutenticada, entity: SQLModel, id: int, **kwargs) 
     return db_entity
 
 
-def update_organizacao(session: DBSessaoAutenticada, id: int, descricao: str):
+def update_organizacao(session: DBSessaoAutenticada, id: int, descricao: str, cidade: str, chave_pix: str):
     db_organizacao = session.get(Organizacao, id)
     sessao_usuario = session.sessao_autenticada
 
@@ -86,6 +86,8 @@ def update_organizacao(session: DBSessaoAutenticada, id: int, descricao: str):
         raise ValueError('Sem permissão para editar a organização')
 
     db_organizacao.descricao = descricao
+    db_organizacao.cidade = cidade
+    db_organizacao.chave_pix = chave_pix
     session.commit()
     return db_organizacao
 
@@ -301,3 +303,13 @@ def get_organizacao(session: DBSessaoAutenticada, id: int) -> Organizacao:
     query = select(Organizacao).where(Organizacao.id == id)
     organizacao = session.exec(query).first()
     return organizacao
+
+
+def venda_gerar_qr_code(session: DBSessaoAutenticada, venda_id: int) -> str:
+    organizacao = get_organizacao(session, session.sessao_autenticada.organizacao_id)
+    venda = session.exec(select(Venda).where(Venda.id == venda_id)).first()
+    return venda.gerar_qr_code(
+        pix_nome=organizacao.descricao,
+        pix_cidade=organizacao.cidade,
+        pix_chave=organizacao.chave_pix
+    )
