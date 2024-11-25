@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Optional
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
@@ -18,7 +19,7 @@ class SessaoAutenticada(BaseModel):
     administrador: bool = False
     organizacao_id: int = None
     organizacao_descricao: str = None
-    expires: float = None
+    expires: Optional[float] = None
 
     @classmethod
     def from_request_session(cls, request: Request):
@@ -38,7 +39,7 @@ class DBSessaoAutenticada(Session):
         return super().__init__(*args, **kwargs)
 
 
-def authenticate(session: Session, request: Request, email: str, senha: str) -> bool:
+def authenticate(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> bool:
     db_usuario = session.exec(select(Usuario).where(Usuario.email == email)).first()
     if not db_usuario:
         return False
@@ -50,9 +51,11 @@ def authenticate(session: Session, request: Request, email: str, senha: str) -> 
 
     sessao = SessaoAutenticada(
         **db_usuario.dict(),
-        expires=(datetime.now()+timedelta(hours=1)).timestamp(),
         valid=True
     )
+
+    if not lembrar_de_mim:
+        sessao.expires = (datetime.now()+timedelta(hours=1)).timestamp()
 
     request.session.update(sessao_autenticada=sessao.dict())
     return True
@@ -62,9 +65,9 @@ def usuario_autenticar(session: Session, request: Request, email: str, senha: st
     return authenticate(session, request, email, senha)
 
 
-def request_login(session: Session, request: Request, email: str, senha: str) -> RedirectResponse:
+def request_login(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> RedirectResponse:
     try:
-        authenticate(session, request, email, senha)
+        authenticate(session, request, email, senha, lembrar_de_mim=lembrar_de_mim)
         return redirect_url_for(request, 'get_home')
     except Exception as ex:
         request.session.clear()
@@ -87,7 +90,7 @@ def header_authorization(request: Request) -> str:
         request.session.clear()
         raise HTTPException(401, 'Não autorizado!')
 
-    if datetime.fromtimestamp(sessao_autenticada.expires) <= datetime.now():
+    if sessao_autenticada.expires and datetime.fromtimestamp(sessao_autenticada.expires) <= datetime.now():
         request.session.clear()
         raise HTTPException(401, 'Sessão expirada!')
 

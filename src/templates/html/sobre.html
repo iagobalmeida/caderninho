@@ -19,6 +19,14 @@
         <h3>Versão Atual:&nbsp;<code>Beta v2.5.7</code></h3>
         <h3>Atualizações</h3>
         <pre>
+# v1.0
+- [ ] Geração de QR Code p/ chave PIX da organização
+  - [X] Geração de QR Code PIX com valor da venda
+  - [ ] Campos `cidade` e `chave_pix` em Organização
+  - [ ] Geração de QR Code PIX de organização
+  - [ ] Geração de QR Code PIX com valor customizado
+- [ ] Upload e download de CSV
+
 ## vb2.5
 - [X] Tela "sobre a aplicação"
 - [X] Corrigir modal de perfil
@@ -27,29 +35,31 @@
   - [X] Funcionalidade criação de conta + organização
   - [X] Bloqueio organizações com mesmo nome
 - [X] Tela "Organização"
-  - [X] Atualizar nome da organização
+  - [X] Alterar nome da organização
   - [X] Criar usuário
-  - [X] Excluír usuário
+  - [X] Apagar usuário
   - [X] Criar usuário dono
   - [X] Limitar ações para apenas donos
   - [X] Editar usuário
     - [X] Modal
     - [X] Funcionalidade
-- [X] Atualizar senha
+- [X] Alterar senha
   - [X] Modal
   - [X] Funcionalidade
 - [X] Reorganizar rotas
 - [X] Expiração de Sessão login
 - [X] Redirecionamento de acordo com status_code
 - [X] Permitindo organizações com mesmo nome
-- [ ] "Lembrar de mim neste dispositivo"
-- [ ] Melhorar `repository.py`
-  - [ ] Unificar verificacao de permissões
-  - [ ] Unificar fluxos repetitivos
-- [ ] Funcionalidade esqueci minha senha
-- [ ] Geração de QR Code p/ chave PIX da organização
-- [ ] Possível integração com Mercado Pago
-- [ ] Upload e download de CSV
+- [X] Refatorar `auth.py`
+- [X] Reestruturar sesão autorizada de banco de dados
+- [X] Alertas de sucesso
+- [X] Padronização de termos (criar, atualizar, excluír, incluir e remover)
+- [X] Unificar modal "deleteSelecionados"
+- [X] Funcionalidade esqueci minha senha
+- [X] "Lembrar de mim neste dispositivo"
+- [X] Melhorar `repository.py`
+  - [X] Unificar verificacao de permissões
+  - [X] Unificar fluxos repetitivos
 
 ## vb2.0
 - [X] Formulários verticais em modal

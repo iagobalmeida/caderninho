@@ -1,5 +1,5 @@
-
 import fastapi
+from pixqrcode import PixQrCode
 from sqlmodel import Session
 
 from src import auth
@@ -17,11 +17,16 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     db_estoques = repository.list_estoques(session)
     db_vendas = repository.list_vendas(session)
 
+    pix_qr_code = None
+    if db_vendas:
+        pix_qr_code = db_vendas[-1].gerar_qr_code('Iago B. Almeida', 'Caxias do Sul', '347.753.508-11')
+
     return render(request, 'home.html', session, context={
         'len_receitas': len(db_receitas),
         'len_ingredientes': len(db_ingredientes),
         'estoques': len(db_estoques),
         'vendas': len(db_vendas),
+        'qr_code': pix_qr_code
     })
 
 

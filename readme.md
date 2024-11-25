@@ -116,10 +116,15 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Padronização de termos (criar, atualizar, excluír, incluir e remover)
 - [X] Unificar modal "deleteSelecionados"
 - [X] Funcionalidade esqueci minha senha
-- [ ] "Lembrar de mim neste dispositivo"
-- [ ] Melhorar `repository.py`
-  - [ ] Unificar verificacao de permissões
-  - [ ] Unificar fluxos repetitivos
+- [X] "Lembrar de mim neste dispositivo"
+- [X] Melhorar `repository.py`
+  - [X] Unificar verificacao de permissões
+  - [X] Unificar fluxos repetitivos
+
+# v1.0
 - [ ] Geração de QR Code p/ chave PIX da organização
-- [ ] Possível integração com Mercado Pago
+  - [X] Geração de QR Code PIX com valor da venda
+  - [ ] Campos `cidade` e `chave_pix` em Organização
+  - [ ] Geração de QR Code PIX de organização
+  - [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV

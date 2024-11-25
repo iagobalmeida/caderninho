@@ -121,11 +121,11 @@ def update_usuario_senha(session: DBSessaoAutenticada, id: int, senha_atual: str
     usuario = session.exec(select(Usuario).where(Usuario.id == id)).first()
     sessao_usuario = session.sessao_autenticada
 
-    if usuario.id != sessao_usuario.id:
-        raise ValueError('Sem permissão para atualizar a senha desse usuário')
-
     if not usuario:
         raise ValueError('Usuário não encontrado')
+
+    if usuario.id != sessao_usuario.id and not sessao_usuario.administrador:
+        raise ValueError('Sem permissão para atualizar a senha desse usuário')
 
     if usuario.senha != senha_atual:
         raise ValueError('Senha atual inválida')

@@ -1,3 +1,4 @@
+
 import logging
 import random
 import re
@@ -112,7 +113,7 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
 
 
 @app.exception_handler(ValueError)
-async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
+async def value_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     if not redirect_to:
         redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
     redirect_to = url_incluir_query_params(redirect_to, error=str(ex))
@@ -125,8 +126,7 @@ async def http_error_exception_handler(request: fastapi.Request, ex: HTTPExcepti
     if ex.status_code == 401:
         request.session.clear()
         redirect_to = request.url_for('get_index')
-
-    return await integrity_error_exception_handler(request, ex, redirect_to=redirect_to)
+    return await value_error_exception_handler(request, ex, redirect_to=redirect_to)
 
 
 @app.exception_handler(RequestValidationError)

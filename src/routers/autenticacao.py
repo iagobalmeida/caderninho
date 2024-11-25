@@ -8,8 +8,8 @@ router = fastapi.APIRouter(prefix='/auth')
 
 
 @router.post('/', include_in_schema=False)
-async def post_index(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), session: auth.DBSessaoAutenticada = db.DBSESSAO_DEP):
-    return auth.request_login(session, request, email=email, senha=senha)
+async def post_index(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), lembrar_de_mim: bool = fastapi.Form(False), session: auth.DBSessaoAutenticada = db.DBSESSAO_DEP):
+    return auth.request_login(session, request, email=email, senha=senha, lembrar_de_mim=lembrar_de_mim)
 
 
 @router.post('/authenticate')

@@ -1,7 +1,9 @@
+
 import math
 from datetime import datetime
 from typing import List, Optional
 
+from pixqrcode import PixQrCode
 from sqlalchemy.orm import validates
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -83,6 +85,10 @@ class Venda(RegistroOrganizacao, table=True):
         base_dict = self.model_dump()
         base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
         return base_dict
+
+    def gerar_qr_code(self, pix_nome, pix_cidade, pix_chave) -> str:
+        pix_qr_code = PixQrCode(pix_nome, pix_chave, pix_cidade, f'{self.valor:.2f}')
+        return pix_qr_code.export_base64()
 
 
 class Ingrediente(RegistroOrganizacao, table=True):

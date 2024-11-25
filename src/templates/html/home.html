@@ -4,6 +4,21 @@
 
 {% include 'resumo_caixa.html' %}
 
+{% if qr_code %}
+    <div class="col-sm-12 col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    QR PIX da última venda
+                </div>
+            </div>
+            <div class="card-body">
+                <img src="{{qr_code}}" alt="QR Code">
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 <div class="col-sm-12 col-lg-4">
     <div class="card">
         <div class="card-header">
