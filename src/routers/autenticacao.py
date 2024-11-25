@@ -24,11 +24,35 @@ async def get_logout(request: fastapi.Request):
 
 @router.post('/perfil', dependencies=[auth.HEADER_AUTH])
 async def post_perfil(request: fastapi.Request, payload: inputs.UsuarioAtualizar = fastapi.Form(),  session: auth.DBSessaoAutenticada = db.DBSESSAO_DEP):
-    repository.update_organizacao_usuario(session, id=payload.id, nome=payload.nome, email=payload.email, dono=payload.dono)
+    repository.update(
+        session=session,
+        entity=repository.Entities.USUARIO,
+        filters={
+            'id': payload.id
+        },
+        values={
+            'nome': payload.nome,
+            'email': payload.email,
+            'dono': payload.dono,
+            'senha': payload.senha
+        }
+    )
     return redirect_back(request, message='Perfil atualizado com sucesso!')
 
 
 @router.post('/atualizar_senha', include_in_schema=False)
 async def post_atualizar_senha(request: fastapi.Request, payload: inputs.AtualizarSenha = fastapi.Form(),  session: auth.DBSessaoAutenticada = db.DBSESSAO_DEP):
-    repository.update_usuario_senha(session, id=payload.id, senha_atual=payload.senha_atual, senha=payload.senha, senha_confirmar=payload.senha_confirmar)
+    if payload.senha != payload.senha_confirmar:
+        raise ValueError('As senhas não batem')
+
+    repository.update(
+        session=session,
+        entity=repository.Entities.USUARIO,
+        filters={
+            'id': payload.id
+        },
+        values={
+            'senha': payload.senha
+        }
+    )
     return redirect_back(request, message='Senha alterada com sucesso!')

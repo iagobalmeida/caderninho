@@ -112,8 +112,8 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
     if session and session.sessao_autenticada:
         base_context.update(usuario=session.sessao_autenticada)
 
-        db_ingredientes = repository.get_ingredientes(session)
-        db_receitas = repository.list_receitas(session)
+        db_ingredientes = repository.get(session, repository.Entities.INGREDIENTE)
+        db_receitas = repository.get(session, repository.Entities.RECEITA)
         entradas, saidas, caixa = repository.get_fluxo_caixa(session)
 
         base_context.update(ingredientes=db_ingredientes)

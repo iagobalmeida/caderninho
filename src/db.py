@@ -10,7 +10,7 @@ sqlite_url = f"sqlite:///{sqlite_nome_arquivo}"
 
 DATABASE_URL = os.getenv('DATABASE_URL', sqlite_url)
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=False)
 
 
 def get_session(request: Request):

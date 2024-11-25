@@ -4,7 +4,7 @@
 
 {% include 'resumo_caixa.html' %}
 
-{% if qr_code %}
+{% if pix_qr_code or pix_mensagem %}
     <div class="col-sm-12 col-lg-4">
         <div class="card">
             <div class="card-header">
@@ -13,7 +13,10 @@
                 </div>
             </div>
             <div class="card-body">
-                <img src="{{qr_code}}" alt="QR Code">
+                <p>{{pix_mensagem | safe}}</p>
+                {% if pix_qr_code %}
+                    <img src="{{pix_qr_code}}" alt="QR Code">
+                {% endif %}
             </div>
         </div>
     </div>

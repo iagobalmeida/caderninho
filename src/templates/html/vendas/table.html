@@ -41,6 +41,7 @@
             <th>Data</th>
             <th>Descrição</th>
             <th>Valor</th>
+            <th>Recebido</th>
           </tr>
         </thead>
         <tbody>
@@ -52,6 +53,13 @@
             <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda">{{ venda.data_criacao | strftime }}</td>
             <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda">{{ venda.descricao }}</td>
             <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda"><b class="text-success">{{ venda.valor | format_reais }}</b></td>
+            <td data-bs-toggle="modal" data-bs-target="#modalUpdateVenda">
+              {% if venda.recebido %}
+                {{ material_symbol('check', 'text-success') | safe }}
+              {% else %}
+                {{ material_symbol('more_horiz', 'text-secondary') | safe }}
+              {% endif %}
+            </td>
           </tr>
           {% else %}
             <tr>

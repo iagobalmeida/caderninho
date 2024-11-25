@@ -19,8 +19,8 @@ def templates_filter_strftime(input: datetime):
     return input.strftime('%d/%m/%Y ás %H:%M')
 
 
-def templates_global_material_symbol(icon_name: str):
-    return f'''<span class="material-symbols-outlined me-1">{icon_name}</span>'''
+def templates_global_material_symbol(icon_name: str, classnames: str = None):
+    return f'''<span class="material-symbols-outlined me-1 {classnames}">{icon_name}</span>'''
 
 
 def __status_html(classname: str, content: str, material_symbol: str = None):

@@ -127,7 +127,8 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
   - [X] Campos `cidade` e `chave_pix` em Organização
     - [X] Atualização dos campos a partir de tela `/organização`
     - [X] Geração de QR Code última venda com dados da organização
-- [ ] Campo `paga` em venda
+- [X] Campo `paga` em venda
+- [X] Melhorar `repository.py`
 - [ ] Ação `marcar como paga` em vendas
 - [ ] Ação `marcar como paga` em home
 - [ ] Geração de QR Code PIX de organização

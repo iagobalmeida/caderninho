@@ -65,7 +65,16 @@ async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar 
         if payload.senha != payload.senha_confirmar:
             raise Exception('As senhas não batem')
 
-        repository.create_usuario(session, nome=payload.nome, email=payload.email, senha=payload.senha, organizacao_descricao=payload.organizacao_descricao, dono=True)
+        db_organizacao = repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})
+        organizacao_id = db_organizacao.id
+
+        repository.create(session, repository.Entities.USUARIO, {
+            'nome': payload.nome,
+            'email': payload.email,
+            'senha': payload.senha,
+            'organizacao_id': organizacao_id,
+            'dono': True
+        })
         message = 'Conta criada com sucesso'
     except Exception as ex:
         template_name = 'autenticacao/criar_conta.html'
@@ -81,7 +90,7 @@ async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Q
 
 @app.post('/recuperar_senha', include_in_schema=False)
 async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: auth.DBSessaoAutenticada = db.DBSESSAO_DEP):
-    db_usuario = repository.get_usuario_por_email(session, email)
+    db_usuario = repository.get(session, repository.Entities.USUARIO, {'email': email}, first=True)
     if not db_usuario:
         raise ValueError('Não foi encontrado usuário com esse email')
 

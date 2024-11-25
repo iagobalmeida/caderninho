@@ -15,26 +15,23 @@ def try_add(obj):
             session.commit()
         return __obj
     except Exception as ex:
+        print(ex)
         return obj
 
 
 def main():
-    organizacao = Organizacao(descricao='Herbaria', usuarios=[
-        Usuario(
-            nome='Usuário',
-            email='usuario@email.com',
-            senha='123',
-            dono=True
-        )
-    ])
-    try_add(organizacao)
+    try_add(Organizacao(descricao='Herbaria', cidade='Caxias do Sul', chave_pix='347.753.508-11', usuarios=[Usuario(
+        nome='Usuário',
+        email='usuario@email.com',
+        senha='123',
+        dono=True
+    )]))
 
     try_add(Usuario(
         nome='Administrador',
         email='admin@email.com',
         senha='admin',
-        administrador=True,
-        organizacao_id=2
+        administrador=True
     ))
 
     ingredientes = [1, 2, 3, 4]

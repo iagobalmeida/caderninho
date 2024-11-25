@@ -36,7 +36,7 @@ class Usuario(RegistroOrganizacao, table=True):
         del base_dict['senha']
         if self.administrador:
             base_dict.update(organizacao_descricao='Administrador')
-        elif self.organizacao:
+        if self.organizacao:
             base_dict.update(organizacao_descricao=self.organizacao.descricao)
         else:
             base_dict.update(organizacao_descricao='-')
@@ -82,6 +82,7 @@ class Venda(RegistroOrganizacao, table=True):
     data_criacao: datetime = Field(default=datetime.now(), nullable=False)
     descricao: str
     valor: float
+    recebido: bool = Field(default=False)
 
     def dict(self):
         base_dict = self.model_dump()

@@ -40,7 +40,7 @@ context_header = Context.Header(
 
 @router.get('/', include_in_schema=False)
 async def get_ingredientes_index(request: fastapi.Request, session: Session = DBSESSAO_DEP):
-    db_ingredientes = repository.get_ingredientes(session)
+    db_ingredientes = repository.get(session, repository.Entities.INGREDIENTE)
     return render(
         session=session,
         request=request,
@@ -54,17 +54,33 @@ async def get_ingredientes_index(request: fastapi.Request, session: Session = DB
 
 @router.post('/', include_in_schema=False)
 async def post_ingredientes_index(request: fastapi.Request, payload: inputs.IngredienteCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.create_ingrediente(session, nome=payload.nome, peso=payload.peso, custo=payload.custo)
+    repository.create(session, repository.Entities.INGREDIENTE, {
+        'nome': payload.nome,
+        'peso': payload.peso,
+        'custo': payload.custo
+    })
     return redirect_back(request, message='Ingrediente criado com sucesso!')
 
 
 @router.post('/atualizar', include_in_schema=False)
 async def post_ingredientes_atualizar(request: fastapi.Request, payload: inputs.IngredienteAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.update_ingrediente(session, id=id, nome=payload.nome, peso=payload.peso, custo=payload.custo)
+    repository.update(
+        session=session,
+        entity=repository.Entities.INGREDIENTE,
+        filters={
+            'id': payload.id
+        },
+        values={
+            'nome': payload.nome,
+            'peso': payload.peso,
+            'custo': payload.custo
+        }
+    )
     return redirect_back(request, message='Ingrediente atualizado com sucesso!')
 
 
 @router.post('/excluir', include_in_schema=False)
 async def post_ingredientes_excluir(request: fastapi.Request, id: int = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.delete_ingrediente(session, id=id)
+    repository.delete(session, repository.Entities.RECEITA_INGREDIENTE, {'ingrediente_id': id})
+    repository.delete(session, repository.Entities.INGREDIENTE, {'id': id})
     return redirect_back(request, message='Ingrediente excluído com sucesso!')

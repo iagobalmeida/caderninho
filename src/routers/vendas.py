@@ -15,7 +15,11 @@ router = fastapi.APIRouter(prefix='/vendas', dependencies=[auth.HEADER_AUTH])
 
 @router.get('/', include_in_schema=False)
 async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
-    db_vendas = repository.list_vendas(session, filter_data_inicio, filter_data_final)
+    db_vendas = repository.get(session, repository.Entities.VENDA, filters={
+        'data_inicio': filter_data_inicio,
+        'data_final': filter_data_final
+    }, order_by='data_criacao', desc=True)
+
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
     context_header = Context.Header(
         pretitle='Registros',
@@ -66,7 +70,10 @@ async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = N
 
 @router.post('/', include_in_schema=False)
 async def post_vendas_index(request: fastapi.Request, payload: inputs.VendaCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.create_venda(session, descricao=payload.descricao, valor=payload.valor)
+    repository.create(session, repository.Entities.VENDA, {
+        'descricao': payload.descricao,
+        'valor': payload.valor
+    })
     return redirect_back(request, message='Venda criada com sucesso!')
 
 
@@ -74,11 +81,22 @@ async def post_vendas_index(request: fastapi.Request, payload: inputs.VendaCriar
 async def post_vendas_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            repository.delete_venda(session, id=int(id))
+            repository.delete(session, repository.Entities.VENDA, {'id': id})
     return redirect_back(request, message='Venda excluída com sucesso!')
 
 
 @router.post('/atualizar', include_in_schema=False)
 async def post_vendas_atualizar(request: fastapi.Request, payload: inputs.VendaAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.update_venda(session, id=payload.id, descricao=payload.descricao, valor=payload.valor)
+    repository.update(
+        session=session,
+        entity=repository.Entities.VENDA,
+        filters={
+            'id': payload.id
+        },
+        values={
+            'descricao': payload.descricao,
+            'valor': payload.valor,
+            'recebido': True if payload.recebido else False
+        }
+    )
     return redirect_back(request, message='Venda atualizada com sucesso!')

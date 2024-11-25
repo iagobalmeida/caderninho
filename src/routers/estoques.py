@@ -15,9 +15,15 @@ router = fastapi.APIRouter(prefix='/estoques', dependencies=[auth.HEADER_AUTH])
 
 @router.get('/', include_in_schema=False)
 async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
-    db_estoques = repository.list_estoques(session, filter_ingrediente_id, filter_data_inicio, filter_data_final)
-    db_ingredientes = repository.get_ingredientes(session)
+    db_estoques = repository.get(session, repository.Entities.ESTOQUE, filters={
+        'ingrediente_id': filter_ingrediente_id,
+        'data_inicio': filter_data_inicio,
+        'data_final': filter_data_final
+    }, order_by='data_criacao', desc=True)
+
+    db_ingredientes = repository.get(session, repository.Entities.INGREDIENTE)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
+
     context_header = Context.Header(
         pretitle='Registros',
         title='Estoque',
@@ -70,29 +76,27 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
 @router.post('/', include_in_schema=False)
 async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if payload.descricao == 'Uso em Receita' and payload.receita_id:
-        db_receita = repository.get_receita(session, payload.receita_id)
+        db_receita = repository.get(session, repository.Entities.RECEITA, {'id': id}, first=True)
         for ingrediente_link in db_receita.ingrediente_links:
             quantidade = -1 * ingrediente_link.quantidade * float(payload.quantidade_receita)
-            repository.create_estoque(
-                session,
-                descricao=payload.descricao,
-                ingrediente_id=ingrediente_link.ingrediente_id,
-                quantidade=quantidade,
-                valor_pago=0
-            )
+            repository.create(session, repository.Entities.ESTOQUE, {
+                'descricao': payload.descricao,
+                'ingrediente_id': ingrediente_link.ingrediente_id,
+                'quantidade': quantidade,
+                'valor_pago': 0
+            })
     else:
         quantidade = float(payload.quantidade_ingrediente) if payload.quantidade_ingrediente else None
         if payload.descricao != 'Compra' and quantidade:
             quantidade = quantidade * -1
         if payload.descricao == 'Outros' and payload.descricao_customizada:
             payload.descricao = payload.descricao_customizada
-        repository.create_estoque(
-            session,
-            descricao=payload.descricao,
-            ingrediente_id=payload.ingrediente_id,
-            quantidade=quantidade,
-            valor_pago=float(payload.valor_pago) if payload.valor_pago else 0
-        )
+        repository.create(session, repository.Entities.ESTOQUE, {
+            'descricao': payload.descricao,
+            'ingrediente_id': payload.ingrediente_id,
+            'quantidade': quantidade,
+            'valor_pago': float(payload.valor_pago) if payload.valor_pago else 0
+        })
     return redirect_back(request, message='Movimentação criada com sucesso!')
 
 
@@ -100,11 +104,23 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
 async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     selecionados_ids = selecionados_ids.split(',')
     for id in selecionados_ids:
-        repository.delete_estoque(session, id=int(id))
+        repository.delete(session, repository.Entities.ESTOQUE, {'id': id})
     return redirect_back(request, message=f'{len(selecionados_ids)} registros excluídos com sucesso!')
 
 
 @router.post('/atualizar', include_in_schema=False)
 async def post_estoques_atualizar(request: fastapi.Request, payload: inputs.EstoqueAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.update_estoque(session, id=payload.id, descricao=payload.descricao, quantidade=payload.quantidade, valor_pago=payload.valor_pago)
+    repository.update(
+        session=session,
+        entity=repository.Entities.ESTOQUE,
+        filters={
+            'id': payload.id
+        },
+        values={
+            'descricao':  payload.descricao,
+            'valor_pago':  payload.valor_pago,
+            'quantidade':  payload.quantidade,
+            'ingrediente_id':  payload.ingrediente_id
+        }
+    )
     return redirect_back(request, message='Movimentação atualizada com sucesso!')

@@ -22,8 +22,8 @@ async def get_organizacao_index(request: fastapi.Request, session: auth.DBSessao
     usuario = session.sessao_autenticada
     context_header['title'] = usuario.organizacao_descricao
 
-    db_usuarios = repository.get_usuarios(session)
-    db_organizacao = repository.get_organizacao(session, usuario.organizacao_id)
+    db_usuarios = repository.get(session, repository.Entities.USUARIO)
+    db_organizacao = repository.get(session, repository.Entities.ORGANIZACAO, {'id': id}, first=True)
 
     return render(
         session=session,
@@ -39,7 +39,18 @@ async def get_organizacao_index(request: fastapi.Request, session: auth.DBSessao
 
 @router.post('/', include_in_schema=False)
 async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.Form(), descricao: str = fastapi.Form(), cidade: str = fastapi.Form(), chave_pix: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.update_organizacao(session, id, descricao, cidade, chave_pix)
+    repository.update(
+        session=session,
+        entity=repository.Entities.ORGANIZACAO,
+        filters={
+            'id': id
+        },
+        values={
+            'descricao': descricao,
+            'cidade': cidade,
+            'chave_pix': chave_pix
+        }
+    )
     return redirect_back(request, message='Organização atualizada com sucesso!')
 
 
@@ -47,17 +58,36 @@ async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.For
 async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if payload.senha != payload.senha_confirmar:
         raise ValueError('As senhas não batem')
-    repository.create_usuario(session, nome=payload.nome, email=payload.email, senha=payload.senha,
-                              organizacao_descricao=payload.organizacao_descricao, organizacao_id=payload.organizacao_id, dono=payload.dono)
+
+    if not payload.organizacao_id:
+        db_organizacao = repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})
+        payload.organizacao_id = db_organizacao.id
+
+    repository.create(session, repository.Entities.USUARIO, {
+        'nome': payload.nome,
+        'email': payload.email,
+        'senha': payload.senha,
+        'organizacao_id': payload.organizacao_id,
+        'dono': payload.dono
+    })
     return redirect_back(request, message='Usuário criado com sucesso!')
 
 
 @router.post('/usuarios/editar', include_in_schema=False)
 async def post_organizacao_usuarios_editar(request: fastapi.Request, payload: inputs.UsuarioEditar = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    if payload.nova_senha:
-        repository.update_organizacao_usuario(session, id=payload.id, nome=payload.nome, email=payload.email, senha=payload.nova_senha, dono=payload.dono)
-    else:
-        repository.update_organizacao_usuario(session, id=payload.id, nome=payload.nome, email=payload.email, dono=payload.dono)
+    repository.update(
+        session=session,
+        entity=repository.Entities.USUARIO,
+        filters={
+            'id': payload.id
+        },
+        values={
+            'nome': payload.nome,
+            'email': payload.email,
+            'dono': payload.dono,
+            'senha': payload.senha
+        }
+    )
     return redirect_back(request, message='Usuário atualizado com sucesso!')
 
 
@@ -65,5 +95,5 @@ async def post_organizacao_usuarios_editar(request: fastapi.Request, payload: in
 async def post_organizacao_usuarios_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            repository.delete_usuario(session, id=int(id))
+            repository.delete(session, repository.Entities.USUARIO, {'id': id})
     return redirect_back(request, message='Usuário excluído com sucesso!')

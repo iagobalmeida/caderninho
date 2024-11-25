@@ -48,6 +48,9 @@ class VendaCriar(BaseModel):
 
 class VendaAtualizar(VendaCriar):
     id: int
+    descricao: str
+    valor: float
+    recebido: Optional[bool] = None
 
 
 class EstoqueCriar(BaseModel):

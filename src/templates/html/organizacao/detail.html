@@ -6,7 +6,6 @@
         <div class="card-header">
             <h5 class="card-title">
               {{ material_symbol('groups') | safe }}
-              {{organizacao.descricao}}
             </h5>
         </div>
         {% if usuario.dono %}
@@ -19,11 +18,11 @@
                     </div>
                     <div class="datagrid-item">
                         <div class="datagrid-title">Cidade</div>
-                        <input class="form-control" type="text" name="cidade" required value="{{organizacao.descricao}}">
+                        <input class="form-control" type="text" name="cidade" required value="{{organizacao.cidade}}">
                     </div>
                     <div class="datagrid-item">
                         <div class="datagrid-title">Chave PIX</div>
-                        <input class="form-control" type="text" name="chave_pix" required value="{{organizacao.descricao}}">
+                        <input class="form-control" type="text" name="chave_pix" required value="{{organizacao.chave_pix}}">
                     </div>
                     <div class="datagrid-item">
                         <div class="datagrid-title">Atualizar</div>
