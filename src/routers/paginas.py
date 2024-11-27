@@ -18,11 +18,13 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
 
     pix_qr_code = None
     pix_mensagem = 'Sem vendas para gerar QR Code.'
+    pix_venda = None
 
     if db_vendas:
+        pix_venda = db_vendas[0]
         if db_vendas[0].recebido:
             pix_qr_code = None
-            pix_mensagem = 'A última venda está marcada como <kbd>Recebida</kbd>. Acesse a tela de vendas para gerar novamente o QR Code caso necessário.'
+            pix_mensagem = 'A última venda está marcada como <kbd>Recebida</kbd>. Acesse a tela de <a href="/vendas">Vendas</a> para gerar novamente o QR Code caso necessário.'
         else:
             pix_qr_code = repository.get_venda_qr_code(session, db_vendas[0].id)
             pix_mensagem = f'Use este QR Code para cobrar R$ {db_vendas[0].valor} referente a <b>{db_vendas[0].descricao}</b>.'
@@ -33,7 +35,8 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
         'estoques': len(db_estoques),
         'vendas': len(db_vendas),
         'pix_qr_code': pix_qr_code,
-        'pix_mensagem': pix_mensagem
+        'pix_mensagem': pix_mensagem,
+        'pix_venda': pix_venda
     })
 
 

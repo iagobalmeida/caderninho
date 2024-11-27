@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% include 'modal_delete.html' %}
+{% include 'modal_confirm.html' %}
 
 {% include 'vendas/modal_edit.html' %}
 {% include 'vendas/modal_create.html' %}
@@ -21,7 +21,56 @@
 {% include 'organizacao/modal_edit_usuario.html' %}
 
   {% block layout %}
-    <div class="page">
+    <div class="page position-relative">
+        {% if header.buttons %}
+          <!-- Mobile Menu -->
+          <div class="position-fixed d-flex flex-column align-items-end gap-2 d-lg-none" style="z-index: 1000; right: 2rem; bottom: 2rem;">
+            <div class="collapse" id="collapseMenuMobile">
+              <div class="d-flex flex-column align-items-end gap-2 bg-white rounded p-4 border border-2 shadow">
+                {% for button in header.buttons %}
+                  {% if button.href %}
+                    <span class="d-inline w-full">
+                      <a
+                      href="{{button.href}}"
+                      class="{{button.classname}} w-full"
+                      {% if button.attributes %}
+                        {% for name, value in button.attributes.items() %}
+                          {{name}} = "{{value}}"
+                        {% endfor %}
+                      {% endif %}
+                      >
+                        {% if button.symbol %}
+                          {{ material_symbol(button.symbol) | safe}}
+                        {% endif %}
+                        {{button.content}}
+                      </a>
+                    </span>
+                  {% else %}
+                    <span class="d-inline w-full">
+                      <button
+                      class="{{button.classname}} w-full"
+                      {% if button.attributes %}
+                        {% for name, value in button.attributes.items() %}
+                          {{name}} = "{{value}}"
+                        {% endfor %}
+                      {% endif %}
+                      >
+                        {% if button.symbol %}
+                          {{ material_symbol(button.symbol) | safe}}
+                        {% endif %}
+                        {{button.content}}
+                      </button>
+                    </span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            <button class="btn shadow" data-bs-toggle="collapse" data-bs-target="#collapseMenuMobile">
+              {{ material_symbol('keyboard_arrow_up') | safe}}
+              Ações
+            </button>
+          </div>
+        {% endif %}
         <!-- Navbar -->
         <header class="navbar navbar-expand-md d-print-none">
           <div class="container-xl">
@@ -137,7 +186,7 @@
                   </div>
                 </div>
                 <!-- Page title actions -->
-                <div class="col-auto ms-auto d-print-none">
+                <div class="col-auto ms-auto d-print-none d-none d-lg-block">
                   <div class="btn-list">
                     {% for button in header.buttons %}
                       {% if button.href %}

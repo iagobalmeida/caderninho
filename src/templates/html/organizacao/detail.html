@@ -61,7 +61,7 @@
                     {{material_symbol('chevron_left') | safe }}
                     Adicionar Usuário
                     </button>
-                    <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalDelete" data-bs-payload='{"action": "{{url_for('post_organizacao_usuarios_excluir')}}", ".text-secondary": "Excluir usuários selecionados?"}'>
+                    <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"action": "{{url_for('post_organizacao_usuarios_excluir')}}", ".text-secondary": "Excluir usuários selecionados?"}'>
                     {{material_symbol('remove') | safe }}
                     Remover Selecionados
                     </button>

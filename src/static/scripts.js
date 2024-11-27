@@ -65,9 +65,19 @@ let checkboxesLastValue = true;
 const updateDeleteAllButton = () => {
     const checkeds = Array.from(document.querySelectorAll('td input[type="checkbox"]:checked')).map(el => el.getAttribute('data-id'));
     if(checkeds.length) {
-        document.querySelector('#btn-excluir-selecionados').removeAttribute("disabled");
+        document.querySelectorAll('#btn-excluir-selecionados').forEach(el => {
+            el.removeAttribute('disabled');
+        })
+        document.querySelectorAll('[data-depends-selected="true"]').forEach(el => {
+            el.removeAttribute('disabled');
+        })
     } else {
-        document.querySelector('#btn-excluir-selecionados').setAttribute("disabled", true);
+        document.querySelectorAll('#btn-excluir-selecionados').forEach(el => {
+            el.setAttribute("disabled", true);
+        })
+        document.querySelectorAll('[data-depends-selected="true"]').forEach(el => {
+            el.setAttribute("disabled", true);
+        })
     }
     if(inputSelecionados) inputSelecionados.forEach(el => el.value = checkeds);
 }

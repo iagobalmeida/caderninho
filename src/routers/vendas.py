@@ -34,10 +34,45 @@ async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = N
                     'disabled': 'true',
                     'data-bs-toggle': 'modal',
                     'id': 'btn-excluir-selecionados',
-                    'data-bs-target': '#modalDelete',
+                    'data-bs-target': '#modalConfirm',
                     'data-bs-payload': json.dumps({
                         'action': str(request.url_for('post_vendas_excluir')),
-                        '.text-secondary': 'Excluir vendas selecionadas?'
+                        '.text-secondary': 'Excluir vendas selecionadas?',
+                        '.btn-danger': 'Excluir selecionadas'
+                    }),
+                }
+            ),
+            Button(
+                content='Marcar como Recebido',
+                classname='btn',
+                symbol='done_all',
+                attributes={
+                    'disabled': 'true',
+                    'data-bs-toggle': 'modal',
+                    'data-depends-selected': 'true',
+                    'id': 'btn-excluir-selecionados',
+                    'data-bs-target': '#modalConfirm',
+                    'data-bs-payload': json.dumps({
+                        'action': str(request.url_for('post_vendas_marcar_recebido')),
+                        '.text-secondary': 'Marcar vendas selecionadas como <kbd>Recebido</kbd>?',
+                        '.btn-danger': 'Alterar selecionadas'
+                    }),
+                }
+            ),
+            Button(
+                content='Marcar como Pendente',
+                classname='btn',
+                symbol='more_horiz',
+                attributes={
+                    'disabled': 'true',
+                    'data-bs-toggle': 'modal',
+                    'data-depends-selected': 'true',
+                    'id': 'btn-excluir-selecionados',
+                    'data-bs-target': '#modalConfirm',
+                    'data-bs-payload': json.dumps({
+                        'action': str(request.url_for('post_vendas_marcar_pendente')),
+                        '.text-secondary': 'Marcar vendas selecionadas como <kbd>Pendente</kbd>?',
+                        '.btn-danger': 'Alterar selecionadas'
                     }),
                 }
             ),
@@ -82,7 +117,23 @@ async def post_vendas_excluir(request: fastapi.Request, selecionados_ids: str = 
     if selecionados_ids:
         for id in selecionados_ids.split(','):
             repository.delete(session, repository.Entities.VENDA, {'id': id})
-    return redirect_back(request, message='Venda excluída com sucesso!')
+    return redirect_back(request, message='Venda(s) excluída(s) com sucesso!')
+
+
+@router.post('/marcar/recebido', include_in_schema=False)
+async def post_vendas_marcar_recebido(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    if selecionados_ids:
+        for id in selecionados_ids.split(','):
+            repository.update(session, repository.Entities.VENDA, {'id': id}, {'recebido': True})
+    return redirect_back(request, message='Venda(s) atualizada(s) com sucesso!')
+
+
+@router.post('/marcar/pendente', include_in_schema=False)
+async def post_vendas_marcar_pendente(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    if selecionados_ids:
+        for id in selecionados_ids.split(','):
+            repository.update(session, repository.Entities.VENDA, {'id': id}, {'recebido': False})
+    return redirect_back(request, message='Venda(s) atualizada(s) com sucesso!')
 
 
 @router.post('/atualizar', include_in_schema=False)

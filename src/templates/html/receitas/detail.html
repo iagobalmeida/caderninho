@@ -149,7 +149,7 @@
             {{material_symbol('chevron_left') | safe }}
             Incluir Ingrediente
           </button>
-          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalDelete" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_ingredientes_remover')}}", ".text-secondary": "Remover ingredientes selecionados?"}'>
+          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_ingredientes_remover')}}", ".text-secondary": "Remover ingredientes selecionados?"}'>
             {{material_symbol('remove') | safe }}
             Remover Selecionados
           </button>

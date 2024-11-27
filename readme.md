@@ -129,8 +129,9 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
     - [X] Geração de QR Code última venda com dados da organização
 - [X] Campo `paga` em venda
 - [X] Melhorar `repository.py`
-- [ ] Ação `marcar como paga` em vendas
-- [ ] Ação `marcar como paga` em home
-- [ ] Geração de QR Code PIX de organização
+- [X] Menu "Ações" mobile
+- [X] Ação `marcar como paga` em vendas
+- [X] Ação `marcar como paga` em home
+- [X] Atalho para `marcar como paga` em Home
 - [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV

@@ -39,7 +39,7 @@ async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, 
                     'id': 'btn-excluir-selecionados',
                     'disabled': 'true',
                     'data-bs-toggle': 'modal',
-                    'data-bs-target': '#modalDelete',
+                    'data-bs-target': '#modalConfirm',
                     'data-bs-payload': json.dumps({
                         'action': str(request.url_for('post_receita_deletar')),
                         '.text-secondary': 'Excluir receitas selecionadas?'

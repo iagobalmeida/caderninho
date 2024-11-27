@@ -37,7 +37,7 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
                     'id': 'btn-excluir-selecionados',
                     'disabled': 'true',
                     'data-bs-toggle': 'modal',
-                    'data-bs-target': '#modalDelete',
+                    'data-bs-target': '#modalConfirm',
                     'data-bs-payload': json.dumps({
                         'action': str(request.url_for('post_estoques_excluir')),
                         '.text-secondary': 'Excluir movimentações selecionadas?'

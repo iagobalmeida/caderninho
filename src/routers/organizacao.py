@@ -23,7 +23,7 @@ async def get_organizacao_index(request: fastapi.Request, session: auth.DBSessao
     context_header['title'] = usuario.organizacao_descricao
 
     db_usuarios = repository.get(session, repository.Entities.USUARIO)
-    db_organizacao = repository.get(session, repository.Entities.ORGANIZACAO, {'id': id}, first=True)
+    db_organizacao = repository.get(session, repository.Entities.ORGANIZACAO, {'id': usuario.organizacao_id}, first=True)
 
     return render(
         session=session,
