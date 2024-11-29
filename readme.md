@@ -133,5 +133,13 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Ação `marcar como paga` em vendas
 - [X] Ação `marcar como paga` em home
 - [X] Atalho para `marcar como paga` em Home
+- [X] Modularização de tabelas
+  - [X] Template `table.html` genérico
+  - [X] Método `columns` e `row` em entidades
+  - [X] Modularizar modal
+  - [X] Remoção `.../table.html`
+  - [X] Contempla `href` para Receitas
+
+# v1.2
 - [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV

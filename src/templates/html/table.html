@@ -1,0 +1,45 @@
+<div class="col-12">
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-vcenter table-striped table-hover">
+        <thead class="sticky-top">
+          <tr>
+            <th class="w-1"></th>
+            {% for column in table_columns %}
+              <th>{{column}}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in table_data %}
+            <tr
+            class="cursor-pointer"
+            data-bs-payload="{{data.dict() | json }}" 
+            {% if data.href %}
+              onclick="window.location = '{{data.href}}'"
+            {% endif %}
+            >
+              <td class="w-1">
+                <input type="checkbox" data-id="{{data.id}}">
+              </td>
+              {% for value in data.row %}
+                <td
+                  {% if table_modal %}
+                    data-bs-toggle="modal"
+                    data-bs-target="{{table_modal}}"
+                  {% endif %}
+                >
+                  {{ value | safe }}
+                </td>
+              {% endfor %}
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6">{{table_no_result}}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

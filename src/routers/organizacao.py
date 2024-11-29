@@ -4,6 +4,7 @@ from sqlmodel import Session
 from src import auth
 from src.db import DBSESSAO_DEP
 from src.domain import inputs, repository
+from src.schemas.auth import DBSessaoAutenticada
 from src.templates import render
 from src.templates.context import Context
 from src.utils import redirect_back
@@ -18,7 +19,7 @@ context_header = Context.Header(
 
 
 @router.get('/', include_in_schema=False)
-async def get_organizacao_index(request: fastapi.Request, session: auth.DBSessaoAutenticada = DBSESSAO_DEP):
+async def get_organizacao_index(request: fastapi.Request, session: DBSessaoAutenticada = DBSESSAO_DEP):
     usuario = session.sessao_autenticada
     context_header['title'] = usuario.organizacao_descricao
 

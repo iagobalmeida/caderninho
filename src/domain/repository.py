@@ -3,9 +3,9 @@ from typing import Tuple
 
 from sqlmodel import func, select, text
 
-from src.auth import DBSessaoAutenticada
 from src.domain.entities import (Estoque, Ingrediente, Organizacao, Receita,
                                  ReceitaIngredienteLink, Usuario, Venda)
+from src.schemas.auth import DBSessaoAutenticada
 
 
 class Entities(Enum):

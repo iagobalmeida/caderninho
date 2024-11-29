@@ -55,13 +55,22 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
             )
         ]
     )
+
+    table_columns = repository.Entities.ESTOQUE.value.columns()
+    table_data = db_estoques
+    table_no_result = 'Nenhum registro encontrado'
+    table_modal = '#modalEditEstoque'
+
     return render(
         session=session,
         request=request,
         template_name='estoques/list.html',
         context={
             'header': context_header,
-            'estoques': db_estoques,
+            'table_columns': table_columns,
+            'table_data': table_data,
+            'table_no_result': table_no_result,
+            'table_modal': table_modal,
             'ingredientes': db_ingredientes,
             'entradas': entradas,
             'saidas': saidas,

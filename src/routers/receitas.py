@@ -57,13 +57,22 @@ async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, 
             )
         ]
     )
+
+    table_columns = repository.Entities.RECEITA.value.columns()
+    table_data = db_receitas
+    table_no_result = 'Nenhum registro encontrado'
+    # table_modal = '#modalEditReceita'
+
     return render(
         session=session,
         request=request,
         template_name='receitas/list.html',
         context={
             'header': context_header,
-            'receitas': db_receitas,
+            'table_columns': table_columns,
+            'table_data': table_data,
+            'table_no_result': table_no_result,
+            # 'table_modal': table_modal,
             'filter_nome': filter_nome
         }
     )

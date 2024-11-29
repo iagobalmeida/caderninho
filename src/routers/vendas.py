@@ -87,13 +87,22 @@ async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = N
             )
         ]
     )
+
+    table_columns = repository.Entities.VENDA.value.columns()
+    table_data = db_vendas
+    table_no_result = 'Nenhum registro encontrado'
+    table_modal = '#modalEditVenda'
+
     return render(
         session=session,
         request=request,
         template_name='vendas/list.html',
         context={
             'header': context_header,
-            'vendas': db_vendas,
+            'table_columns': table_columns,
+            'table_data': table_data,
+            'table_no_result': table_no_result,
+            'table_modal': table_modal,
             'entradas': entradas,
             'saidas': saidas,
             'caixa': caixa,

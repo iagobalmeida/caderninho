@@ -7,6 +7,8 @@ from pixqrcode import PixQrCode
 from sqlalchemy.orm import validates
 from sqlmodel import Field, Relationship, SQLModel
 
+from src.templates import filters
+
 STRFTIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
@@ -72,6 +74,34 @@ class Estoque(RegistroOrganizacao, table=True):
     quantidade: Optional[float] = Field(default=0)
     valor_pago: Optional[float] = Field(default=0)
 
+    @classmethod
+    def columns(self):
+        return [
+            'Data',
+            'Descrição',
+            'Valor Pago',
+            'Ingrediente',
+            'Quantidade'
+        ]
+
+    @property
+    def row(self):
+        col_valor_pago = filters.templates_filter_format_reais(self.valor_pago)
+
+        col_ingrediente = '-'
+        if self.ingrediente:
+            col_ingrediente = self.ingrediente.nome
+
+        col_quantidade = filters.templates_filter_format_quantity(self.quantidade)
+
+        return [
+            self.data_criacao.strftime(STRFTIME_FORMAT),
+            self.descricao,
+            col_valor_pago,
+            col_ingrediente,
+            col_quantidade
+        ]
+
     def dict(self):
         base_dict = self.model_dump()
         base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
@@ -83,6 +113,31 @@ class Venda(RegistroOrganizacao, table=True):
     descricao: str
     valor: float
     recebido: bool = Field(default=False)
+
+    @classmethod
+    def columns(self):
+        return [
+            'Data',
+            'Descrição',
+            'Valor',
+            'Recebido',
+        ]
+
+    @property
+    def row(self):
+        col_data_criacao = self.data_criacao.strftime(STRFTIME_FORMAT)
+        col_valor = filters.templates_filter_format_reais(self.valor)
+
+        col_recebido = filters.templates_global_material_symbol('more_horiz', 'text-secondary')
+        if self.recebido:
+            col_recebido = filters.templates_global_material_symbol('check', 'text-success')
+
+        return [
+            col_data_criacao,
+            self.descricao,
+            col_valor,
+            col_recebido
+        ]
 
     def dict(self):
         base_dict = self.model_dump()
@@ -100,6 +155,36 @@ class Ingrediente(RegistroOrganizacao, table=True):
     custo: float
     receita_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='ingrediente')
     estoque_links: List['Estoque'] = Relationship(back_populates='ingrediente')
+
+    @classmethod
+    def columns(self):
+        return [
+            '#',
+            'Nome',
+            'Custo (R$)',
+            'Peso (g)',
+            'Custo/grama (R$)',
+            'Custo/grama méd. (R$)',
+            'Estoque Atual',
+        ]
+
+    @property
+    def row(self):
+        col_custo = filters.templates_filter_format_reais(self.custo)
+        col_peso = filters.templates_filter_format_quantity(self.peso)
+        col_custo_p_grama = filters.templates_filter_format_reais(self.custo_p_grama)
+        col_custo_p_grama_medio = filters.templates_filter_format_reais(self.custo_p_grama_medio)
+        col_estoque = filters.templates_filter_format_stock(self.estoque_atual)
+
+        return [
+            self.id,
+            self.nome,
+            col_custo,
+            col_peso,
+            col_custo_p_grama,
+            col_custo_p_grama_medio,
+            col_estoque
+        ]
 
     def dict(self):
         base_dict = self.model_dump()
@@ -125,6 +210,38 @@ class Receita(RegistroOrganizacao, table=True):
     porcentagem_lucro: int = 33
 
     ingrediente_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='receita')
+
+    @classmethod
+    def columns(self):
+        return [
+            'Nome',
+            'Rendimento (Un.)',
+            'Preço Sug. (R$)',
+            'Custo (R$)',
+            'Faturamento',
+            'Lucro'
+        ]
+
+    @property
+    def row(self):
+        col_rendimento = f'{self.rendimento_unidades} Un.'
+        col_preco_sug = filters.templates_filter_format_reais(self.preco_sugerido)
+        col_custo = filters.templates_filter_format_reais(self.custo)
+        col_faturamento = filters.templates_filter_format_reais(self.faturamento)
+        col_lucro = filters.templates_filter_format_reais(self.lucro)
+
+        return [
+            self.nome,
+            col_rendimento,
+            col_preco_sug,
+            col_custo,
+            col_faturamento,
+            col_lucro
+        ]
+
+    @property
+    def href(self):
+        return f'/receitas/{self.id}'
 
     @validates('nome')
     def convert_upper(self, key, value):

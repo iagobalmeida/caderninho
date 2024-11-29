@@ -3,7 +3,7 @@ import os
 from fastapi import Depends, Request
 from sqlmodel import SQLModel, create_engine
 
-from src.auth import DBSessaoAutenticada
+from src.schemas.auth import DBSessaoAutenticada
 
 sqlite_nome_arquivo = "database.db"
 sqlite_url = f"sqlite:///{sqlite_nome_arquivo}"

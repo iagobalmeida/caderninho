@@ -12,7 +12,7 @@ from sqlalchemy.log import rootlogger
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from src import auth, db
+from src import db
 from src.domain import inputs, repository
 from src.modules import send_email
 from src.routers.autenticacao import router as router_autenticacao
@@ -23,6 +23,7 @@ from src.routers.paginas import router as router_paginas
 from src.routers.receitas import router as router_receitas
 from src.routers.scripts import router as router_scripts
 from src.routers.vendas import router as router_vendas
+from src.schemas.auth import DBSessaoAutenticada
 from src.templates import render
 from src.utils import url_incluir_query_params
 
@@ -58,7 +59,7 @@ async def get_registrar(request: fastapi.Request, message: str = fastapi.Query(N
 
 
 @app.post('/registrar', include_in_schema=False)
-async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: auth.DBSessaoAutenticada = db.DBSESSAO_DEP):
+async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
     template_name = 'autenticacao/login.html'
     message = None
     try:
@@ -89,7 +90,7 @@ async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Q
 
 
 @app.post('/recuperar_senha', include_in_schema=False)
-async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: auth.DBSessaoAutenticada = db.DBSESSAO_DEP):
+async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
     db_usuario = repository.get(session, repository.Entities.USUARIO, {'email': email}, first=True)
     if not db_usuario:
         raise ValueError('Não foi encontrado usuário com esse email')

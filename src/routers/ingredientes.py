@@ -41,13 +41,22 @@ context_header = Context.Header(
 @router.get('/', include_in_schema=False)
 async def get_ingredientes_index(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     db_ingredientes = repository.get(session, repository.Entities.INGREDIENTE)
+
+    table_columns = repository.Entities.INGREDIENTE.value.columns()
+    table_data = db_ingredientes
+    table_no_result = 'Nenhum registro encontrado'
+    table_modal = '#modalEditIngrediente'
+
     return render(
         session=session,
         request=request,
         template_name='ingredientes/list.html',
         context={
             'header': context_header,
-            'ingredientes': db_ingredientes
+            'table_columns': table_columns,
+            'table_data': table_data,
+            'table_no_result': table_no_result,
+            'table_modal': table_modal
         }
     )
 
