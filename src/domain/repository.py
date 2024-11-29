@@ -18,7 +18,7 @@ class Entities(Enum):
     RECEITA = Receita
 
 
-def get(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, first: bool = False, order_by: str = None, desc: bool = False):
+def get(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, first: bool = False, order_by: str = None, desc: bool = False, ignore_validations: bool = False):
     query = select(entity.value)
 
     if filters:
@@ -32,8 +32,9 @@ def get(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, firs
             else:
                 query = query.filter(entity.value.__dict__[key] == value)
 
-    if not session.sessao_autenticada.administrador and entity != Entities.ORGANIZACAO:
-        query = query.filter(text(f'organizacao_id == {session.sessao_autenticada.organizacao_id}'))
+    if not ignore_validations:
+        if not session.sessao_autenticada.administrador and entity != Entities.ORGANIZACAO:
+            query = query.filter(text(f'organizacao_id == {session.sessao_autenticada.organizacao_id}'))
 
     if order_by:
         if desc:

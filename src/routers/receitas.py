@@ -61,7 +61,6 @@ async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, 
     table_columns = repository.Entities.RECEITA.value.columns()
     table_data = db_receitas
     table_no_result = 'Nenhum registro encontrado'
-    # table_modal = '#modalEditReceita'
 
     return render(
         session=session,
@@ -72,7 +71,6 @@ async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, 
             'table_columns': table_columns,
             'table_data': table_data,
             'table_no_result': table_no_result,
-            # 'table_modal': table_modal,
             'filter_nome': filter_nome
         }
     )
@@ -90,6 +88,18 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
         symbol='library_books',
         buttons=[]
     )
+
+    table_columns = [
+        'Nome',
+        'Quantidade (g)',
+        'Custo/grama (R$)',
+        'Custo Total (R$)',
+        'Estoque Atual'
+    ]
+    table_data = db_receita.ingrediente_links
+    table_no_result = 'Nenhum registro encontrado'
+    table_modal = '#atualizarReceitaIngredienteModal'
+
     return render(
         session=session,
         request=request,
@@ -97,7 +107,10 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
         context={
             'header': context_header,
             'receita': db_receita,
-            'ingredientes': db_ingredientes
+            'table_columns': table_columns,
+            'table_data': table_data,
+            'table_no_result': table_no_result,
+            'table_modal': table_modal
         }
     )
 

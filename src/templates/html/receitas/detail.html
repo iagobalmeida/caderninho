@@ -156,36 +156,8 @@
         </div>
       </div>
     </div>
-    
-    <div class="table-responsive">
-      <table class="table table-vcenter table-striped table-hover">
-        <thead class="sticky-top">
-          <tr>
-            <th class="w-1"></th>
-            <th>Nome</th>
-            <th>Quantidade (g)</th>
-            <th>Custo/grama (R$)</th>
-            <!-- <th>Custo/grama méd. (R$)</th> -->
-            <th>Custo Total (R$)</th>
-            <th>Estoque Atual</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for receita_ingrediente in receita.ingrediente_links %}
-          <tr class="cursor-pointer" data-bs-payload="{{receita_ingrediente.dict() | json }}">
-            <td class="w-1">
-              <input type="checkbox" name="checkbox_{{receita_ingrediente.id}}" id="checkbox_{{receita_ingrediente.id}}" data-id="{{receita_ingrediente.id}}">
-            </td>
-            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal">{{ receita_ingrediente.ingrediente.nome }}</td>
-            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal">{{ receita_ingrediente.quantidade | format_quantity | safe }}</td>
-            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal">{{ receita_ingrediente.ingrediente.custo_p_grama | format_reais }}</td>
-            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal">{{ receita_ingrediente.custo | format_reais }}</td>
-            <td data-bs-toggle="modal" data-bs-target="#atualizarReceitaIngredienteModal">{{ receita_ingrediente.ingrediente.estoque_atual | format_stock | safe }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+
+    {% include 'table.html' %}
   </div>
 </div>
 {% endblock %} {% block script %}

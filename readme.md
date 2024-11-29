@@ -139,6 +139,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
   - [X] Modularizar modal
   - [X] Remoção `.../table.html`
   - [X] Contempla `href` para Receitas
+  - [X] Contempla "ingredientes" de Receita
 
 # v1.2
 - [ ] Geração de QR Code PIX com valor customizado

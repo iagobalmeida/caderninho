@@ -58,6 +58,21 @@ class ReceitaIngredienteLink(RegistroOrganizacao, table=True):
             return 0
         return round(self.quantidade * self.ingrediente.custo_p_grama, 2)
 
+    @property
+    def row(self):
+        col_quantidade = filters.templates_filter_format_quantity(self.quantidade)
+        col_custo_p_grama = filters.templates_filter_format_reais(self.ingrediente.custo_p_grama)
+        col_custo = filters.templates_filter_format_reais(self.custo)
+        col_estoque_atual = filters.templates_filter_format_stock(self.ingrediente.estoque_atual)
+
+        return [
+            self.ingrediente.nome,
+            col_quantidade,
+            col_custo_p_grama,
+            col_custo,
+            col_estoque_atual
+        ]
+
     def dict(self):
         base_dict = self.model_dump()
         base_dict['ingrediente_nome'] = self.ingrediente.nome
