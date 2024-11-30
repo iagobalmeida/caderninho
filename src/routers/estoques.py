@@ -64,7 +64,7 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
     return render(
         session=session,
         request=request,
-        template_name='estoques/list.html',
+        template_name='list.html',
         context={
             'header': context_header,
             'table_columns': table_columns,

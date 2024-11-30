@@ -50,7 +50,7 @@ async def get_ingredientes_index(request: fastapi.Request, session: Session = DB
     return render(
         session=session,
         request=request,
-        template_name='ingredientes/list.html',
+        template_name='list.html',
         context={
             'header': context_header,
             'table_columns': table_columns,

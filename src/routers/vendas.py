@@ -96,7 +96,7 @@ async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = N
     return render(
         session=session,
         request=request,
-        template_name='vendas/list.html',
+        template_name='list.html',
         context={
             'header': context_header,
             'table_columns': table_columns,

@@ -203,6 +203,20 @@ class Ingrediente(RegistroOrganizacao, table=True):
 
     def dict(self):
         base_dict = self.model_dump()
+        base_dict['#usado_em'] = [
+            f'''
+                <a href="/receitas/{r.receita.id}">
+                    <div class="card">
+                        <div class="card-body">
+                            {r.receita.nome}<br>
+                            <span class="text-muted">Clique para acessar</span>
+                        </div>
+                    </div>
+                </a>
+            '''
+            for r in self.receita_links
+        ]
+        base_dict['estoque_atual'] = self.estoque_atual
         return base_dict
 
     @property

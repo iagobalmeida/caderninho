@@ -65,7 +65,7 @@ async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, 
     return render(
         session=session,
         request=request,
-        template_name='receitas/list.html',
+        template_name='list.html',
         context={
             'header': context_header,
             'table_columns': table_columns,

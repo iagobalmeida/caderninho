@@ -5,7 +5,8 @@
     <div class="card">
         <div class="card-header">
             <h5 class="card-title">
-              {{ material_symbol('groups') | safe }}
+              {{ material_symbol('info') | safe }}
+              Informações
             </h5>
         </div>
         {% if usuario.dono %}
@@ -46,11 +47,53 @@
     </div>
 </div>
 
+{% if usuario.dono %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex flex-column align-items-start cursor-pointer" data-bs-toggle="collapse" data-bs-target="#collapse_configuracoes">
+                <h5 class="card-title mb-1">
+                    {{ material_symbol('settings') | safe }}
+                    Configurações
+                </h5>
+                <span class="text-muted text-sm">Clique para expandir</span>
+            </div>
+            <div class="card-body collapse" id="collapse_configuracoes">
+                <form action="{{url_for('post_organizacao_index')}}">
+                    <div class="mb-3">
+                    <div class="form-label">Unidades de Medida</div>
+                    <label class="form-check form-switch">
+                        <input name="dono" class="form-check-input" type="checkbox" >
+                        <span class="form-check-label">Converter valores maiores que <b>1000g</b> para <b>Kg</b></span>
+                    </label>
+                    </div>
+                    <div class="mb-3">
+                    <div class="form-label">Cálculos</div>
+                    <label class="form-check form-switch">
+                        <input name="dono" class="form-check-input" type="checkbox" >
+                        <span class="form-check-label">
+                            Utilizar <b>Custo/grama méd (R$)</b> em vez de <b>Custo/grama (R$)</b>
+                            <br>
+                            <small class="text-muted">O campo <b>Custo/grama méd</b> é calculado a partir dos cadastros de <b>Movimentações de Compra</b> de um ingrediente</small>
+                            <br>
+                            <small class="text-danger">* Ingredientes sem nenhum registro de Movimentação de compra não são afetados por essa configuração</small>
+                        </span>
+                    </label>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-label">Aplicar Configurações</div>
+                        <button class="btn">Aplicar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 <div class="col-12">
     <div class="card">
         <div class="card-header">
             <h5 class="card-title">
-                {{ material_symbol('account_circle') | safe }}
+                {{ material_symbol('groups') | safe }}
                 Usuários
             </h5>
             {% if usuario.dono %}

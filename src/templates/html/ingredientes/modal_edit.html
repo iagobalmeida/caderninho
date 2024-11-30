@@ -1,0 +1,64 @@
+
+
+<div class="modal" id="modalEditIngrediente" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_receita_ingredientes_atualizar') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <span class="material-symbols-outlined"> package_2 </span>
+            Editar Ingrediente
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input required type="hidden" class="form-control pe-0"  name="id" />
+          <div class="mb-3">
+            <label for="nome" class="form-label required">
+              Nome
+            </label>
+            <input type="text" class="form-control" name="nome" placeholder="Preencha para atualizar o nome desse ingrediente">
+          </div>
+          <div class="mb-3">
+            <label for="custo" class="form-label required">
+              Custo
+            </label>
+            <div class="input-group input-group-flat">
+              <span class="input-group-text"> R$ </span>
+              <input name="custo" required type="number" step="any" class="form-control text-end" min="1" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="peso" class="form-label required">
+              Peso (por pacote)
+            </label>
+            <div class="input-group input-group-flat">
+              <input type="number" class="form-control" name="peso">
+              <span class="input-group-text"> g </span>
+            </div>
+          </div>
+          <hr>
+          <div class="mb-3">
+            <label for="estoque_atual" class="form-label required">
+              Estoque Atual
+            </label>
+            <div class="input-group input-group-flat">
+              <input readonly type="number" class="form-control" name="estoque_atual">
+              <span class="input-group-text"> g </span>
+            </div>
+            <span class="text-muted">
+              Somatória da quantidade das Movimentações desse ingrediente.
+            </span>
+          </div>
+          <hr>
+          <div class="mb-3">
+            <label class="form-label">Receitas associadas</label>
+            <div id="usado_em"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost-danger me-auto" data-bs-toggle="modal" data-bs-target="#excluirReceitaIngredienteModal" data-bs-payload="">Remover da Receita</button>
+          <button type="submit" class="btn">Atualizar</button>
+        </div>
+      </div>
+    </form>
+  </div>
