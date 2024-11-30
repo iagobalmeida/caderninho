@@ -135,5 +135,5 @@ def render(templates: Jinja2Templates, request: Request, template_name: str, ses
         name=template_name,
         context=context
     )
-    response.set_cookie('theme', context.get('data_bs_theme', 'light'))
+    response.set_cookie('theme', request.session['theme'])
     return response

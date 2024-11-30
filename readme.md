@@ -145,11 +145,13 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Gestão de ingredientes
   - [X] Exibir receitas associadas em Ingrediente
   - [X] Exibir estoque atual em ingredientes
-- [ ] Configurações em Organização
+- [X] Configurações em Organização
   - [X] Card colapsavel de configurações
-  - [ ] Campos JSON em banco de dados
-  - [ ] Rota de atualização / assocaição com tela
-  - [ ] Aplicar filtro de medida de acordo com config
-  - [ ] Aplicar calculos baseados em custo med/g de acordo com config
+  - [X] Campos JSON em banco de dados
+  - [X] Rota de atualização / assocaição com tela
+  - [X] Aplicar filtro de medida de acordo com config
+  - [X] Aplicar filtro de medida geral de acordo com config
+  - [X] Aplicar calculos baseados em custo med/g de acordo com config
+- [X] Collapse em QR Code home
 - [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV

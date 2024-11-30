@@ -142,7 +142,17 @@
         {{ material_symbol('package_2') | safe }}
         Ingredientes
       </h5>
-      <div class="dropdown ms-auto">
+      <div class="ms-auto d-none d-md-flex btn-list">
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaIngredienteModal">
+          {{material_symbol('chevron_left') | safe }}
+          Incluir Ingrediente
+        </button>
+        <button class="btn" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_ingredientes_remover')}}", ".text-secondary": "Remover ingredientes selecionados?"}'>
+          {{material_symbol('remove') | safe }}
+          Remover Selecionados
+        </button>
+      </div>
+      <div class="dropdown ms-auto d-md-none">
         <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
           <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaIngredienteModal">

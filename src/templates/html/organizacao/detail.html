@@ -23,7 +23,13 @@
                     </div>
                     <div class="datagrid-item">
                         <div class="datagrid-title">Chave PIX</div>
-                        <input class="form-control" type="text" name="chave_pix" required value="{{organizacao.chave_pix}}">
+                        {% if organizacao.chave_pix_valida %}
+                            <input class="form-control is-valid" type="text" name="chave_pix" required value="{{organizacao.chave_pix}}">
+                            <div class="valid-feedback">Chave PIX válida</div>
+                        {% else %}
+                            <input class="form-control is-invalid" type="text" name="chave_pix" required value="{{organizacao.chave_pix}}">
+                            <div class="invalid-feedback">Essa Chave PIX é inválida</div>
+                        {% endif %}
                     </div>
                     <div class="datagrid-item">
                         <div class="datagrid-title">Atualizar</div>
@@ -33,7 +39,7 @@
                     </div>
                 </form>
             </div>
-        {% else %}
+            {% else %}
             <div class="card-body">
                 <div class="datagrid" method="POST">
                     <input type="hidden" name="id" value="{{organizacao.id}}">
@@ -43,11 +49,11 @@
                     </div>
                 </div>
             </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
-</div>
-
-{% if usuario.dono %}
+    
+    {% if usuario.dono and organizacao %}
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex flex-column align-items-start cursor-pointer" data-bs-toggle="collapse" data-bs-target="#collapse_configuracoes">
@@ -55,27 +61,38 @@
                     {{ material_symbol('settings') | safe }}
                     Configurações
                 </h5>
-                <span class="text-muted text-sm">Clique para expandir</span>
+                <span class="text-muted text-sm">Clique para expandir/fechar</span>
             </div>
-            <div class="card-body collapse" id="collapse_configuracoes">
-                <form action="{{url_for('post_organizacao_index')}}">
+            <div class="card-body collapse show" id="collapse_configuracoes">
+                <form method="POST" action="{{url_for('post_organizacao_configuracoes')}}">
+                    <input type="hidden" name="id" value="{{organizacao.id}}">
                     <div class="mb-3">
                     <div class="form-label">Unidades de Medida</div>
                     <label class="form-check form-switch">
-                        <input name="dono" class="form-check-input" type="checkbox" >
+                        <input name="converter_kg" class="form-check-input" type="checkbox" {{ 'checked' if organizacao.configuracoes.converter_kg else ''}}>
                         <span class="form-check-label">Converter valores maiores que <b>1000g</b> para <b>Kg</b></span>
+                    </label>
+                    <label class="form-check form-switch">
+                        <input name="converter_kg_sempre" class="form-check-input" type="checkbox" {{ 'checked' if organizacao.configuracoes.converter_kg_sempre else ''}}>
+                        <span class="form-check-label">
+                            Converter todos os valores para <b>Kg</b>
+                            <br>
+                            <small class="text-danger">* Essa opção sobrepõe a anterior</small>
+                        </span>
                     </label>
                     </div>
                     <div class="mb-3">
                     <div class="form-label">Cálculos</div>
                     <label class="form-check form-switch">
-                        <input name="dono" class="form-check-input" type="checkbox" >
+                        <input name="usar_custo_med" class="form-check-input" type="checkbox" {{ 'checked' if organizacao.configuracoes.usar_custo_med else ''}}>
                         <span class="form-check-label">
                             Utilizar <b>Custo/grama méd (R$)</b> em vez de <b>Custo/grama (R$)</b>
                             <br>
                             <small class="text-muted">O campo <b>Custo/grama méd</b> é calculado a partir dos cadastros de <b>Movimentações de Compra</b> de um ingrediente</small>
                             <br>
                             <small class="text-danger">* Ingredientes sem nenhum registro de Movimentação de compra não são afetados por essa configuração</small>
+                            <br>
+                            <small class="text-danger">* Essa opção afeta a precificação das receitas</small>
                         </span>
                     </label>
                     </div>

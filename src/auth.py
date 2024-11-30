@@ -64,5 +64,10 @@ def header_authorization(request: Request) -> str:
         request.session.clear()
         raise HTTPException(401, 'Sessão expirada!')
 
+    if request.query_params.get('theme', None):
+        request.session['theme'] = request.query_params.get('theme')
+    elif not request.session.get('theme', None):
+        request.session['theme'] = 'light'
+
 
 HEADER_AUTH = Depends(header_authorization)

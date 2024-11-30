@@ -7,25 +7,24 @@
 {% if pix_qr_code or pix_mensagem %}
     <div class="col-12 col-lg-4">
         <div class="card">
-            <div class="card-header">
-                <div class="card-title">
+            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#card_pix">
+                <h5 class="card-title cursor-pointer">
+                    {{ material_symbol('qr_code') | safe }}
                     QR PIX da última venda
-                </div>
+                    <small class="text-secondary ms-auto">Clique para exibir</small>
+                </h5>
             </div>
             <form class="card-body" method="POST" action="{{request.url_for('post_vendas_marcar_recebido')}}">
                 <input type="hidden" name="selecionados_ids" value="{{pix_venda.id}}">
                 <p>{{pix_mensagem | safe}}</p>
-                <ul>
-                    <li>{{pix_venda.descricao}}</li>
-                    <li>{{pix_venda.valor | format_reais}}</li>
-                    <li>{{pix_venda.data_criacao}}</li>
-                </ul>
+                <button class="btn btn-success">
+                    {{material_symbol('done_all') | safe}}
+                    Marcar como Recebido
+                </button>
                 {% if not pix_venda.recebido %}
-                    <img src="{{pix_qr_code}}" alt="QR Code" style="max-height: 300px">
-                    <button class="btn btn-success">
-                        {{material_symbol('done_all') | safe}}
-                        Marcar como Recebido
-                    </button>
+                    <div class="collapse" id="card_pix">
+                        <img src="{{pix_qr_code}}" alt="QR Code" style="max-height: 300px" class="mt-3 rounded">
+                    </div>
                 {% endif %}
             </form>
         </div>

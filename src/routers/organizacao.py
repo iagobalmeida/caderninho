@@ -55,6 +55,25 @@ async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.For
     return redirect_back(request, message='Organização atualizada com sucesso!')
 
 
+@router.post('/configuracoes', include_in_schema=False)
+async def post_organizacao_configuracoes(request: fastapi.Request, id: int = fastapi.Form(), converter_kg: bool = fastapi.Form(False), converter_kg_sempre: bool = fastapi.Form(False), usar_custo_med: bool = fastapi.Form(False), session: Session = DBSESSAO_DEP):
+    repository.update(
+        session=session,
+        entity=repository.Entities.ORGANIZACAO,
+        filters={
+            'id': id
+        },
+        values={
+            'configuracoes': {
+                'converter_kg': converter_kg,
+                'converter_kg_sempre': converter_kg_sempre,
+                'usar_custo_med': usar_custo_med
+            }
+        }
+    )
+    return redirect_back(request, message='Organização atualizada com sucesso!')
+
+
 @router.post('/usuarios/criar', include_in_schema=False)
 async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if payload.senha != payload.senha_confirmar:

@@ -4,12 +4,9 @@ from typing import List, Tuple
 
 from fastapi.templating import Jinja2Templates
 
-CONVERTER_GRAMAS_PARA_KILO = False
-CONVERTER_GRAMAS_PARA_KILO_SEMPRE = False
 
-
-def __unit_converter(input: float, unity: str = 'g'):
-    if (CONVERTER_GRAMAS_PARA_KILO and abs(input) > 1000 and unity == 'g') or CONVERTER_GRAMAS_PARA_KILO_SEMPRE:
+def __unit_converter(input: float, unity: str = 'g', converter_kg: bool = False, converter_kg_sempre: bool = False):
+    if (converter_kg and abs(input) > 1000 and unity == 'g') or converter_kg_sempre:
         input = input/1000
         unity = 'Kg'
     return (input, unity)
@@ -33,7 +30,7 @@ def __status_html(classname: str, content: str, material_symbol: str = None):
     '''
 
 
-def templates_filter_format_stock(input: float, unity: str = 'g', icon_positive: str = 'check', icon_zero: str = 'more_horiz', icon_negative: str = 'close'):
+def templates_filter_format_stock(input: float, converter_kg: bool = False, converter_kg_sempre: bool = False, icon_positive: str = 'check', icon_zero: str = 'more_horiz', icon_negative: str = 'close'):
     material_symbol = icon_positive
     classname = 'status-success'
     if input < 0:
@@ -42,7 +39,7 @@ def templates_filter_format_stock(input: float, unity: str = 'g', icon_positive:
     elif input == 0:
         material_symbol = icon_zero
         classname = 'status-secondary'
-    input, unity = __unit_converter(input, unity)
+    input, unity = __unit_converter(input, 'g', converter_kg, converter_kg_sempre)
 
     return __status_html(classname, f'{input} {unity}', material_symbol)
 
@@ -51,8 +48,8 @@ def templates_filter_format_stock_movement(input: float):
     return templates_filter_format_stock(input, icon_positive='arrow_upward', icon_negative='arrow_downward')
 
 
-def templates_filter_format_quantity(input: float):
-    input, unity = __unit_converter(input, 'g')
+def templates_filter_format_quantity(input: float, converter_kg: bool = False, converter_kg_sempre: bool = False):
+    input, unity = __unit_converter(input, 'g', converter_kg, converter_kg_sempre)
     return __status_html('status-primary', f'{input} {unity}')
 
 

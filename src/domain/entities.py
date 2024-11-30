@@ -1,11 +1,11 @@
 
 import math
 from datetime import datetime
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pixqrcode import PixQrCode
 from sqlalchemy.orm import validates
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
 from src.templates import filters
 
@@ -18,6 +18,22 @@ class Organizacao(SQLModel, table=True):
     cidade: str
     chave_pix: str
     usuarios: List['Usuario'] = Relationship(back_populates='organizacao')
+    configuracoes: Dict = Field(default_factory=lambda: dict({
+        'converter_kg': False,
+        'converter_kg_sempre': False,
+        'usar_custo_med': False
+    }), sa_column=Column(JSON))
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    @property
+    def chave_pix_valida(self):
+        try:
+            pix_qr_code = PixQrCode(self.descricao, self.chave_pix, self.cidade, f'{10:.2f}')
+            return isinstance(pix_qr_code.export_base64(), str)
+        except Exception as ex:
+            return False
 
 
 class RegistroOrganizacao(SQLModel, table=False):
@@ -51,19 +67,29 @@ class ReceitaIngredienteLink(RegistroOrganizacao, table=True):
     ingrediente_id: Optional[int] = Field(default=None, foreign_key="ingrediente.id")
     receita: "Receita" = Relationship(back_populates="ingrediente_links")
     ingrediente: "Ingrediente" = Relationship(back_populates="receita_links")
+    organizacao: "Organizacao" = Relationship()
+
+    @property
+    def ingrediente_custo_p_grama(self):
+        if self.organizacao.configuracoes['usar_custo_med']:
+            return self.ingrediente.custo_p_grama_medio
+        return self.ingrediente.custo_p_grama
 
     @property
     def custo(self):
         if not self.ingrediente:
             return 0
-        return round(self.quantidade * self.ingrediente.custo_p_grama, 2)
+        return round(self.quantidade * self.ingrediente_custo_p_grama, 2)
 
     @property
     def row(self):
-        col_quantidade = filters.templates_filter_format_quantity(self.quantidade)
-        col_custo_p_grama = filters.templates_filter_format_reais(self.ingrediente.custo_p_grama)
+        converter_kg = self.organizacao.configuracoes.get('converter_kg', False)
+        converter_kg_sempre = self.organizacao.configuracoes.get('converter_kg_sempre', False)
+
+        col_quantidade = filters.templates_filter_format_quantity(self.quantidade, converter_kg, converter_kg_sempre)
+        col_custo_p_grama = filters.templates_filter_format_reais(self.ingrediente_custo_p_grama)
         col_custo = filters.templates_filter_format_reais(self.custo)
-        col_estoque_atual = filters.templates_filter_format_stock(self.ingrediente.estoque_atual)
+        col_estoque_atual = filters.templates_filter_format_stock(self.ingrediente.estoque_atual, converter_kg, converter_kg_sempre)
 
         return [
             self.ingrediente.nome,
@@ -101,13 +127,16 @@ class Estoque(RegistroOrganizacao, table=True):
 
     @property
     def row(self):
+        converter_kg = self.organizacao.configuracoes.get('converter_kg', False)
+        converter_kg_sempre = self.organizacao.configuracoes.get('converter_kg_sempre', False)
+
         col_valor_pago = filters.templates_filter_format_reais(self.valor_pago)
 
         col_ingrediente = '-'
         if self.ingrediente:
             col_ingrediente = self.ingrediente.nome
 
-        col_quantidade = filters.templates_filter_format_quantity(self.quantidade)
+        col_quantidade = filters.templates_filter_format_quantity(self.quantidade, converter_kg, converter_kg_sempre)
 
         return [
             self.data_criacao.strftime(STRFTIME_FORMAT),
@@ -170,6 +199,7 @@ class Ingrediente(RegistroOrganizacao, table=True):
     custo: float
     receita_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='ingrediente')
     estoque_links: List['Estoque'] = Relationship(back_populates='ingrediente')
+    organizacao: "Organizacao" = Relationship()
 
     @classmethod
     def columns(self):
@@ -185,11 +215,14 @@ class Ingrediente(RegistroOrganizacao, table=True):
 
     @property
     def row(self):
+        converter_kg = self.organizacao.configuracoes.get('converter_kg', False)
+        converter_kg_sempre = self.organizacao.configuracoes.get('converter_kg_sempre', False)
+
         col_custo = filters.templates_filter_format_reais(self.custo)
-        col_peso = filters.templates_filter_format_quantity(self.peso)
+        col_peso = filters.templates_filter_format_quantity(self.peso, converter_kg, converter_kg_sempre)
         col_custo_p_grama = filters.templates_filter_format_reais(self.custo_p_grama)
         col_custo_p_grama_medio = filters.templates_filter_format_reais(self.custo_p_grama_medio)
-        col_estoque = filters.templates_filter_format_stock(self.estoque_atual)
+        col_estoque = filters.templates_filter_format_stock(self.estoque_atual, converter_kg, converter_kg_sempre)
 
         return [
             self.id,
@@ -221,6 +254,8 @@ class Ingrediente(RegistroOrganizacao, table=True):
 
     @property
     def custo_p_grama_medio(self):
+        if not self.estoque_links:
+            return self.custo_p_grama
         estoques_com_preco = [(e.valor_pago/e.quantidade) for e in self.estoque_links if e.valor_pago]
         return sum(estoques_com_preco)/len(estoques_com_preco) if estoques_com_preco else self.custo_p_grama
 
