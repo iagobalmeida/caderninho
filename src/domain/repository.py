@@ -34,7 +34,7 @@ def get(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, firs
 
     if not ignore_validations:
         if not session.sessao_autenticada.administrador and entity != Entities.ORGANIZACAO:
-            query = query.filter(text(f'organizacao_id == {session.sessao_autenticada.organizacao_id}'))
+            query = query.filter(text(f'organizacao_id = {session.sessao_autenticada.organizacao_id}'))
 
     if order_by:
         if desc:

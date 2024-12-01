@@ -21,7 +21,7 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
     if filter_data_final:
         filter.update(filter_data_final=filter_data_final)
     if filter_ingrediente_id:
-        filters.update(filter_ingrediente_id=filter_ingrediente_id))
+        filters.update(filter_ingrediente_id=filter_ingrediente_id)
 
     db_estoques = repository.get(session, repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
 
@@ -29,10 +29,10 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
 
     context_header = Context.Header(
-        pretitle = 'Registros',
-        title = 'Estoque',
-        symbol = 'inventory_2',
-        buttons = [
+        pretitle='Registros',
+        title='Estoque',
+        symbol='inventory_2',
+        buttons=[
             Button(
                 content='Excluír Selecionados',
                 classname='btn',
@@ -66,10 +66,10 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
     table_modal = '#modalEditEstoque'
 
     return render(
-        session = session,
-        request = request,
-        template_name = 'list.html',
-        context = {
+        session=session,
+        request=request,
+        template_name='list.html',
+        context={
             'header': context_header,
             'table_columns': table_columns,
             'table_data': table_data,
@@ -124,12 +124,12 @@ async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str 
 @ router.post('/atualizar', include_in_schema=False)
 async def post_estoques_atualizar(request: fastapi.Request, payload: inputs.EstoqueAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.update(
-        session = session,
-        entity = repository.Entities.ESTOQUE,
-        filters = {
+        session=session,
+        entity=repository.Entities.ESTOQUE,
+        filters={
             'id': payload.id
         },
-        values = {
+        values={
             'descricao':  payload.descricao,
             'valor_pago':  payload.valor_pago,
             'quantidade':  payload.quantidade,
