@@ -17,11 +17,11 @@ router = fastapi.APIRouter(prefix='/estoques', dependencies=[auth.HEADER_AUTH])
 async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
     filters = {}
     if filter_data_inicio:
-        filter.update(filter_data_inicio=filter_data_inicio)
+        filter.update(data_inicio=filter_data_inicio)
     if filter_data_final:
-        filter.update(filter_data_final=filter_data_final)
+        filter.update(data_final=filter_data_final)
     if filter_ingrediente_id:
-        filters.update(filter_ingrediente_id=filter_ingrediente_id)
+        filters.update(ingrediente_id=filter_ingrediente_id)
 
     db_estoques = repository.get(session, repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
 
