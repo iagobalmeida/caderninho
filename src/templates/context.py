@@ -97,7 +97,7 @@ BASE_NAVBAR_LINKS = [
 
 
 def get_context(request: Request, session=None, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
-    theme = request.cookies.get('theme', 'light')
+    theme = request.session.get('theme', 'light')
 
     base_context = Context(
         title='Caderninho',

@@ -1,0 +1,74 @@
+<div class="col-12">
+    <div class="card mb-1 d-md-none">
+        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapse_pesquisa">
+            <h5 class="card-title">
+                {{ material_symbol('search') | safe }}
+                Filtros
+            </h5>
+        </div>
+        <form class="card-body collapse" id="collapse_pesquisa">
+            <input type="hidden" name="page" value="{{request.query_params.get('page', 1)}}">
+            <div class="mb-3">
+                <label class="form-label">
+                    Data Inicial
+                </label>
+                <input class="form-control" type="datetime-local" name="filter_data_inicio" value="{{request.query_params.get('filter_data_inicio', '')}}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">
+                    Data Final
+                </label>
+                <input class="form-control" type="datetime-local" name="filter_data_final" value="{{request.query_params.get('filter_data_inicio', '')}}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">
+                    Pesquisar
+                </label>
+                <div class="input-icon mb-1">
+                    <input type="text" class="form-control" placeholder="Pesquisar..." id="filter_pesquisa" name="filter_pesquisa"/>
+                    <span class="input-icon-addon">
+                    {{material_symbol('search') | safe}}
+                    </span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <button class="btn w-full" type="submit">Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<form class="mb-1 mt-5 d-none d-md-block"  method="GET">
+    <input type="hidden" name="page" value="{{request.query_params.get('page', 1)}}">
+    <div class="datagrid">
+        <div class="datagrid-item">
+            <div class="datagrid-title">
+                Data Inicial
+            </div>
+            <div class="datagrid-content">
+                <input class="form-control" type="datetime-local" name="filter_data_inicio" value="{{request.query_params.get('filter_data_inicio', '')}}">
+            </div>
+        </div>
+        <div class="datagrid-item">
+            <div class="datagrid-title">
+                Data Final
+            </div>
+            <div class="datagrid-content">
+                <input class="form-control" type="datetime-local" name="filter_data_final" value="{{request.query_params.get('filter_data_inicio', '')}}">
+            </div>
+        </div>
+        <div class="datagrid-item">
+            <div class="datagrid-title">
+                Pesquisar
+            </div>
+            <div class="datagrid-content">
+                <div class="input-icon mb-1">
+                  <input type="text" class="form-control" placeholder="Pesquisar..." id="filter_pesquisa" name="filter_pesquisa"/>
+                  <span class="input-icon-addon">
+                    {{material_symbol('search') | safe}}
+                  </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

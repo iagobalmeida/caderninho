@@ -26,43 +26,45 @@
           <!-- Mobile Menu -->
           <div class="position-fixed d-flex flex-column align-items-end gap-2 d-lg-none" style="z-index: 1000; right: 2rem; bottom: 2rem;">
             <div class="collapse" id="collapseMenuMobile">
-              <div class="d-flex flex-column align-items-end gap-2 bg-white rounded p-4 border border-2 shadow">
-                {% for button in header.buttons %}
-                  {% if button.href %}
-                    <span class="d-inline w-full">
-                      <a
-                      href="{{button.href}}"
-                      class="{{button.classname}} w-full"
-                      {% if button.attributes %}
-                        {% for name, value in button.attributes.items() %}
-                          {{name}} = "{{value}}"
-                        {% endfor %}
-                      {% endif %}
-                      >
-                        {% if button.symbol %}
-                          {{ material_symbol(button.symbol) | safe}}
+              <div class="card">
+                <div class="d-flex flex-column align-items-end gap-2 card-body rounded p-4  shadow">
+                  {% for button in header.buttons %}
+                    {% if button.href %}
+                      <span class="d-inline w-full">
+                        <a
+                        href="{{button.href}}"
+                        class="{{button.classname}} w-full"
+                        {% if button.attributes %}
+                          {% for name, value in button.attributes.items() %}
+                            {{name}} = "{{value}}"
+                          {% endfor %}
                         {% endif %}
-                        {{button.content}}
-                      </a>
-                    </span>
-                  {% else %}
-                    <span class="d-inline w-full">
-                      <button
-                      class="{{button.classname}} w-full"
-                      {% if button.attributes %}
-                        {% for name, value in button.attributes.items() %}
-                          {{name}} = "{{value}}"
-                        {% endfor %}
-                      {% endif %}
-                      >
-                        {% if button.symbol %}
-                          {{ material_symbol(button.symbol) | safe}}
+                        >
+                          {% if button.symbol %}
+                            {{ material_symbol(button.symbol) | safe}}
+                          {% endif %}
+                          {{button.content}}
+                        </a>
+                      </span>
+                    {% else %}
+                      <span class="d-inline w-full">
+                        <button
+                        class="{{button.classname}} w-full"
+                        {% if button.attributes %}
+                          {% for name, value in button.attributes.items() %}
+                            {{name}} = "{{value}}"
+                          {% endfor %}
                         {% endif %}
-                        {{button.content}}
-                      </button>
-                    </span>
-                  {% endif %}
-                {% endfor %}
+                        >
+                          {% if button.symbol %}
+                            {{ material_symbol(button.symbol) | safe}}
+                          {% endif %}
+                          {{button.content}}
+                        </button>
+                      </span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
               </div>
             </div>
             <button class="btn shadow" data-bs-toggle="collapse" data-bs-target="#collapseMenuMobile">
@@ -157,7 +159,7 @@
             </div>
           </div>
         </header>
-        <div class="page-wrapper">
+        <div class="page-wrapper ">
           <!-- Page header -->
           <div class="page-header d-print-none">
             <div class="container-xl">
@@ -238,7 +240,7 @@
             </div>
           </div>
           <!-- Page body -->
-          <div class="page-body mt-1">
+          <div class="page-body mt-1 pb-5">
             <div class="container-xl">
               {% if request.query_params['error'] %}
                 <div class="alert alert-danger " role="alert">
