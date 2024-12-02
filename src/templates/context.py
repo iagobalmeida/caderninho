@@ -7,6 +7,7 @@ from src.domain import repository
 from src.schemas.auth import SessaoAutenticada
 from src.templates.filters import \
     templates_global_material_symbol as material_symbol
+from src.utils import url_incluir_query_params
 
 
 class Button(TypedDict):
@@ -44,13 +45,19 @@ class Context(TypedDict):
     usuario: SessaoAutenticada = None
 
     @classmethod
-    def factory_navbar_link(self, request: Request, title: str, symbol_name: str, url_name: str):
-        nav_url = request.url_for(url_name)
+    def factory_navbar_link(self, request: Request, title: str, symbol_name: str, url_name: str, query_params: dict = None):
+        base_nav_url = request.url_for(url_name)
+
+        if query_params:
+            nav_url = url_incluir_query_params(base_nav_url, **query_params)
+        else:
+            nav_url = base_nav_url
+
         return Context.Navbar.Link(
             title=title,
             symbol=material_symbol(symbol_name),
             url=nav_url,
-            active=(request.url == nav_url or str(nav_url) in str(request.url))
+            active=(request.url == base_nav_url or str(base_nav_url) in str(request.url))
         )
 
     @classmethod
@@ -81,7 +88,7 @@ class Context(TypedDict):
 
 BASE_NAVBAR_LINKS = [
     ('Home', 'home', 'get_home'),
-    ('Vendas', 'shopping_cart', 'get_vendas_index'),
+    ('Vendas', 'shopping_cart', 'get_vendas_index', {'page': 1}),
     ('Estoque', 'inventory_2', 'get_estoques_index'),
     ('Receitas', 'library_books', 'get_receitas_index'),
     ('Ingredientes', 'package_2', 'get_ingredientes_index'),
@@ -96,7 +103,7 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
         title='Caderninho',
         navbar=Context.Navbar(
             links=[
-                Context.factory_navbar_link(request, __navbar_link[0], __navbar_link[1], __navbar_link[2])
+                Context.factory_navbar_link(request, *__navbar_link)
                 for __navbar_link in navbar_links
             ]
         ),

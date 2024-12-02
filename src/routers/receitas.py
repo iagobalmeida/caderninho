@@ -13,19 +13,9 @@ from src.utils import redirect_back, redirect_url_for
 router = fastapi.APIRouter(prefix='/receitas', dependencies=[auth.HEADER_AUTH])
 
 
-@router.post('/', include_in_schema=False)
-async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    db_receita = repository.create(session, repository.Entities.RECEITA, {
-        'nome': nome,
-        'peso_unitario': 1,
-        'procentagem_lucro': 33
-    })
-    return redirect_url_for(request, 'get_receita', id=db_receita.id)
-
-
 @router.get('/', include_in_schema=False)
 async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, session: Session = DBSESSAO_DEP):
-    db_receitas = repository.get(session, repository.Entities.RECEITA, {'nome': filter_nome})
+    db_receitas, db_receitas_pages, db_receitas_count = repository.get(session, repository.Entities.RECEITA, {'nome': filter_nome})
     context_header = Context.Header(
         pretitle='Registros',
         title='Receitas',
@@ -65,15 +55,27 @@ async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, 
     return render(
         session=session,
         request=request,
-        template_name='list.html',
+        template_name='layout/list.html',
         context={
             'header': context_header,
             'table_columns': table_columns,
             'table_data': table_data,
             'table_no_result': table_no_result,
+            'table_pages': db_receitas_pages,
+            'table_count': db_receitas_count,
             'filter_nome': filter_nome
         }
     )
+
+
+@router.post('/', include_in_schema=False)
+async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    db_receita = repository.create(session, repository.Entities.RECEITA, {
+        'nome': nome,
+        'peso_unitario': 1,
+        'procentagem_lucro': 33
+    })
+    return redirect_url_for(request, 'get_receita', id=db_receita.id)
 
 
 @router.get('/{id}', include_in_schema=False)

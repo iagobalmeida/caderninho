@@ -23,7 +23,7 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
     if filter_ingrediente_id:
         filters.update(ingrediente_id=filter_ingrediente_id)
 
-    db_estoques = repository.get(session, repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
+    db_estoques, db_estoques_pages, db_estoques_count = repository.get(session, repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
 
     db_ingredientes = repository.get(session, repository.Entities.INGREDIENTE)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
@@ -68,13 +68,15 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
     return render(
         session=session,
         request=request,
-        template_name='list.html',
+        template_name='layout/list.html',
         context={
             'header': context_header,
             'table_columns': table_columns,
             'table_data': table_data,
             'table_no_result': table_no_result,
             'table_modal': table_modal,
+            'table_pages': db_estoques_pages,
+            'table_count': db_estoques_count,
             'ingredientes': db_ingredientes,
             'entradas': entradas,
             'saidas': saidas,

@@ -1,4 +1,5 @@
 from enum import Enum
+from math import ceil
 from typing import Tuple
 
 from sqlmodel import func, select, text
@@ -18,7 +19,22 @@ class Entities(Enum):
     RECEITA = Receita
 
 
-def get(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, first: bool = False, order_by: str = None, desc: bool = False, ignore_validations: bool = False):
+def count_all(session: DBSessaoAutenticada, entity: Entities):
+    count_query = select(func.count()).select_from(entity.value)
+    return session.exec(count_query).one()
+
+
+def get(
+        session: DBSessaoAutenticada,
+        entity: Entities,
+        filters: dict = {},
+        first: bool = False,
+        order_by: str = None,
+        desc: bool = False,
+        per_page: int = 10,
+        page: int = 1,
+        ignore_validations: bool = False
+):
     query = select(entity.value)
 
     if filters:
@@ -45,7 +61,16 @@ def get(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, firs
     if first:
         return session.exec(query).first()
 
-    return session.exec(query).all()
+    count_query = select(func.count()).select_from(query.subquery())
+    count = session.exec(count_query).one()
+
+    pages = ceil(count / per_page) if per_page else 1
+
+    query_limit = per_page
+    query_offset = per_page * (page - 1)
+    query = query.limit(query_limit).offset(query_offset)
+
+    return session.exec(query).all(), pages, count
 
 
 def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, values: dict = {}):

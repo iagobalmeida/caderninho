@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'layout/base.html' %}
 
-{% include 'modal_confirm.html' %}
+{% include 'components/modal_confirm.html' %}
 
 {% include 'vendas/modal_edit.html' %}
 {% include 'vendas/modal_create.html' %}
@@ -10,7 +10,6 @@
 
 {% include 'estoques/modal_create.html' %}
 {% include 'estoques/modal_edit.html' %}
-
 
 
 {% include 'receitas/modal_create.html' %}
@@ -150,7 +149,7 @@
                 <div class="row flex-fill align-items-center">
                   <div class="col">
                     <ul class="navbar-nav">
-                      {% include 'navbar_items.html' %}
+                      {% include 'components/navbar_items.html' %}
                     </ul>
                   </div>
                 </div>
@@ -183,6 +182,13 @@
                           {% endif %}
                         </li>
                       {% endfor %}
+                      {% with page = request.query_params.get('page', None) %}
+                        {% if page %}
+                          <li class="breadcrumb-item">
+                            <a>Página {{page}}</a>
+                          </li>
+                        {% endif %}
+                      {% endwith %}
                     </ol>
                   </div>
                 </div>

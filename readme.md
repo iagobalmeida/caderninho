@@ -153,5 +153,11 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
   - [X] Aplicar filtro de medida geral de acordo com config
   - [X] Aplicar calculos baseados em custo med/g de acordo com config
 - [X] Collapse em QR Code home
+- [X] Reorganização de templates
+- [X] Paginação em tabelas
+- [ ] Reorganização de roteadores
+  - [ ] Criação de Schemas
+  - [ ] Criação de Services (?)
+- [ ] Filtro em tabelas
 - [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV

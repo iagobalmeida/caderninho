@@ -1,0 +1,10 @@
+{% with page = request.query_params.get('page', 1) %}
+  <div class="col-12 pagination">
+      <div class="btn-list">
+        {% for i in range(table_pages) %}
+          <a href="?page={{i+1}}" class="btn {{'btn-primary' if page|int == i+1 else ''}}">{{i+1}}</a>
+        {% endfor %}
+      </div>
+      <span class="text-secondary">Visualizando 10 de {{table_count}} registros</span>
+  </div>
+{% endwith %}

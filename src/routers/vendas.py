@@ -14,11 +14,11 @@ router = fastapi.APIRouter(prefix='/vendas', dependencies=[auth.HEADER_AUTH])
 
 
 @router.get('/', include_in_schema=False)
-async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
-    db_vendas = repository.get(session, repository.Entities.VENDA, filters={
-        'data_inicio': filter_data_inicio,
-        'data_final': filter_data_final
-    }, order_by='data_criacao', desc=True)
+async def get_vendas_index(request: fastapi.Request, page: int = fastapi.Query(1), session: Session = DBSESSAO_DEP):
+    db_vendas, db_vendas_pages, db_vendas_count = repository.get(session, repository.Entities.VENDA, filters={
+        # 'data_inicio': filter_data_inicio,
+        # 'data_final': filter_data_final
+    }, order_by='data_criacao', desc=True, page=page)
 
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
     context_header = Context.Header(
@@ -96,18 +96,20 @@ async def get_vendas_index(request: fastapi.Request, filter_data_inicio: str = N
     return render(
         session=session,
         request=request,
-        template_name='list.html',
+        template_name='layout/list.html',
         context={
             'header': context_header,
             'table_columns': table_columns,
             'table_data': table_data,
             'table_no_result': table_no_result,
             'table_modal': table_modal,
+            'table_pages': db_vendas_pages,
+            'table_count': db_vendas_count,
             'entradas': entradas,
             'saidas': saidas,
             'caixa': caixa,
-            'filter_data_inicio': filter_data_inicio,
-            'filter_data_final': filter_data_final
+            # 'filter_data_inicio': filter_data_inicio,
+            # 'filter_data_final': filter_data_final
         }
     )
 

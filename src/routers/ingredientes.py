@@ -40,7 +40,7 @@ context_header = Context.Header(
 
 @router.get('/', include_in_schema=False)
 async def get_ingredientes_index(request: fastapi.Request, session: Session = DBSESSAO_DEP):
-    db_ingredientes = repository.get(session, repository.Entities.INGREDIENTE)
+    db_ingredientes, db_ingredientes_pages, db_ingredientes_count = repository.get(session, repository.Entities.INGREDIENTE)
 
     table_columns = repository.Entities.INGREDIENTE.value.columns()
     table_data = db_ingredientes
@@ -50,13 +50,15 @@ async def get_ingredientes_index(request: fastapi.Request, session: Session = DB
     return render(
         session=session,
         request=request,
-        template_name='list.html',
+        template_name='layout/list.html',
         context={
             'header': context_header,
             'table_columns': table_columns,
             'table_data': table_data,
             'table_no_result': table_no_result,
-            'table_modal': table_modal
+            'table_modal': table_modal,
+            'table_pages': db_ingredientes_pages,
+            'table_count': db_ingredientes_count,
         }
     )
 
