@@ -189,8 +189,12 @@ class Venda(RegistroOrganizacao, table=True):
         return base_dict
 
     def gerar_qr_code(self, pix_nome, pix_cidade, pix_chave) -> str:
-        pix_qr_code = PixQrCode(pix_nome, pix_chave, pix_cidade, f'{self.valor:.2f}')
-        return pix_qr_code.export_base64()
+        try:
+            pix_qr_code = PixQrCode(pix_nome, pix_chave, pix_cidade, f'{self.valor:.2f}')
+            return pix_qr_code.export_base64()
+        except Exception as ex:
+            print(ex)
+            return None
 
 
 class Ingrediente(RegistroOrganizacao, table=True):
