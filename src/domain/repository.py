@@ -2,7 +2,7 @@ from enum import Enum
 from math import ceil
 from typing import Tuple
 
-from sqlmodel import func, select, text
+from sqlmodel import func, select
 
 from src.domain.entities import (Estoque, Ingrediente, Organizacao, Receita,
                                  ReceitaIngredienteLink, Usuario, Venda)
@@ -50,7 +50,7 @@ def get(
 
     if getattr(session, 'sessao_autenticada', False) and not ignore_validations:
         if not session.sessao_autenticada.administrador and entity != Entities.ORGANIZACAO:
-            query = query.filter(text(f'organizacao_id = {session.sessao_autenticada.organizacao_id}'))
+            query = query.filter(getattr(entity, 'organizacao_id') == session.sessao_autenticada.organizacao_id)
 
     if order_by:
         if desc:
