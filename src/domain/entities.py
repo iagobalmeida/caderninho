@@ -15,8 +15,8 @@ STRFTIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 class Organizacao(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     descricao: str
-    cidade: str
-    chave_pix: str
+    cidade: Optional[str] = None
+    chave_pix: Optional[str] = None
     usuarios: List['Usuario'] = Relationship(back_populates='organizacao')
     configuracoes: Dict = Field(default_factory=lambda: dict({
         'converter_kg': False,
