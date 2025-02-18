@@ -16,9 +16,6 @@
             <tr
             class="cursor-pointer"
             data-bs-payload="{{data.dict() | json }}" 
-            {% if data.href %}
-              onclick="window.location = '{{data.href}}'"
-            {% endif %}
             >
               <td class="w-1">
                 <input type="checkbox" data-id="{{data.id}}">
@@ -28,6 +25,8 @@
                   {% if table_modal %}
                     data-bs-toggle="modal"
                     data-bs-target="{{table_modal}}"
+                  {% elif data.href %}
+                    onclick="window.location = '{{data.href}}'"
                   {% endif %}
                 >
                   {{ value | safe }}

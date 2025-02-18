@@ -17,11 +17,11 @@
             <form class="card-body" method="POST" action="{{request.url_for('post_vendas_marcar_recebido')}}">
                 <input type="hidden" name="selecionados_ids" value="{{pix_venda.id}}">
                 <p>{{pix_mensagem | safe}}</p>
-                <button class="btn btn-success">
-                    {{material_symbol('done_all') | safe}}
-                    Marcar como Recebido
-                </button>
                 {% if not pix_venda.recebido %}
+                    <button class="btn btn-success">
+                        {{material_symbol('done_all') | safe}}
+                        Marcar como Recebido
+                    </button>
                     <div class="collapse" id="card_pix">
                         <img src="{{pix_qr_code}}" alt="QR Code" style="max-height: 300px" class="mt-3 rounded">
                     </div>

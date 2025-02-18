@@ -80,10 +80,10 @@ async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form
 
 @router.get('/{id}', include_in_schema=False)
 async def get_receita(request: fastapi.Request, id: int, session: Session = DBSESSAO_DEP):
-    db_receita = repository.get(session, repository.Entities.RECEITA, {'id': id}, first=True)
+    db_receita, _, _ = repository.get(session, repository.Entities.RECEITA, {'id': id}, first=True)
     if not db_receita:
         raise ValueError(f'Receita com id {id} não encontrada')
-    db_ingredientes = repository.get(session, repository.Entities.INGREDIENTE)
+    db_ingredientes, _, _ = repository.get(session, repository.Entities.INGREDIENTE)
     context_header = Context.Header(
         pretitle='Registros',
         title='Receitas',

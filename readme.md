@@ -27,7 +27,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 3. Instale as bibliotecas necessárias com `pip install -r requirements.txt`
 
 ### Execução
-1. Inicie a aplicação com `uvicorn src.app:app`
+1. Inicie a aplicação com `uvicorn src.app:app --reload`
 
 ### Testes
 1. Inicie a aplicação

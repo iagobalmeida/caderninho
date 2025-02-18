@@ -59,7 +59,7 @@ def get(
             query = query.order_by(entity.value.__dict__[order_by])
 
     if first:
-        return session.exec(query).first()
+        return session.exec(query).first(), None, None
 
     count_query = select(func.count()).select_from(query.subquery())
     count = session.exec(count_query).one()
@@ -74,7 +74,7 @@ def get(
 
 
 def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, values: dict = {}):
-    db_entity = get(session, entity, filters, first=True)
+    db_entity, _, _ = get(session, entity, filters, first=True)
 
     if not db_entity:
         raise ValueError(f'{entity} não encontrado!')
@@ -104,7 +104,7 @@ def delete(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}):
     if entity == Entities.ORGANIZACAO:
         raise ValueError('Não é possível excluir uma organização!')
 
-    db_entities = get(session, entity, filters)
+    db_entities, _, _ = get(session, entity, filters)
 
     if not db_entities:
         raise ValueError(f'{entity} não encontrado!')
@@ -131,10 +131,10 @@ def create(session: DBSessaoAutenticada, entity: Entities, values: dict = {}):
 # Funções otimizadas
 
 def get_venda_qr_code(session: DBSessaoAutenticada, venda_id: int) -> str:
-    organizacao = get(session, Entities.ORGANIZACAO, {'id': session.sessao_autenticada.organizacao_id}, first=True)
+    organizacao, _, _ = get(session, Entities.ORGANIZACAO, {'id': session.sessao_autenticada.organizacao_id}, first=True)
     if not organizacao:
         return None
-    venda = get(session, Entities.VENDA, {'id': venda_id}, first=True)
+    venda, _, _ = get(session, Entities.VENDA, {'id': venda_id}, first=True)
     return venda.gerar_qr_code(
         pix_nome=organizacao.descricao,
         pix_cidade=organizacao.cidade,

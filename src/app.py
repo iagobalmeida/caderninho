@@ -2,6 +2,7 @@
 import logging
 import random
 import re
+from logging import getLogger
 
 import fastapi
 import fastapi.security
@@ -9,6 +10,7 @@ from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
@@ -27,6 +29,8 @@ from src.schemas.auth import DBSessaoAutenticada
 from src.templates import render
 from src.utils import url_incluir_query_params
 
+log = getLogger(__name__)
+
 SESSION_SECRET_KEY = 'SESSION_SECRET_KEY'
 
 rootlogger.setLevel(logging.WARN)
@@ -44,6 +48,17 @@ app.include_router(router_scripts)
 app.include_router(router_autenticacao)
 app.include_router(router_paginas)
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
+
+
+class CacheControlMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "public, max-age=3600"
+        return response
+
+
+app.add_middleware(CacheControlMiddleware)
 
 db.init()
 
@@ -91,7 +106,7 @@ async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Q
 
 @app.post('/recuperar_senha', include_in_schema=False)
 async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
-    db_usuario = repository.get(session, repository.Entities.USUARIO, {'email': email}, first=True)
+    db_usuario, _, _ = repository.get(session, repository.Entities.USUARIO, {'email': email}, first=True)
     if not db_usuario:
         raise ValueError('Não foi encontrado usuário com esse email')
 
@@ -109,6 +124,7 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
 
 @app.exception_handler(IntegrityError)
 async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
+    log.exception(ex)
     if not redirect_to:
         redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
 
@@ -124,6 +140,7 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
 
 @app.exception_handler(ValueError)
 async def value_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
+    log.exception(ex)
     if not redirect_to:
         redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
     redirect_to = url_incluir_query_params(redirect_to, error=str(ex))
@@ -132,6 +149,7 @@ async def value_error_exception_handler(request: fastapi.Request, ex, redirect_t
 
 @app.exception_handler(HTTPException)
 async def http_error_exception_handler(request: fastapi.Request, ex: HTTPException):
+    log.exception(ex)
     redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
     if ex.status_code == 401:
         request.session.clear()
@@ -141,6 +159,7 @@ async def http_error_exception_handler(request: fastapi.Request, ex: HTTPExcepti
 
 @app.exception_handler(RequestValidationError)
 async def generic_exception_handler(request: fastapi.Request, ex: Exception):
+    log.exception(ex)
     redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
     redirect_to = url_incluir_query_params(redirect_to, error=ex.errors()[0]["msg"])
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)

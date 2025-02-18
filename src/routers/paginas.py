@@ -16,7 +16,7 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     db_estoques = repository.count_all(session, repository.Entities.ESTOQUE)
     db_vendas = repository.count_all(session, repository.Entities.VENDA)
 
-    db_ultima_venda = repository.get(session, repository.Entities.VENDA, order_by='data_criacao', desc=True, first=True)
+    db_ultima_venda, _, _ = repository.get(session, repository.Entities.VENDA, order_by='data_criacao', desc=True, first=True)
     pix_qr_code = None
     pix_mensagem = 'Sem vendas para gerar QR Code.'
     pix_venda = None

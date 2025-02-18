@@ -25,7 +25,7 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
 
     db_estoques, db_estoques_pages, db_estoques_count = repository.get(session, repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
 
-    db_ingredientes = repository.get(session, repository.Entities.INGREDIENTE)
+    db_ingredientes, _, _ = repository.get(session, repository.Entities.INGREDIENTE)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
 
     context_header = Context.Header(
@@ -88,10 +88,10 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
     )
 
 
-@ router.post('/', include_in_schema=False)
+@router.post('/', include_in_schema=False)
 async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if payload.descricao == 'Uso em Receita' and payload.receita_id:
-        db_receita = repository.get(session, repository.Entities.RECEITA, {'id': id}, first=True)
+        db_receita, _, _ = repository.get(session, repository.Entities.RECEITA, {'id': id}, first=True)
         for ingrediente_link in db_receita.ingrediente_links:
             quantidade = -1 * ingrediente_link.quantidade * float(payload.quantidade_receita)
             repository.create(session, repository.Entities.ESTOQUE, {
@@ -115,7 +115,7 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
     return redirect_back(request, message='Movimentação criada com sucesso!')
 
 
-@ router.post('/excluir', include_in_schema=False)
+@router.post('/excluir', include_in_schema=False)
 async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     selecionados_ids = selecionados_ids.split(',')
     for id in selecionados_ids:
@@ -123,7 +123,7 @@ async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str 
     return redirect_back(request, message=f'{len(selecionados_ids)} registros excluídos com sucesso!')
 
 
-@ router.post('/atualizar', include_in_schema=False)
+@router.post('/atualizar', include_in_schema=False)
 async def post_estoques_atualizar(request: fastapi.Request, payload: inputs.EstoqueAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.update(
         session=session,

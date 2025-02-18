@@ -1,3 +1,5 @@
+import json
+
 import fastapi
 from sqlmodel import Session
 
@@ -9,33 +11,6 @@ from src.templates.context import Button, Context
 from src.utils import redirect_back
 
 router = fastapi.APIRouter(prefix='/ingredientes', dependencies=[auth.HEADER_AUTH])
-context_header = Context.Header(
-    pretitle='Registros',
-    title='Ingredientes',
-    symbol='package_2',
-    buttons=[
-        Button(
-            content='Excluír Selecionados',
-            classname='btn',
-            symbol='delete',
-            attributes={
-                'disabled': 'true',
-                'data-bs-toggle': 'modal',
-                'data-bs-target': '#modalDeleteIngrediente',
-                'id': 'btn-excluir-selecionados'
-            }
-        ),
-        Button(
-            content='Criar Ingrediente',
-            classname='btn btn-success',
-            symbol='add',
-            attributes={
-                'data-bs-toggle': 'modal',
-                'data-bs-target': '#modalCreateIngrediente'
-            }
-        )
-    ]
-)
 
 
 @router.get('/', include_in_schema=False)
@@ -46,6 +21,38 @@ async def get_ingredientes_index(request: fastapi.Request, session: Session = DB
     table_data = db_ingredientes
     table_no_result = 'Nenhum registro encontrado'
     table_modal = '#modalEditIngrediente'
+
+    context_header = Context.Header(
+        pretitle='Registros',
+        title='Ingredientes',
+        symbol='package_2',
+        buttons=[
+            Button(
+                content='Excluír Selecionados',
+                classname='btn',
+                symbol='delete',
+                attributes={
+                    'disabled': 'true',
+                    'data-bs-toggle': 'modal',
+                    'data-bs-target': '#modalConfirm',
+                    'data-bs-payload': json.dumps({
+                        'action': str(request.url_for('post_ingredientes_excluir')),
+                        '.text-secondary': 'Excluir ingredientes selecionados?'
+                    }),
+                    'id': 'btn-excluir-selecionados'
+                }
+            ),
+            Button(
+                content='Criar Ingrediente',
+                classname='btn btn-success',
+                symbol='add',
+                attributes={
+                    'data-bs-toggle': 'modal',
+                    'data-bs-target': '#modalCreateIngrediente'
+                }
+            )
+        ]
+    )
 
     return render(
         session=session,
@@ -91,7 +98,12 @@ async def post_ingredientes_atualizar(request: fastapi.Request, payload: inputs.
 
 
 @router.post('/excluir', include_in_schema=False)
-async def post_ingredientes_excluir(request: fastapi.Request, id: int = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.delete(session, repository.Entities.RECEITA_INGREDIENTE, {'ingrediente_id': id})
-    repository.delete(session, repository.Entities.INGREDIENTE, {'id': id})
-    return redirect_back(request, message='Ingrediente excluído com sucesso!')
+async def post_ingredientes_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    selecionados_ids = selecionados_ids.split(',')
+    for id in selecionados_ids:
+        try:
+            repository.delete(session, repository.Entities.RECEITA_INGREDIENTE, {'ingrediente_id': id})
+        except ValueError:
+            pass
+        repository.delete(session, repository.Entities.INGREDIENTE, {'id': id})
+    return redirect_back(request, message=f'{len(selecionados_ids)} ingredientes excluídos com sucesso!')
