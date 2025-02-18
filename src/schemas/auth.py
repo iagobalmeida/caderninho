@@ -12,8 +12,8 @@ class SessaoAutenticada(BaseModel):
     email: str = None
     dono: bool = None
     administrador: bool = False
-    organizacao_id: int = None
-    organizacao_descricao: str = None
+    organizacao_id: Optional[int] = None
+    organizacao_descricao: Optional[str] = None
     expires: Optional[float] = None
 
     @classmethod
