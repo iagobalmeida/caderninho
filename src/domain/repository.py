@@ -145,12 +145,12 @@ def get_venda_qr_code(session: DBSessaoAutenticada, venda_id: int) -> str:
 def get_fluxo_caixa(session: DBSessaoAutenticada) -> Tuple[float, float, float]:
     query_entradas = select(func.sum(Venda.valor))
     if not session.sessao_autenticada.administrador:
-        query_entradas.filter(text(f'organizacao_id == {session.sessao_autenticada.organizacao_id}'))
+        query_entradas.filter(Venda.organizacao_id == session.sessao_autenticada.organizacao_id)
     entradas = session.exec(query_entradas).first()
 
     query_saidas = select(func.sum(Estoque.valor_pago))
     if not session.sessao_autenticada.administrador:
-        query_saidas.filter(text(f'organizacao_id == {session.sessao_autenticada.organizacao_id}'))
+        query_entradas.filter(Estoque.organizacao_id == session.sessao_autenticada.organizacao_id)
     saidas = session.exec(query_saidas).first()
 
     if not entradas and entradas != 0:
