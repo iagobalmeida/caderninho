@@ -48,7 +48,7 @@ def get(
             else:
                 query = query.filter(entity.value.__dict__[key] == value)
 
-    if getattr(session, 'sessao_autenticada') and not ignore_validations:
+    if getattr(session, 'sessao_autenticada', False) and not ignore_validations:
         if not session.sessao_autenticada.administrador and entity != Entities.ORGANIZACAO:
             query = query.filter(text(f'organizacao_id = {session.sessao_autenticada.organizacao_id}'))
 
