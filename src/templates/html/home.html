@@ -11,13 +11,15 @@
                 <h5 class="card-title cursor-pointer">
                     {{ material_symbol('qr_code') | safe }}
                     QR PIX da última venda
-                    <small class="text-secondary ms-auto">Clique para exibir</small>
+                    {% if pix_qr_code %}
+                        <small class="text-secondary ms-auto">Clique para exibir</small>
+                    {% endif %}
                 </h5>
             </div>
             <form class="card-body" method="POST" action="{{request.url_for('post_vendas_marcar_recebido')}}">
                 <input type="hidden" name="selecionados_ids" value="{{pix_venda.id}}">
                 <p>{{pix_mensagem | safe}}</p>
-                {% if not pix_venda.recebido %}
+                {% if pix_qr_code and not pix_venda.recebido %}
                     <button class="btn btn-success">
                         {{material_symbol('done_all') | safe}}
                         Marcar como Recebido
