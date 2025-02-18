@@ -7,6 +7,7 @@ from logging import getLogger
 import fastapi
 import fastapi.security
 from fastapi.exceptions import HTTPException, RequestValidationError
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
@@ -59,6 +60,7 @@ class CacheControlMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(CacheControlMiddleware)
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 db.init()
 
