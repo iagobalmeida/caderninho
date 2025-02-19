@@ -1,6 +1,7 @@
 import os
 
 from fastapi import Depends, Request
+from sqlalchemy import text
 from sqlmodel import SQLModel, create_engine
 
 from src.schemas.auth import DBSessaoAutenticada
@@ -24,6 +25,10 @@ def init():
 
 
 def reset():
+    with engine.connect() as conn:
+        conn.execute(text("DROP TABLE IF EXISTS receitaingredientelink CASCADE;"))
+        conn.execute(text("DROP TABLE IF EXISTS receitainsumolink CASCADE;"))
+        conn.commit()
     SQLModel.metadata.drop_all(bind=engine)
     SQLModel.metadata.create_all(bind=engine)
     return True
