@@ -28,6 +28,9 @@
                         <img src="{{pix_qr_code}}" alt="QR Code" style="max-height: 300px" class="mt-3 rounded">
                     </div>
                 {% endif %}
+                {% if pix_mensagem and not pix_qr_code %}
+                    <p class="text-danger">É necessário cadastrar uma chave PIX em <code class="text-red">Organização</code>.</p>
+                {% endif %}
             </form>
         </div>
     </div>
