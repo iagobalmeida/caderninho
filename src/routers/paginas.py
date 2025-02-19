@@ -6,7 +6,7 @@ from src.db import DBSESSAO_DEP
 from src.domain import repository
 from src.templates import render
 
-router = fastapi.APIRouter(prefix='', dependencies=[auth.HEADER_AUTH])
+router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
 
 
 @router.get('/home', include_in_schema=False, dependencies=[auth.HEADER_AUTH])

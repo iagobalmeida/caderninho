@@ -10,7 +10,7 @@ from src.templates import render
 from src.templates.context import Button, Context
 from src.utils import redirect_back
 
-router = fastapi.APIRouter(prefix='/vendas', dependencies=[auth.HEADER_AUTH])
+router = fastapi.APIRouter(prefix='/app/vendas', dependencies=[auth.HEADER_AUTH])
 
 
 @router.get('/', include_in_schema=False)

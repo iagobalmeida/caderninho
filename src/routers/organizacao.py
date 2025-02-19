@@ -9,7 +9,7 @@ from src.templates import render
 from src.templates.context import Context
 from src.utils import redirect_back
 
-router = fastapi.APIRouter(prefix='/organizacao', dependencies=[auth.HEADER_AUTH])
+router = fastapi.APIRouter(prefix='/app/organizacao', dependencies=[auth.HEADER_AUTH])
 context_header = Context.Header(
     pretitle='Organização',
     title='Organização',

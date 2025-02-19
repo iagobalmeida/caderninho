@@ -1,4 +1,4 @@
-from typing import Dict, List, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
@@ -35,7 +35,7 @@ class Context(TypedDict):
 
     class Breadcrumb(TypedDict):
         label: str
-        url: str
+        url: Optional[str] = None
 
     data_bs_theme: str = 'dark'
     title: str = 'Caderninho'
@@ -66,12 +66,13 @@ class Context(TypedDict):
         if request.url.port:
             base_url = f"{base_url}:{request.base_url.port}"
         breadcrumbs = [
-            Context.Breadcrumb(
-                label='Home',
-                url=request.url_for('get_home')
-            )
+            # Context.Breadcrumb(
+            #     label='Home',
+            #     url=request.url_for('get_home')
+            # )
         ]
         current_path = ""
+        steps = 0
         for b in request.url.path.split('/'):
             if not b:
                 continue
@@ -80,9 +81,10 @@ class Context(TypedDict):
             breadcrumbs.append(
                 Context.Breadcrumb(
                     label=b,
-                    url=f'{base_url}/{current_path}'
+                    url=f'{base_url}/{current_path}/' if steps else None
                 )
             )
+            steps += 1
         return breadcrumbs
 
 

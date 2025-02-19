@@ -114,6 +114,7 @@ class Estoque(RegistroOrganizacao, table=True):
     ingrediente: "Ingrediente" = Relationship(back_populates="estoque_links")
     quantidade: Optional[float] = Field(default=0)
     valor_pago: Optional[float] = Field(default=0)
+    organizacao: "Organizacao" = Relationship()
 
     @classmethod
     def columns(self):
@@ -157,6 +158,7 @@ class Venda(RegistroOrganizacao, table=True):
     descricao: str
     valor: float
     recebido: bool = Field(default=False)
+    organizacao: "Organizacao" = Relationship()
 
     @classmethod
     def columns(self):
@@ -242,7 +244,7 @@ class Ingrediente(RegistroOrganizacao, table=True):
         base_dict = self.model_dump()
         base_dict['#usado_em'] = [
             f'''
-                <a href="/receitas/{r.receita.id}">
+                <a href="/app/receitas/{r.receita.id}">
                     <div class="card">
                         <div class="card-body">
                             {r.receita.nome}<br>
@@ -276,6 +278,7 @@ class Receita(RegistroOrganizacao, table=True):
     nome: str = Field(index=True, unique=True)
     peso_unitario: float = 0
     porcentagem_lucro: int = 33
+    organizacao: "Organizacao" = Relationship()
 
     ingrediente_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='receita')
 
@@ -309,7 +312,7 @@ class Receita(RegistroOrganizacao, table=True):
 
     @property
     def href(self):
-        return f'/receitas/{self.id}'
+        return f'/app/receitas/{self.id}'
 
     @validates('nome')
     def convert_upper(self, key, value):

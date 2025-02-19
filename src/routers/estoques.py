@@ -10,7 +10,7 @@ from src.templates import render
 from src.templates.context import Button, Context
 from src.utils import redirect_back
 
-router = fastapi.APIRouter(prefix='/estoques', dependencies=[auth.HEADER_AUTH])
+router = fastapi.APIRouter(prefix='/app/estoques', dependencies=[auth.HEADER_AUTH])
 
 
 @router.get('/', include_in_schema=False)
@@ -20,7 +20,7 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
         filters.update(data_inicio=filter_data_inicio)
     if filter_data_final:
         filters.update(data_final=filter_data_final)
-    if filter_ingrediente_id:
+    if filter_ingrediente_id >= 0:
         filters.update(ingrediente_id=filter_ingrediente_id)
 
     db_estoques, db_estoques_pages, db_estoques_count = repository.get(session, repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)

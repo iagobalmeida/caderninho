@@ -5,7 +5,7 @@ from src.domain import inputs, repository
 from src.schemas.auth import DBSessaoAutenticada
 from src.utils import redirect_back
 
-router = fastapi.APIRouter(prefix='/auth')
+router = fastapi.APIRouter(prefix='/app/auth')
 
 
 @router.post('/', include_in_schema=False)

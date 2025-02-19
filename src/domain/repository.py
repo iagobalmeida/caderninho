@@ -50,13 +50,15 @@ def get(
 
     if getattr(session, 'sessao_autenticada', False) and not ignore_validations:
         if not session.sessao_autenticada.administrador and entity != Entities.ORGANIZACAO:
-            query = query.filter(getattr(entity.value.organizacao_id) == session.sessao_autenticada.organizacao_id)
+            query = query.filter(entity.value.organizacao_id == session.sessao_autenticada.organizacao_id)
 
     if order_by:
         if desc:
             query = query.order_by(entity.value.__dict__[order_by].desc())
         else:
             query = query.order_by(entity.value.__dict__[order_by])
+
+    print(f'{filters} {query}')
 
     if first:
         return session.exec(query).first(), None, None

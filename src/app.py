@@ -65,17 +65,17 @@ app.add_middleware(GZipMiddleware, minimum_size=500)
 db.init()
 
 
-@app.get('/', include_in_schema=False)
+@app.get('/app', include_in_schema=False)
 async def get_index(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
     return render(request, 'autenticacao/login.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
-@app.get('/registrar', include_in_schema=False)
+@app.get('/app/registrar', include_in_schema=False)
 async def get_registrar(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
     return render(request, 'autenticacao/criar_conta.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
-@app.post('/registrar', include_in_schema=False)
+@app.post('/app/registrar', include_in_schema=False)
 async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
     template_name = 'autenticacao/login.html'
     message = None
@@ -101,12 +101,12 @@ async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar 
     return render(request, template_name, context={'error': error, 'message': message, 'data_bs_theme': 'auto'})
 
 
-@app.get('/recuperar_senha', include_in_schema=False)
+@app.get('/app/recuperar_senha', include_in_schema=False)
 async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
     return render(request, 'autenticacao/recuperar_senha.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
-@app.post('/recuperar_senha', include_in_schema=False)
+@app.post('/app/recuperar_senha', include_in_schema=False)
 async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
     db_usuario, _, _ = repository.get(session, repository.Entities.USUARIO, {'email': email}, first=True)
     if not db_usuario:

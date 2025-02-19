@@ -83,3 +83,7 @@ a[disabled="true"] {
     --tblr-backdrop-bg: black;
     --tblr-backdrop-opacity: 0.5;
 }
+
+html {
+    overflow-y: scroll;
+}
