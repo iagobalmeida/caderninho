@@ -13,7 +13,7 @@
             <label for="descricao" class="form-label required">Tipo</label>
             <select name="descricao" class="form-select">
               <option value="Compra">Compra</option>
-              <option value="Consumo Ingrediente">Consumo Ingrediente</option>
+              <option value="Consumo Insumo">Consumo Insumo</option>
               <option value="Uso em Receita">Uso em Receita</option>
               <option value="Outros">Outros</option>
             </select>
@@ -26,20 +26,20 @@
               <input name="valor_pago" type="number" step="any" class="form-control text-end" min="1" />
             </div>
           </div>
-          <div id="datagrid-ingrediente">
+          <div id="datagrid-insumo">
             <div class="mb-3">
-              <label for="ingrediente_id" class="form-label required">Ingrediente</label>
-              <select class="form-select" name="ingrediente_id">
+              <label for="insumo_id" class="form-label required">Insumo</label>
+              <select class="form-select" name="insumo_id">
                 <option selected value="-1">Selecionar</option>
-                {% for ingrediente in ingredientes %}
-                  <option value="{{ingrediente.id}}" data-custo_p_grama="{{ingrediente.custo_p_grama}}">{{ingrediente.nome | title}}</option>
+                {% for insumo in insumos %}
+                  <option value="{{insumo.id}}" data-custo_p_grama="{{insumo.custo_p_grama}}">{{insumo.nome | title}}</option>
                 {% endfor %}
               </select>
             </div>
-            <div class="mb-3" id="fieldset-quantidade-ingrediente" style="display: none;">
-              <label for="quantidade_ingrediente" class="form-label required">Quantidade</label>
+            <div class="mb-3" id="fieldset-quantidade-insumo" style="display: none;">
+              <label for="quantidade_insumo" class="form-label required">Quantidade</label>
               <div class="input-group input-group-flat">
-                <input type="number" step="any" name="quantidade_ingrediente" class="form-control pe-0" min="1" />
+                <input type="number" step="any" name="quantidade_insumo" class="form-control pe-0" min="1" />
                 <span class="input-group-text"> g </span>
               </div>
             </div>
@@ -76,19 +76,19 @@
   </div>
 
 <script>
-  const fieldSetQuantidadeIngrediente = document.querySelector('#fieldset-quantidade-ingrediente')
+  const fieldSetQuantidadeInsumo = document.querySelector('#fieldset-quantidade-insumo')
   const fieldSetQuantidadeReceita = document.querySelector('#fieldset-quantidade-receita')
   const fieldSetValorPago = document.querySelector('#fieldset-valor_pago');
   const datagridReceita = document.querySelector('#datagrid-receita');
-  const datagridIngrediente = document.querySelector('#datagrid-ingrediente');
+  const datagridInsumo = document.querySelector('#datagrid-insumo');
   const datagridDesricaoCustomizada = document.querySelector('#datagrid-descricao-customizada');
 
-  document.querySelector('#modalCreateEstoque select[name="ingrediente_id"]').addEventListener('change', function(e) {
+  document.querySelector('#modalCreateEstoque select[name="insumo_id"]').addEventListener('change', function(e) {
     console.log(this.value);
     if(this.value != -1) {
-      fieldSetQuantidadeIngrediente.style.display = 'block';
+      fieldSetQuantidadeInsumo.style.display = 'block';
     } else {
-      fieldSetQuantidadeIngrediente.style.display = 'none';
+      fieldSetQuantidadeInsumo.style.display = 'none';
     }
   });
 
@@ -104,15 +104,15 @@
   document.querySelector('#modalCreateEstoque select[name="descricao"]').addEventListener('change', function (e) {
     if(this.value == 'Uso em Receita') {
       datagridReceita.style.display = 'grid';
-      datagridIngrediente.style.display = 'none';
+      datagridInsumo.style.display = 'none';
       datagridDesricaoCustomizada.style.display = 'none';
-    } else if(this.value == 'Consumo Ingrediente' || this.value == 'Compra') {
+    } else if(this.value == 'Consumo Insumo' || this.value == 'Compra') {
       datagridReceita.style.display = 'none';
-      datagridIngrediente.style.display = 'grid';
+      datagridInsumo.style.display = 'grid';
       datagridDesricaoCustomizada.style.display = 'none';
     } else {
       datagridReceita.style.display = 'none';
-      datagridIngrediente.style.display = 'none';
+      datagridInsumo.style.display = 'none';
       datagridDesricaoCustomizada.style.display = 'grid';
     }
 

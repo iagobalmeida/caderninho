@@ -30,7 +30,7 @@ def __status_html(classname: str, content: str, material_symbol: str = None):
     '''
 
 
-def templates_filter_format_stock(input: float, converter_kg: bool = False, converter_kg_sempre: bool = False, icon_positive: str = 'check', icon_zero: str = 'more_horiz', icon_negative: str = 'close'):
+def templates_filter_format_stock(input: float, converter_kg: bool = False, converter_kg_sempre: bool = False, icon_positive: str = 'check', icon_zero: str = 'more_horiz', icon_negative: str = 'close', unity: str = 'g'):
     material_symbol = icon_positive
     classname = 'status-success'
     if input < 0:
@@ -39,18 +39,18 @@ def templates_filter_format_stock(input: float, converter_kg: bool = False, conv
     elif input == 0:
         material_symbol = icon_zero
         classname = 'status-secondary'
-    input, unity = __unit_converter(input, 'g', converter_kg, converter_kg_sempre)
+    input, unity = __unit_converter(input, unity, converter_kg, converter_kg_sempre)
 
-    return __status_html(classname, f'{input} {unity}', material_symbol)
+    return __status_html(classname, f'{input} {unity}.', material_symbol)
 
 
 def templates_filter_format_stock_movement(input: float):
     return templates_filter_format_stock(input, icon_positive='arrow_upward', icon_negative='arrow_downward')
 
 
-def templates_filter_format_quantity(input: float, converter_kg: bool = False, converter_kg_sempre: bool = False):
-    input, unity = __unit_converter(input, 'g', converter_kg, converter_kg_sempre)
-    return __status_html('status-primary', f'{input} {unity}')
+def templates_filter_format_quantity(input: float, converter_kg: bool = False, converter_kg_sempre: bool = False, unity: str = 'g'):
+    input, unity = __unit_converter(input, unity, converter_kg, converter_kg_sempre)
+    return __status_html('status-primary', f'{input} {unity}.')
 
 
 def templates_filter_format_reais(input: float):

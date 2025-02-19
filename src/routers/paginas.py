@@ -12,7 +12,7 @@ router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
 @router.get('/home', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
 async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     db_receitas = repository.count_all(session, repository.Entities.RECEITA)
-    db_ingredientes = repository.count_all(session, repository.Entities.INGREDIENTE)
+    db_insumos = repository.count_all(session, repository.Entities.INGREDIENTE)
     db_estoques = repository.count_all(session, repository.Entities.ESTOQUE)
     db_vendas = repository.count_all(session, repository.Entities.VENDA)
 
@@ -31,7 +31,7 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
 
     return render(request, 'home.html', session, context={
         'len_receitas': db_receitas,
-        'len_ingredientes': db_ingredientes,
+        'len_insumos': db_insumos,
         'estoques': db_estoques,
         'vendas': db_vendas,
         'pix_qr_code': pix_qr_code,

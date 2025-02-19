@@ -14,7 +14,7 @@ Essa aplicação não seria possível seu a existência de:
 
 No lugar de tabelas do excel, você pode usar o KDerninho para:
 - Estimar custo, faturamento e lucro de receitas de forma dinâmica
-- Gerenciar o estoque de seus ingredientes e outros insumos
+- Gerenciar o estoque de seus insumos e outros insumos
 - Gerenciar seu fluxo de caixa cadastrando compras, produção de receitas e outros gastos em geral
 - Compartilhar essas informações com outros usuários de sua organização (⚙ Em desenvolvimento)
 - Exportar e importar dados em CSV (⚙ Em desenvolvimento)
@@ -42,27 +42,27 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Permitir valores quebrados em inputs
 - [X] Cadastrar movimentação de estoque a partir de `receita_id` e `quantidade_produzida`
 - [X] Cadastrar quantidade positiva/negativa em estoque a partir de descrição
-- [X] Remover tela `Ingredientes` (confusa)
+- [X] Remover tela `Insumos` (confusa)
 - [X] Usar clique em linha em vez de `editar/excluir`
 - [X] Adicionar checkbox com delete massivo em tabelas
     - [X] Vendas
     - [X] Estoques
     - [X] Receitas
         - [X] Listagem
-        - [X] Ingredientes
+        - [X] Insumos
 - [X] Adicionar opção excluir em modal de `editar`
     - [X] Vendas
     - [X] Estoque
     - [X] Receitas
         - [X] Listagem
-        - [X] Ingredientes
+        - [X] Insumos
 
 ## vb1.1
 - [X] Melhorar UX para mobile
 - [X] Bloquear acesso sem login (decorator)
 - [X] Padronizar botão `Ações` contendo `Criar` e `Apagar`
 - [X] Adicionar confirmação para sair
-- [X] Encontrar lugar para editar nome de ingrediente
+- [X] Encontrar lugar para editar nome de insumo
 - [X] Maior robustes em delete/update para garantir organization_id
 - [X] Autenticação em fluxos de `seed`
 - [X] Ajustar redirect de erro
@@ -139,12 +139,12 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
   - [X] Modularizar modal
   - [X] Remoção `.../table.html`
   - [X] Contempla `href` para Receitas
-  - [X] Contempla "ingredientes" de Receita
+  - [X] Contempla "insumos" de Receita
 
 # v1.2
-- [X] Gestão de ingredientes
-  - [X] Exibir receitas associadas em Ingrediente
-  - [X] Exibir estoque atual em ingredientes
+- [X] Gestão de insumos
+  - [X] Exibir receitas associadas em Insumo
+  - [X] Exibir estoque atual em insumos
 - [X] Configurações em Organização
   - [X] Card colapsavel de configurações
   - [X] Campos JSON em banco de dados
@@ -155,9 +155,17 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Collapse em QR Code home
 - [X] Reorganização de templates
 - [X] Paginação em tabelas
-- [ ] Reorganização de roteadores
-  - [ ] Criação de Schemas
-  - [ ] Criação de Services (?)
+- [X] Reorganização de roteadores
+  - [X] Criação de Schemas
+
+# v1.3
+- [X] Ingredientes viraram Insumos
+  - [X] Permitir unidades em insumos (gramas e unidade)
+  - [X] Atualizar calculo de receitas
+- [X] Ajustar contexto e sessão
+- [X] Ajustar informações dashboard
+
+# v1.4
 - [ ] Filtro em tabelas
 - [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV

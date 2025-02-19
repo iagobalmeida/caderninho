@@ -10,21 +10,21 @@ from src.templates import render
 from src.templates.context import Button, Context
 from src.utils import redirect_back
 
-router = fastapi.APIRouter(prefix='/app/ingredientes', dependencies=[auth.HEADER_AUTH])
+router = fastapi.APIRouter(prefix='/app/insumos', dependencies=[auth.HEADER_AUTH])
 
 
 @router.get('/', include_in_schema=False)
-async def get_ingredientes_index(request: fastapi.Request, session: Session = DBSESSAO_DEP):
-    db_ingredientes, db_ingredientes_pages, db_ingredientes_count = repository.get(session, repository.Entities.INGREDIENTE)
+async def get_insumos_index(request: fastapi.Request, session: Session = DBSESSAO_DEP):
+    db_insumos, db_insumos_pages, db_insumos_count = repository.get(session, repository.Entities.INGREDIENTE)
 
     table_columns = repository.Entities.INGREDIENTE.value.columns()
-    table_data = db_ingredientes
+    table_data = db_insumos
     table_no_result = 'Nenhum registro encontrado'
-    table_modal = '#modalEditIngrediente'
+    table_modal = '#modalEditInsumo'
 
     context_header = Context.Header(
         pretitle='Registros',
-        title='Ingredientes',
+        title='Insumos',
         symbol='package_2',
         buttons=[
             Button(
@@ -36,19 +36,19 @@ async def get_ingredientes_index(request: fastapi.Request, session: Session = DB
                     'data-bs-toggle': 'modal',
                     'data-bs-target': '#modalConfirm',
                     'data-bs-payload': json.dumps({
-                        'action': str(request.url_for('post_ingredientes_excluir')),
-                        '.text-secondary': 'Excluir ingredientes selecionados?'
+                        'action': str(request.url_for('post_insumos_excluir')),
+                        '.text-secondary': 'Excluir insumos selecionados?'
                     }),
                     'id': 'btn-excluir-selecionados'
                 }
             ),
             Button(
-                content='Criar Ingrediente',
+                content='Criar Insumo',
                 classname='btn btn-success',
                 symbol='add',
                 attributes={
                     'data-bs-toggle': 'modal',
-                    'data-bs-target': '#modalCreateIngrediente'
+                    'data-bs-target': '#modalCreateInsumo'
                 }
             )
         ]
@@ -64,24 +64,25 @@ async def get_ingredientes_index(request: fastapi.Request, session: Session = DB
             'table_data': table_data,
             'table_no_result': table_no_result,
             'table_modal': table_modal,
-            'table_pages': db_ingredientes_pages,
-            'table_count': db_ingredientes_count,
+            'table_pages': db_insumos_pages,
+            'table_count': db_insumos_count,
         }
     )
 
 
 @router.post('/', include_in_schema=False)
-async def post_ingredientes_index(request: fastapi.Request, payload: inputs.IngredienteCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+async def post_insumos_index(request: fastapi.Request, payload: inputs.InsumoCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.create(session, repository.Entities.INGREDIENTE, {
         'nome': payload.nome,
         'peso': payload.peso,
-        'custo': payload.custo
+        'custo': payload.custo,
+        'unidade': payload.unidade
     })
-    return redirect_back(request, message='Ingrediente criado com sucesso!')
+    return redirect_back(request, message='Insumo criado com sucesso!')
 
 
 @router.post('/atualizar', include_in_schema=False)
-async def post_ingredientes_atualizar(request: fastapi.Request, payload: inputs.IngredienteAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+async def post_insumos_atualizar(request: fastapi.Request, payload: inputs.InsumoAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     repository.update(
         session=session,
         entity=repository.Entities.INGREDIENTE,
@@ -94,16 +95,16 @@ async def post_ingredientes_atualizar(request: fastapi.Request, payload: inputs.
             'custo': payload.custo
         }
     )
-    return redirect_back(request, message='Ingrediente atualizado com sucesso!')
+    return redirect_back(request, message='Insumo atualizado com sucesso!')
 
 
 @router.post('/excluir', include_in_schema=False)
-async def post_ingredientes_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+async def post_insumos_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     selecionados_ids = selecionados_ids.split(',')
     for id in selecionados_ids:
         try:
-            repository.delete(session, repository.Entities.RECEITA_INGREDIENTE, {'ingrediente_id': id})
+            repository.delete(session, repository.Entities.RECEITA_INGREDIENTE, {'insumo_id': id})
         except ValueError:
             pass
         repository.delete(session, repository.Entities.INGREDIENTE, {'id': id})
-    return redirect_back(request, message=f'{len(selecionados_ids)} ingredientes excluídos com sucesso!')
+    return redirect_back(request, message=f'{len(selecionados_ids)} insumos excluídos com sucesso!')

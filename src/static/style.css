@@ -84,6 +84,6 @@ a[disabled="true"] {
     --tblr-backdrop-opacity: 0.5;
 }
 
-html {
+html:not(:has(.modal.show)) {
     overflow-y: scroll;
 }

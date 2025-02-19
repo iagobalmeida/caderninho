@@ -81,7 +81,7 @@ class Context(TypedDict):
             breadcrumbs.append(
                 Context.Breadcrumb(
                     label=b,
-                    url=f'{base_url}/{current_path}/' if steps else None
+                    url=f'{base_url}/{current_path}' if steps else None
                 )
             )
             steps += 1
@@ -93,7 +93,7 @@ BASE_NAVBAR_LINKS = [
     ('Vendas', 'shopping_cart', 'get_vendas_index', {'page': 1}),
     ('Estoque', 'inventory_2', 'get_estoques_index'),
     ('Receitas', 'library_books', 'get_receitas_index'),
-    ('Ingredientes', 'package_2', 'get_ingredientes_index'),
+    ('Insumos', 'package_2', 'get_insumos_index'),
     ('Organização', 'groups', 'get_organizacao_index'),
 ]
 
@@ -121,11 +121,11 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
     if session and session.sessao_autenticada:
         base_context.update(usuario=session.sessao_autenticada)
 
-        db_ingredientes, _, _ = repository.get(session, repository.Entities.INGREDIENTE)
+        db_insumos, _, _ = repository.get(session, repository.Entities.INGREDIENTE)
         db_receitas, _, _ = repository.get(session, repository.Entities.RECEITA)
         entradas, saidas, caixa = repository.get_fluxo_caixa(session)
 
-        base_context.update(ingredientes=db_ingredientes)
+        base_context.update(insumos=db_insumos)
         base_context.update(receitas=db_receitas)
         base_context.update(entradas=entradas)
         base_context.update(saidas=saidas)

@@ -14,18 +14,18 @@ router = fastapi.APIRouter(prefix='/app/estoques', dependencies=[auth.HEADER_AUT
 
 
 @router.get('/', include_in_schema=False)
-async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
+async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
     filters = {}
     if filter_data_inicio:
         filters.update(data_inicio=filter_data_inicio)
     if filter_data_final:
         filters.update(data_final=filter_data_final)
-    if filter_ingrediente_id >= 0:
-        filters.update(ingrediente_id=filter_ingrediente_id)
+    if filter_insumo_id >= 0:
+        filters.update(insumo_id=filter_insumo_id)
 
     db_estoques, db_estoques_pages, db_estoques_count = repository.get(session, repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
 
-    db_ingredientes, _, _ = repository.get(session, repository.Entities.INGREDIENTE)
+    db_insumos, _, _ = repository.get(session, repository.Entities.INGREDIENTE)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
 
     context_header = Context.Header(
@@ -77,11 +77,11 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
             'table_modal': table_modal,
             'table_pages': db_estoques_pages,
             'table_count': db_estoques_count,
-            'ingredientes': db_ingredientes,
+            'insumos': db_insumos,
             'entradas': entradas,
             'saidas': saidas,
             'caixa': caixa,
-            'filter_ingrediente_id': filter_ingrediente_id,
+            'filter_insumo_id': filter_insumo_id,
             'filter_data_inicio': filter_data_inicio,
             'filter_data_final': filter_data_final
         }
@@ -92,23 +92,23 @@ async def get_estoques_index(request: fastapi.Request, filter_ingrediente_id: in
 async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if payload.descricao == 'Uso em Receita' and payload.receita_id:
         db_receita, _, _ = repository.get(session, repository.Entities.RECEITA, {'id': id}, first=True)
-        for ingrediente_link in db_receita.ingrediente_links:
-            quantidade = -1 * ingrediente_link.quantidade * float(payload.quantidade_receita)
+        for insumo_link in db_receita.insumo_links:
+            quantidade = -1 * insumo_link.quantidade * float(payload.quantidade_receita)
             repository.create(session, repository.Entities.ESTOQUE, {
                 'descricao': payload.descricao,
-                'ingrediente_id': ingrediente_link.ingrediente_id,
+                'insumo_id': insumo_link.insumo_id,
                 'quantidade': quantidade,
                 'valor_pago': 0
             })
     else:
-        quantidade = float(payload.quantidade_ingrediente) if payload.quantidade_ingrediente else None
+        quantidade = float(payload.quantidade_insumo) if payload.quantidade_insumo else None
         if payload.descricao != 'Compra' and quantidade:
             quantidade = quantidade * -1
         if payload.descricao == 'Outros' and payload.descricao_customizada:
             payload.descricao = payload.descricao_customizada
         repository.create(session, repository.Entities.ESTOQUE, {
             'descricao': payload.descricao,
-            'ingrediente_id': payload.ingrediente_id,
+            'insumo_id': payload.insumo_id,
             'quantidade': quantidade,
             'valor_pago': float(payload.valor_pago) if payload.valor_pago else 0
         })
@@ -135,7 +135,7 @@ async def post_estoques_atualizar(request: fastapi.Request, payload: inputs.Esto
             'descricao':  payload.descricao,
             'valor_pago':  payload.valor_pago,
             'quantidade':  payload.quantidade,
-            'ingrediente_id':  payload.ingrediente_id
+            'insumo_id':  payload.insumo_id
         }
     )
     return redirect_back(request, message='Movimentação atualizada com sucesso!')

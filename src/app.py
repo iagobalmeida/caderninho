@@ -20,7 +20,7 @@ from src.domain import inputs, repository
 from src.modules import send_email
 from src.routers.autenticacao import router as router_autenticacao
 from src.routers.estoques import router as router_estoques
-from src.routers.ingredientes import router as router_ingredientes
+from src.routers.insumos import router as router_insumos
 from src.routers.organizacao import router as router_organizacao
 from src.routers.paginas import router as router_paginas
 from src.routers.receitas import router as router_receitas
@@ -41,7 +41,7 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY, https_only=False)
 
 app.include_router(router_receitas)
-app.include_router(router_ingredientes)
+app.include_router(router_insumos)
 app.include_router(router_estoques)
 app.include_router(router_vendas)
 app.include_router(router_organizacao)

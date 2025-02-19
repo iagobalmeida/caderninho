@@ -61,38 +61,38 @@ class Usuario(RegistroOrganizacao, table=True):
         return base_dict
 
 
-class ReceitaIngredienteLink(RegistroOrganizacao, table=True):
+class ReceitaInsumoLink(RegistroOrganizacao, table=True):
     quantidade: float
     receita_id: Optional[int] = Field(default=None, foreign_key="receita.id")
-    ingrediente_id: Optional[int] = Field(default=None, foreign_key="ingrediente.id")
-    receita: "Receita" = Relationship(back_populates="ingrediente_links")
-    ingrediente: "Ingrediente" = Relationship(back_populates="receita_links")
+    insumo_id: Optional[int] = Field(default=None, foreign_key="insumo.id")
+    receita: "Receita" = Relationship(back_populates="insumo_links")
+    insumo: "Insumo" = Relationship(back_populates="receita_links")
     organizacao: "Organizacao" = Relationship()
 
     @property
-    def ingrediente_custo_p_grama(self):
+    def insumo_custo_p_grama(self):
         if self.organizacao.configuracoes['usar_custo_med']:
-            return self.ingrediente.custo_p_grama_medio
-        return self.ingrediente.custo_p_grama
+            return self.insumo.custo_p_grama_medio
+        return self.insumo.custo_p_grama
 
     @property
     def custo(self):
-        if not self.ingrediente:
+        if not self.insumo:
             return 0
-        return round(self.quantidade * self.ingrediente_custo_p_grama, 2)
+        return round(self.quantidade * self.insumo_custo_p_grama, 2)
 
     @property
     def row(self):
         converter_kg = self.organizacao.configuracoes.get('converter_kg', False)
         converter_kg_sempre = self.organizacao.configuracoes.get('converter_kg_sempre', False)
 
-        col_quantidade = filters.templates_filter_format_quantity(self.quantidade, converter_kg, converter_kg_sempre)
-        col_custo_p_grama = filters.templates_filter_format_reais(self.ingrediente_custo_p_grama)
+        col_quantidade = filters.templates_filter_format_quantity(self.quantidade, converter_kg, converter_kg_sempre, unity=self.insumo.unidade)
+        col_custo_p_grama = filters.templates_filter_format_reais(self.insumo_custo_p_grama)
         col_custo = filters.templates_filter_format_reais(self.custo)
-        col_estoque_atual = filters.templates_filter_format_stock(self.ingrediente.estoque_atual, converter_kg, converter_kg_sempre)
+        col_estoque_atual = filters.templates_filter_format_stock(self.insumo.estoque_atual, converter_kg, converter_kg_sempre, unity=self.insumo.unidade)
 
         return [
-            self.ingrediente.nome,
+            self.insumo.nome,
             col_quantidade,
             col_custo_p_grama,
             col_custo,
@@ -101,17 +101,18 @@ class ReceitaIngredienteLink(RegistroOrganizacao, table=True):
 
     def dict(self):
         base_dict = self.model_dump()
-        base_dict['ingrediente_nome'] = self.ingrediente.nome
-        base_dict['ingrediente_custo'] = self.ingrediente.custo
-        base_dict['ingrediente_peso'] = self.ingrediente.peso
+        base_dict['insumo_nome'] = self.insumo.nome
+        base_dict['insumo_custo'] = self.insumo.custo
+        base_dict['insumo_peso'] = self.insumo.peso
+        base_dict['#input_quantidade_unidade'] = self.insumo.unidade
         return base_dict
 
 
 class Estoque(RegistroOrganizacao, table=True):
     descricao: Optional[str] = Field(default=None)
     data_criacao: datetime = Field(default=datetime.now(), nullable=False)
-    ingrediente_id: Optional[int] = Field(default=None, foreign_key="ingrediente.id")
-    ingrediente: "Ingrediente" = Relationship(back_populates="estoque_links")
+    insumo_id: Optional[int] = Field(default=None, foreign_key="insumo.id")
+    insumo: "Insumo" = Relationship(back_populates="estoque_links")
     quantidade: Optional[float] = Field(default=0)
     valor_pago: Optional[float] = Field(default=0)
     organizacao: "Organizacao" = Relationship()
@@ -122,7 +123,7 @@ class Estoque(RegistroOrganizacao, table=True):
             'Data',
             'Descrição',
             'Valor Pago',
-            'Ingrediente',
+            'Insumo',
             'Quantidade'
         ]
 
@@ -133,9 +134,9 @@ class Estoque(RegistroOrganizacao, table=True):
 
         col_valor_pago = filters.templates_filter_format_reais(self.valor_pago)
 
-        col_ingrediente = '-'
-        if self.ingrediente:
-            col_ingrediente = self.ingrediente.nome
+        col_insumo = '-'
+        if self.insumo:
+            col_insumo = self.insumo.nome
 
         col_quantidade = filters.templates_filter_format_quantity(self.quantidade, converter_kg, converter_kg_sempre)
 
@@ -143,7 +144,7 @@ class Estoque(RegistroOrganizacao, table=True):
             self.data_criacao.strftime(STRFTIME_FORMAT),
             self.descricao,
             col_valor_pago,
-            col_ingrediente,
+            col_insumo,
             col_quantidade
         ]
 
@@ -199,12 +200,13 @@ class Venda(RegistroOrganizacao, table=True):
             return None
 
 
-class Ingrediente(RegistroOrganizacao, table=True):
+class Insumo(RegistroOrganizacao, table=True):
     nome: str = Field(index=True, unique=True)
     peso: float
     custo: float
-    receita_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='ingrediente')
-    estoque_links: List['Estoque'] = Relationship(back_populates='ingrediente')
+    unidade: Optional[str] = 'g'
+    receita_links: List['ReceitaInsumoLink'] = Relationship(back_populates='insumo')
+    estoque_links: List['Estoque'] = Relationship(back_populates='insumo')
     organizacao: "Organizacao" = Relationship()
 
     @classmethod
@@ -213,9 +215,9 @@ class Ingrediente(RegistroOrganizacao, table=True):
             '#',
             'Nome',
             'Custo (R$)',
-            'Peso (g)',
-            'Custo/grama (R$)',
-            'Custo/grama méd. (R$)',
+            'Un./Pct.',
+            'Custo/un. (R$)',
+            'Custo/un. méd. (R$)',
             'Estoque Atual',
         ]
 
@@ -225,10 +227,12 @@ class Ingrediente(RegistroOrganizacao, table=True):
         converter_kg_sempre = self.organizacao.configuracoes.get('converter_kg_sempre', False)
 
         col_custo = filters.templates_filter_format_reais(self.custo)
-        col_peso = filters.templates_filter_format_quantity(self.peso, converter_kg, converter_kg_sempre)
+        col_peso = filters.templates_filter_format_quantity(self.peso, converter_kg, converter_kg_sempre, unity=self.unidade)
+
         col_custo_p_grama = filters.templates_filter_format_reais(self.custo_p_grama)
         col_custo_p_grama_medio = filters.templates_filter_format_reais(self.custo_p_grama_medio)
-        col_estoque = filters.templates_filter_format_stock(self.estoque_atual, converter_kg, converter_kg_sempre)
+
+        col_estoque = filters.templates_filter_format_stock(self.estoque_atual, converter_kg, converter_kg_sempre, unity=self.unidade)
 
         return [
             self.id,
@@ -242,18 +246,23 @@ class Ingrediente(RegistroOrganizacao, table=True):
 
     def dict(self):
         base_dict = self.model_dump()
+        receitas_associadas = []
+        for r in self.receita_links:
+            if not r.receita in receitas_associadas:
+                receitas_associadas.append(r.receita)
+
         base_dict['#usado_em'] = [
             f'''
-                <a href="/app/receitas/{r.receita.id}">
+                <a href="/app/receitas/{r.id}">
                     <div class="card">
                         <div class="card-body">
-                            {r.receita.nome}<br>
+                            {r.nome}<br>
                             <span class="text-muted">Clique para acessar</span>
                         </div>
                     </div>
                 </a>
             '''
-            for r in self.receita_links
+            for r in receitas_associadas
         ]
         base_dict['estoque_atual'] = self.estoque_atual
         return base_dict
@@ -280,7 +289,7 @@ class Receita(RegistroOrganizacao, table=True):
     porcentagem_lucro: int = 33
     organizacao: "Organizacao" = Relationship()
 
-    ingrediente_links: List['ReceitaIngredienteLink'] = Relationship(back_populates='receita')
+    insumo_links: List['ReceitaInsumoLink'] = Relationship(back_populates='receita')
 
     @classmethod
     def columns(self):
@@ -328,14 +337,14 @@ class Receita(RegistroOrganizacao, table=True):
 
     @property
     def custo(self):
-        '''Retorna a soma de custo dos ingredientes usados'''
-        custo = sum([i.custo for i in self.ingrediente_links])
+        '''Retorna a soma de custo dos insumos usados'''
+        custo = sum([i.custo for i in self.insumo_links])
         return round(custo, 2)
 
     @property
     def rendimento(self):
-        '''Retorna a soma da quantiadde dos ingredientes usados (em gramas)'''
-        return max(1, round(sum([i.quantidade for i in self.ingrediente_links]), 2))
+        '''Retorna a soma da quantiadde dos insumos usados (em gramas)'''
+        return max(1, round(sum([i.quantidade for i in self.insumo_links if i.insumo.unidade == 'g']), 2))
 
     @property
     def rendimento_unidades(self):

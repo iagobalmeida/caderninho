@@ -4,8 +4,8 @@ from random import randint
 from sqlmodel import Session
 
 from src.db import engine
-from src.domain.entities import (Estoque, Ingrediente, Organizacao, Receita,
-                                 ReceitaIngredienteLink, Usuario, Venda)
+from src.domain.entities import (Estoque, Insumo, Organizacao, Receita,
+                                 ReceitaInsumoLink, Usuario, Venda)
 
 
 def try_add(obj):
@@ -34,24 +34,24 @@ def main():
         administrador=True
     ))
 
-    ingredientes = [1, 2, 3, 4]
+    insumos = [1, 2, 3, 4]
 
-    try_add(Ingrediente(organizacao_id=1, id=1, nome='Açúcar', peso=1000, custo=14))
-    try_add(Ingrediente(organizacao_id=1, id=2, nome='Manteiga', peso=1000, custo=40))
-    try_add(Ingrediente(organizacao_id=1, id=3, nome='Chocolate', peso=1000, custo=57))
-    try_add(Ingrediente(organizacao_id=1, id=4, nome='Farinha', peso=1000, custo=4))
+    try_add(Insumo(organizacao_id=1, id=1, nome='Açúcar', peso=1000, custo=14))
+    try_add(Insumo(organizacao_id=1, id=2, nome='Manteiga', peso=1000, custo=40))
+    try_add(Insumo(organizacao_id=1, id=3, nome='Chocolate', peso=1000, custo=57))
+    try_add(Insumo(organizacao_id=1, id=4, nome='Farinha', peso=1000, custo=4))
 
     try_add(Receita(organizacao_id=1, id=1, nome='Cookies', peso_unitario=100))
 
     try_add(Receita(organizacao_id=3, id=2, nome='Cookies Apenas ADMIN Vê', peso_unitario=100))
 
-    for __ingrediente in ingredientes:
-        try_add(ReceitaIngredienteLink(organizacao_id=1, quantidade=100, receita_id=1, ingrediente_id=__ingrediente))
+    for __insumo in insumos:
+        try_add(ReceitaInsumoLink(organizacao_id=1, quantidade=100, receita_id=1, insumo_id=__insumo))
         estoque_quantidade = randint(250, 2000) - randint(250, 2000)
         try_add(Estoque(
             organizacao_id=1,
             descricao='Compra' if estoque_quantidade > 0 else 'Uso em receita',
-            ingrediente_id=__ingrediente,
+            insumo_id=__insumo,
             quantidade=estoque_quantidade,
             valor_pago=randint(1, 10) if estoque_quantidade > 0 else 0
         ))

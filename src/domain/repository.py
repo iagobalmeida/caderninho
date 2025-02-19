@@ -4,23 +4,25 @@ from typing import Tuple
 
 from sqlmodel import func, select
 
-from src.domain.entities import (Estoque, Ingrediente, Organizacao, Receita,
-                                 ReceitaIngredienteLink, Usuario, Venda)
+from src.domain.entities import (Estoque, Insumo, Organizacao, Receita,
+                                 ReceitaInsumoLink, Usuario, Venda)
 from src.schemas.auth import DBSessaoAutenticada
 
 
 class Entities(Enum):
     ORGANIZACAO = Organizacao
     USUARIO = Usuario
-    RECEITA_INGREDIENTE = ReceitaIngredienteLink
+    RECEITA_INGREDIENTE = ReceitaInsumoLink
     ESTOQUE = Estoque
     VENDA = Venda
-    INGREDIENTE = Ingrediente
+    INGREDIENTE = Insumo
     RECEITA = Receita
 
 
 def count_all(session: DBSessaoAutenticada, entity: Entities):
     count_query = select(func.count()).select_from(entity.value)
+    if not session.sessao_autenticada.administrador:
+        count_query = count_query.filter(entity.value.organizacao_id == session.sessao_autenticada.organizacao_id)
     return session.exec(count_query).one()
 
 
@@ -57,8 +59,6 @@ def get(
             query = query.order_by(entity.value.__dict__[order_by].desc())
         else:
             query = query.order_by(entity.value.__dict__[order_by])
-
-    print(f'{filters} {query}')
 
     if first:
         return session.exec(query).first(), None, None

@@ -2,11 +2,11 @@
 
 {% include 'receitas/modal_create.html' %}
 
-{% include 'receitas/modal_ingredientes_incluir.html' %}
-{% include 'receitas/modal_ingredientes_remover.html' %}
-{% include 'receitas/modal_ingredientes_atualizar.html' %}
+{% include 'receitas/modal_insumos_incluir.html' %}
+{% include 'receitas/modal_insumos_remover.html' %}
+{% include 'receitas/modal_insumos_atualizar.html' %}
 
-{% include 'ingredientes/modal_create.html' %}
+{% include 'insumos/modal_create.html' %}
 
 {% block content %}
 <div class="col-12">
@@ -136,18 +136,18 @@
   </div>
 </div>
 <div class="col-12">
-  <div class="card" id="cardIngredientes">
+  <div class="card" id="cardInsumos">
     <div class="card-header">
       <h5 class="card-title">
         {{ material_symbol('package_2') | safe }}
-        Ingredientes
+        Insumos
       </h5>
       <div class="ms-auto d-none d-md-flex btn-list">
-        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaIngredienteModal">
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
           {{material_symbol('chevron_left') | safe }}
-          Incluir Ingrediente
+          Incluir Insumo
         </button>
-        <button class="btn" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_ingredientes_remover')}}", ".text-secondary": "Remover ingredientes selecionados?"}'>
+        <button class="btn" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_insumos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
           {{material_symbol('remove') | safe }}
           Remover Selecionados
         </button>
@@ -155,11 +155,11 @@
       <div class="dropdown ms-auto d-md-none">
         <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
-          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaIngredienteModal">
+          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
             {{material_symbol('chevron_left') | safe }}
-            Incluir Ingrediente
+            Incluir Insumo
           </button>
-          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_ingredientes_remover')}}", ".text-secondary": "Remover ingredientes selecionados?"}'>
+          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_insumos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
             {{material_symbol('remove') | safe }}
             Remover Selecionados
           </button>
@@ -171,40 +171,4 @@
   </div>
 </div>
 {% endblock %} {% block script %}
-<script>
-  window.addEventListener("load", () => {
-    const inputQuantidade = document.querySelector('#cardIngredientes input[name="quantidade"]');
-    const selectIngrediente = document.querySelector('#cardIngredientes select[name="ingrediente_id"]');
-
-    const getSelectIngredienteSelectedOption = () => {
-      const selected_option = Array.from(selectIngrediente.options).find((o) => o.value == selectIngrediente.value);
-      if (!selected_option) return null;
-      return selected_option;
-    };
-
-    const getSelectIngredienteSelectedOptionAttr = (attrName) => {
-      const selected_option = getSelectIngredienteSelectedOption();
-      if (!selected_option) return null;
-      const custo_p_grama = selected_option.getAttribute(attrName);
-      if (!custo_p_grama) return null;
-      return parseFloat(custo_p_grama).toFixed(3);
-    };
-
-    const updatePreview = () => {
-      const custo_p_grama = getSelectIngredienteSelectedOptionAttr("data-custo_p_grama");
-      if (!custo_p_grama) {
-        document.querySelector("#ingrediente_custo_p_grama").innerHTML = "Selecione um ingrediente";
-        document.querySelector("#ingediente_custo_final").innerHTML = "Insira uma quantidade";
-        return;
-      } else {
-        const custo_final = parseFloat(inputQuantidade.value * custo_p_grama).toFixed(2);
-        document.querySelector("#ingrediente_custo_p_grama").innerHTML = `Custo por grama: R$ ${custo_p_grama}/g`;
-        document.querySelector("#ingediente_custo_final").innerHTML = `Custo final: R$ ${custo_final}`;
-      }
-    };
-
-    selectIngrediente.addEventListener("change", updatePreview);
-    inputQuantidade.addEventListener("change", updatePreview);
-  });
-</script>
 {% endblock %}

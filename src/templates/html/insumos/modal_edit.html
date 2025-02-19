@@ -1,12 +1,12 @@
 
 
-<div class="modal fade" id="modalEditIngrediente" tabindex="-1">
-    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_receita_ingredientes_atualizar') }}">
+<div class="modal fade" id="modalEditInsumo" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_insumos_atualizar') }}">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
             <span class="material-symbols-outlined"> package_2 </span>
-            Editar Ingrediente
+            Editar Insumo
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -16,7 +16,7 @@
             <label for="nome" class="form-label required">
               Nome
             </label>
-            <input type="text" class="form-control" name="nome" placeholder="Preencha para atualizar o nome desse ingrediente">
+            <input type="text" class="form-control" name="nome" placeholder="Preencha para atualizar o nome desse insumo">
           </div>
           <div class="mb-3">
             <label for="custo" class="form-label required">
@@ -36,6 +36,13 @@
               <span class="input-group-text"> g </span>
             </div>
           </div>
+          <div class="mb-3">
+            <label for="unidade" class="form-label required">Unidade de Medida</label>
+            <select class="form-select" name="unidade">
+              <option value="g">Gramas (g)</option>
+              <option value="un">Unidades (un)</option>
+            </select>
+          </div>
           <hr>
           <div class="mb-3">
             <label for="estoque_atual" class="form-label required">
@@ -46,7 +53,7 @@
               <span class="input-group-text"> g </span>
             </div>
             <span class="text-muted">
-              Somatória da quantidade das Movimentações desse ingrediente.
+              Somatória da quantidade das Movimentações desse insumo.
             </span>
           </div>
           <hr>
@@ -56,7 +63,6 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-ghost-danger me-auto" data-bs-toggle="modal" data-bs-target="#excluirReceitaIngredienteModal" data-bs-payload="">Remover da Receita</button>
           <button type="submit" class="btn">Atualizar</button>
         </div>
       </div>

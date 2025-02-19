@@ -64,7 +64,7 @@
         </div>
         <div class="card-body">
             <p>
-                Cadastre as <b>movimentações de estoque</b> para formalizar compras e/ou uso de <code>Ingredientes</code>.
+                Cadastre as <b>movimentações de estoque</b> para formalizar compras e/ou uso de <code>Insumos</code>.
             </p>
             <div class="ms-auto" style="width: fit-content;">
                 <a href="{{ url_for('get_estoques_index') }}" class="btn">Visualizar Estoque</a>
@@ -84,7 +84,7 @@
         </div>
         <div class="card-body">
             <p>
-                Cadastre <b>receitas</b> selecionando <code>Ingredientes</code> para determinar o preço de venda, lucro e faturamento previsto.
+                Cadastre <b>receitas</b> selecionando <code>Insumos</code> para determinar o preço de venda, lucro e faturamento previsto.
             </p>
             <div class="ms-auto" style="width: fit-content;">
                 <a href="{{ url_for('get_receitas_index') }}" class="btn">Visualizar Receitas</a>
@@ -98,16 +98,16 @@
         <div class="card-header">
             <h3 class="card-title">
                 {{ material_symbol('package_2') | safe }}
-                Ingredientes
-                <small class="text-secondary ms-auto">{{len_ingredientes}} ingrediente cadastrado</small>
+                Insumos
+                <small class="text-secondary ms-auto">{{len_insumos}} insumo cadastrado</small>
             </h3>
         </div>
         <div class="card-body">
             <p>
-                Cadastre <b>ingredientes</b> que serão utilizados nas receitas. É possível visualizar o estoque atual de cada ingrediente.
+                Cadastre <b>insumos</b> que serão utilizados nas receitas. É possível visualizar o estoque atual de cada insumo.
             </p>
             <div class="ms-auto" style="width: fit-content;">
-                <a href="{{ url_for('get_ingredientes_index') }}" class="btn">Visualizar Ingredientes</a>
+                <a href="{{ url_for('get_insumos_index') }}" class="btn">Visualizar Insumos</a>
             </div>
         </div>
     </div>
