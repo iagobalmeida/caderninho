@@ -50,7 +50,7 @@ def get(
 
     if getattr(session, 'sessao_autenticada', False) and not ignore_validations:
         if not session.sessao_autenticada.administrador and entity != Entities.ORGANIZACAO:
-            query = query.filter(getattr(entity, 'organizacao_id') == session.sessao_autenticada.organizacao_id)
+            query = query.filter(getattr(entity.value.organizacao_id) == session.sessao_autenticada.organizacao_id)
 
     if order_by:
         if desc:
