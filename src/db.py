@@ -26,8 +26,13 @@ def init():
 
 def reset():
     with engine.connect() as conn:
-        conn.execute(text("DROP TABLE IF EXISTS receitaingredientelink CASCADE;"))
         conn.execute(text("DROP TABLE IF EXISTS receitainsumolink CASCADE;"))
+        conn.execute(text("DROP TABLE IF EXISTS receita CASCADE;"))
+        conn.execute(text("DROP TABLE IF EXISTS estoque CASCADE;"))
+        conn.execute(text("DROP TABLE IF EXISTS venda CASCADE;"))
+        conn.execute(text("DROP TABLE IF EXISTS insumo CASCADE;"))
+        conn.execute(text("DROP TABLE IF EXISTS usuario CASCADE;"))
+        conn.execute(text("DROP TABLE IF EXISTS organizacao CASCADE;"))
         conn.commit()
     SQLModel.metadata.drop_all(bind=engine)
     SQLModel.metadata.create_all(bind=engine)
