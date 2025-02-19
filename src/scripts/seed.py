@@ -13,6 +13,7 @@ def try_add(obj):
         with Session(engine) as session:
             __obj = session.add(obj)
             session.commit()
+            session.refresh(__obj)
         return __obj
     except Exception as ex:
         print(ex)
@@ -34,24 +35,22 @@ def main():
         administrador=True
     ))
 
-    insumos = [1, 2, 3, 4]
+    acucar = try_add(Insumo(organizacao_id=1, nome='Açúcar', peso=1000, custo=14))
+    manteiga = try_add(Insumo(organizacao_id=1, nome='Manteiga', peso=1000, custo=40))
+    chocolate = try_add(Insumo(organizacao_id=1, nome='Chocolate', peso=1000, custo=57))
+    farinha = try_add(Insumo(organizacao_id=1, nome='Farinha', peso=1000, custo=4))
 
-    try_add(Insumo(organizacao_id=1, id=1, nome='Açúcar', peso=1000, custo=14))
-    try_add(Insumo(organizacao_id=1, id=2, nome='Manteiga', peso=1000, custo=40))
-    try_add(Insumo(organizacao_id=1, id=3, nome='Chocolate', peso=1000, custo=57))
-    try_add(Insumo(organizacao_id=1, id=4, nome='Farinha', peso=1000, custo=4))
+    cookies = try_add(Receita(organizacao_id=1, nome='Cookies', peso_unitario=100))
 
-    try_add(Receita(organizacao_id=1, id=1, nome='Cookies', peso_unitario=100))
+    cookies_admin = try_add(Receita(organizacao_id=3, nome='Cookies Apenas ADMIN Vê', peso_unitario=100))
 
-    try_add(Receita(organizacao_id=3, id=2, nome='Cookies Apenas ADMIN Vê', peso_unitario=100))
-
-    for __insumo in insumos:
-        try_add(ReceitaInsumoLink(organizacao_id=1, quantidade=100, receita_id=1, insumo_id=__insumo))
+    for __insumo in [acucar, manteiga, chocolate, farinha]:
+        try_add(ReceitaInsumoLink(organizacao_id=1, quantidade=100, receita_id=1, insumo_id=__insumo.id))
         estoque_quantidade = randint(250, 2000) - randint(250, 2000)
         try_add(Estoque(
             organizacao_id=1,
             descricao='Compra' if estoque_quantidade > 0 else 'Uso em receita',
-            insumo_id=__insumo,
+            insumo_id=__insumo.id,
             quantidade=estoque_quantidade,
             valor_pago=randint(1, 10) if estoque_quantidade > 0 else 0
         ))
