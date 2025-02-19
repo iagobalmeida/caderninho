@@ -42,14 +42,14 @@ def request_login(session: Session, request: Request, email: str, senha: str, le
     except Exception as ex:
         request.session.clear()
 
-        url = request.url_for('get_index')
+        url = request.url_for('get_app_index')
         url = url.include_query_params(message=str(ex))
 
         return RedirectResponse(url, status_code=302)
 
 
 def request_logout(request: Request) -> RedirectResponse:
-    response = redirect_url_for(request, 'get_index')
+    response = redirect_url_for(request, 'get_app_index')
     request.session.clear()
     return response
 

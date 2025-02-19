@@ -65,8 +65,13 @@ app.add_middleware(GZipMiddleware, minimum_size=500)
 db.init()
 
 
+@app.get('/', include_in_schema=False)
+async def get_index(request: fastapi.Request):
+    return render(request, 'index.html', context={})
+
+
 @app.get('/app', include_in_schema=False)
-async def get_index(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
+async def get_app_index(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
     return render(request, 'autenticacao/login.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
@@ -128,7 +133,7 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
 async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     log.exception(ex)
     if not redirect_to:
-        redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
+        redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
 
     error = f'<span>Verifique os campos preenchidos'
     detalhe = re.search(r'\.(\w+)$', str(ex.orig))
@@ -144,7 +149,7 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
 async def value_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     log.exception(ex)
     if not redirect_to:
-        redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
+        redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
     redirect_to = url_incluir_query_params(redirect_to, error=str(ex))
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
 
@@ -152,16 +157,16 @@ async def value_error_exception_handler(request: fastapi.Request, ex, redirect_t
 @app.exception_handler(HTTPException)
 async def http_error_exception_handler(request: fastapi.Request, ex: HTTPException):
     log.exception(ex)
-    redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
+    redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
     if ex.status_code == 401:
         request.session.clear()
-        redirect_to = request.url_for('get_index')
+        redirect_to = request.url_for('get_app_index')
     return await value_error_exception_handler(request, ex, redirect_to=redirect_to)
 
 
 @app.exception_handler(RequestValidationError)
 async def generic_exception_handler(request: fastapi.Request, ex: Exception):
     log.exception(ex)
-    redirect_to = str(request.headers.get('referer', request.url_for('get_index')))
+    redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
     redirect_to = url_incluir_query_params(redirect_to, error=ex.errors()[0]["msg"])
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
