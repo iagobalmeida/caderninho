@@ -181,6 +181,9 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Tornar alerta "apagavel" (metadata de usuário em JSON talvez?)
   - [X] LocalStorage deu conta do recado
 
+# v1.4.5
+- [ ] Testes unitários de todas as rotas do sistema
+
 # v1.5
 - [ ] Gerar QR PIX em detalhamento de vendas
 - [ ] Campo `plano` em Organização

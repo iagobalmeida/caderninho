@@ -12,7 +12,8 @@
     <div class="card-body">
       <h5 class="card-title" id="como_usar_1">1. Cadastrar uma Receita</h5>
       <p>No <i class="text-primary">KDerninho</i>, o primeiro passo é criar uma <code>Receita</code>.</p>
-      <b id="como_usar_1_1">1.1 O que é uma Receita?</b>
+      <b id="como_usar_1_1">1.1 O que é uma Receita?</b><br>
+      <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_receita.png')}}" style="max-width: 1080px;">
       <p class="mb-0">Uma <code>Receita</code> representa literalmente uma receita que você faz. No cadastro de uma receita, estarão os ingredientes, embalagens e outros materiais que são necessários para produzir aquela receita, assim como as informações de precificação e estimativas.</p>
       <p class="mb-0">No <i class="text-primary">KDerninho</i>, todos esses ingredientes, embalagens e materiais que compõem uma <code>Receita</code> são chamados de <code>Insumos</code>.</p>
       <p>Para que os cálculos funcionem, você irá precisar fornecer o peso de cada unidade (<code>Peso Unitario</code>) produzida por aquela receita.</p>
@@ -21,7 +22,8 @@
       <p class="mb-0">É importante que o preço do seu produto final seja baseado em cálculos que consideram os seus custos, pra isso o <i class="text-primary">KDerninho</i> irá calcular automáticamente algumas informações relevantes sobre a sua receita.</p>
       <ul class="ms-3">
         <li>
-          <b id="como_usar_precificacao">1.2.1 Precifição</b>
+          <b id="como_usar_precificacao">1.2.1 Precifição</b><br>
+          <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_precificacao.png')}}" style="max-width: 560px;">
           <ul>
             <li><b>Rendimento:</b> Soma da quantidade (em gramas) de todos os insumos (Não são considerados insumos com unidade de medida <code>un.</code>).</li>
             <li><b>Rendimento Unidades:</b> Total de unidades que essa receita irá produzir.<br><code>Rendimento Unidades = Rendimento / Peso Unitario</code></li>
@@ -30,7 +32,8 @@
           </ul>
         </li>
         <li>
-          <b id="como_usar_estimativas">1.2.2 Estimativas</b>
+          <b id="como_usar_estimativas">1.2.2 Estimativas</b><br>
+          <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_estimativas.png')}}" style="max-width: 560px;">
           <ul>
             <li><b>Custo:</b> Soma do custo total de todos os insumos.</li>
             <li><b>Faturamento:</b> Valor bruto a ser recebido com a venda de tudo que essa receita produzir. <br><code>Faturamento = Preço Sugerido * Rendimento Unidades</code></li>
@@ -39,13 +42,15 @@
         </li>
       </ul>
       <b id="como_usar_cadastrar_receita">1.3 Cadastrando uma Receita</b>
-      <p class="mb-0">Para cadastrar uma receita, acesse a página &nbsp;<a href="/app/receitas" target="_blank">{{material_symbol('library_books') | safe }}Receitas</a>, clique em <span class="badge bg-green-lt">Criar Receita</span> e preencha o campo <code>Nome</code> com o nome da receita.</p>
+      <p class="mb-0">Para cadastrar uma receita, acesse a página <a href="/app/receitas" target="_blank">{{material_symbol('library_books') | safe }}Receitas</a>, clique em <span class="badge bg-green-lt">Criar Receita</span> e preencha o campo <code>Nome</code> com o nome da receita.</p>
+      <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_nova_receita.png')}}" style="max-width: 480px;">
       <p class="">Você irá cair na página de detalhamento da receita, onde já pode visualizar a precificação e estimativas e, no final da página, uma tabela de insumos que ainda está vazia.</p>
-      <b id="como_usar_incluir_insumo">1.4 Incluindo um Insumo</b>
+      <b id="como_usar_incluir_insumo">1.4 Incluindo um Insumo</b><br>
+      <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_insumos.png')}}" style="max-width: 1080px;">
       <p class="mb-0">Na página de detalhamento da receita, na caixa <b>Insumos</b>, clique no botão <span class="badge">Incluir Insumo</span>.</p>
       <ul>
         <li>Caso já tenha o <code>Insumo</code> cadastrado, basta seleciona-lo, informar a quantidade que é utilizada na receita e clicar em <span class="badge bg-success-lt">Incluir</span>.</li>
-        <li>É possível clicar em <span class="badge bg-primary-lt">Novo Insumo</span> abaixo da caixa de seleção para abrir uma janela de cadastro de <code>Insumo</code> sem precisar navegar para a página  &nbsp;<a href="/app/receitas" target="_blank">{{material_symbol('package_2') | safe }}Insumos</a>.</li>
+        <li>É possível clicar em <span class="badge bg-primary-lt">Novo Insumo</span> abaixo da caixa de seleção para abrir uma janela de cadastro de <code>Insumo</code> sem precisar navegar para a página  <a href="/app/receitas" target="_blank">{{material_symbol('package_2') | safe }}Insumos</a>.</li>
         <li><a href="#insumos">Documentação sobre Insumo</a></li>
       </ul>
       <b>1.5 Verificando Cálculos</b>
@@ -56,25 +61,28 @@
 
       <h5 id="como_usar_2" class="card-title">2. Cadastrar uma Compra</h5>
       <p>Com uma <code>Receita</code> cadastrada, é hora de registrar uma <code>Movimentação de Compra</code> dos <code>Insumos</code>.</p>
-      <b id="como_usar_movimentacao">2.1 O que é uma Movimentação?</b>
+      <b id="como_usar_movimentacao">2.1 O que é uma Movimentação?</b><br>
+      <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_movimentacoes.png')}}" style="max-width: 1080px;">
       <p class="mb-0">Além de calcular os preços dos seus produtos, você também precisa gerenciar seu estoque e manter um histórico dos preços pagos em cada <code>Insumo</code>.</p>
       <p class="mb-0">No <i class="text-primary">KDerninho</i>, tanto as compras, quanto o consumo dos <code>Insumos</code> são chamados de <code>Movimentação</code>, e podem ser de 4 tipos diferentes:</p>
       <ul class="ms-3">
-        <li><b>Movimentação de Compra:</b> Compra de um insumo específico</li>
-        <li><b>Movimentação de Consumo de Insumo:</b> Consumo de um insumo específico</li>
-        <li><b>Movimentação de Uso em Receita:</b> Consumo de todos os insumos de uma receita</li>
+        <li><b>Compra:</b> Compra de um insumo específico</li>
+        <li><b>Consumo de Insumo:</b> Consumo de um insumo específico</li>
+        <li><b>Uso em Receita:</b> Consumo de todos os insumos de uma receita</li>
         <li><b>Outros:</b> Qualquer outro tipo de gasto</li>
       </ul>
       <b id="como_usar_cadastrar_compra">2.2 Cadastrando uma Movimentação de Compra</b>
-      <p>Para cadastrar uma movimentação de compra, acesse a página &nbsp;<a href="/app/estoques" target="_blank">{{material_symbol('inventory_2') | safe }}Estoques</a>, clique em <span class="badge bg-green-lt">Criar Movimentação</span>, selecione <i>Compra</i> e preencha com o <code>Valor Pago</code>, o <code>Insumo</code> e a <code>Quantidade</code> adquirida.</p>
+      <p class="mb-0">Para cadastrar uma movimentação de compra, acesse a página <a href="/app/estoques" target="_blank">{{material_symbol('inventory_2') | safe }}Estoques</a>, clique em <span class="badge bg-green-lt">Criar Movimentação</span>, selecione <i>Compra</i> e preencha com o <code>Valor Pago</code>, o <code>Insumo</code> e a <code>Quantidade</code> adquirida.</p>
+      <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_nova_movimentacao.png')}}" style="max-width: 480px;">
       
       <hr>
 
       <h5 class="card-title"  id="como_usar_3">3. Cadastrar um Uso em Receita</h5>
-      <p>Ainda na página &nbsp;<a href="/app/estoques" target="_blank">{{material_symbol('inventory_2') | safe }}Estoques</a>, quando uma receita for produzida, você deve cadastrar a produção criando uma <code>Movimentação de Uso em Receita</code>.</p>
+      <p>Ainda na página <a href="/app/estoques" target="_blank">{{material_symbol('inventory_2') | safe }}Estoques</a>, quando uma receita for produzida, você deve cadastrar a produção criando uma <code>Movimentação de Uso em Receita</code>.</p>
       <b>3.1 Cadastrando uma Movimentação de Uso em Receita</b>
-      <p class="mb-0">Para cadastrar uma movimentação de compra, acesse a página &nbsp;<a href="/app/estoques" target="_blank">{{material_symbol('inventory_2') | safe }}Estoques</a>, clique em <span class="badge bg-green-lt">Criar Movimentação</span>, selecione <i>Uso em Receita</i> e preencha com a <code>Receita</code>, e a <code>Quantidade</code> produzida.</p>
-      
+      <p class="mb-0">Para cadastrar uma movimentação de compra, acesse a página <a href="/app/estoques" target="_blank">{{material_symbol('inventory_2') | safe }}Estoques</a>, clique em <span class="badge bg-green-lt">Criar Movimentação</span>, selecione <i>Uso em Receita</i> e preencha com a <code>Receita</code>, e a <code>Quantidade</code> produzida.</p>
+      <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_nova_uso_em_receita.png')}}" style="max-width: 480px;">
+
       <hr>
 
       <h5 id="como_usar_4" class="card-title">4. Cadastrando uma Venda</h5>
@@ -82,19 +90,22 @@
       <b id="como_usar_venda">4.1 O que é uma Venda</b>
       <p class="mb-0">Apesar de ser intuitivo, é importante lembrar que uma venda pode ser imediata ou "prolongada". Uma venda prolongada é aquela onde o cliente solicita o produto, ele é produzido e enviado e o recebimento é feito mediante a entrega.</p>
       <p class="mb-0">Em ambos os casos, o <i class="text-primary">KDerninho</i> considera como uma <code>Venda</code>, que pode ser "recebida" na hora ou não.</p>
-      <p>Todas as <code>Vendas</code> possuem um marcador (<code>Pagamento Recebido</code>) que indica se ela já foi "recebida" (o cliente já pagou) ou não, e é possível alterar isso tanto no detalhamento da venda quanto de forma massiva pela tela de &nbsp;<a href="/app/vendas" target="_blank">{{material_symbol('shopping_cart') | safe }}Vendas</a></p>
+      <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_vendas.png')}}" style="max-width: 1080px;">
+      <p>Todas as <code>Vendas</code> possuem um marcador (<code>Pagamento Recebido</code>) que indica se ela já foi "recebida" (o cliente já pagou) ou não, e é possível alterar isso tanto no detalhamento da venda quanto de forma massiva pela tela de <a href="/app/vendas" target="_blank">{{material_symbol('shopping_cart') | safe }}Vendas</a></p>
       <b id="como_usar_cadastrar_venda">4.2 Cadastrando uma Venda</b>
-      <p>Para cadastrar uma venda, acesse a página &nbsp;<a href="/app/vendas" target="_blank">{{material_symbol('shopping_cart') | safe }}Vendas</a>, clique em <span class="badge bg-green-lt">Criar Venda</span>, preencha com a <code>Descrição</code>, e o <code>Valor</code>.</p>
+      <p class="mb-0">Para cadastrar uma venda, acesse a página <a href="/app/vendas" target="_blank">{{material_symbol('shopping_cart') | safe }}Vendas</a>, clique em <span class="badge bg-green-lt">Criar Venda</span>, preencha com a <code>Descrição</code>, e o <code>Valor</code>.</p>
+      <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_nova_venda.png')}}" style="max-width: 480px;"><br>
       <b id="como_usar_qr_pix">4.3 Gerando um QR PIX</b>
       <p class="mb-0">Depois que uma venda foi cadastrada, você pode gerar o QRPix dessa venda acessando seu detalhamento (clicando na venda).</p>
-      <p class="mb-0">É necessário cadastrar a <code>Chave PIX</code> na página &nbsp;<a href="/app/organizacao" target="_blank">{{material_symbol('groups') | safe }}Organização</a></p>
+      <p class="mb-0">É necessário cadastrar a <code>Chave PIX</code> na página <a href="/app/organizacao" target="_blank">{{material_symbol('groups') | safe }}Organização</a></p>
       <ul>
-        <li>A página &nbsp;<a href="/app/home" target="_blank">{{material_symbol('home') | safe }}Home</a> exibe o <code>QR PIX</code> da última venda.</li>
+        <li>A página <a href="/app/home" target="_blank">{{material_symbol('home') | safe }}Home</a> exibe o <code>QR PIX</code> da última venda.</li>
       </ul>
       <b id="como_usar_receber_pagamento">4.4 Recebendo um Pagamento</b>
       <p class="mb-0">Assim que o pagamento for recebido, é necessário atualizar na venda o marcador <code>Pagamento Recebido</code>. Isso irá indicar que essa venda já foi recebida.</p>
+      <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_detalhamento_venda.png')}}" style="max-width: 480px;"><br>
       <ul class="mb-0">
-        <li>Existe um atalho na página &nbsp;<a href="/app/home" target="_blank">{{material_symbol('home') | safe }}Home</a> para marcar a última venda cadastrada como <code>Pagamento Recebido</code></li>
+        <li>Existe um atalho na página <a href="/app/home" target="_blank">{{material_symbol('home') | safe }}Home</a> para marcar a última venda cadastrada como <code>Pagamento Recebido</code></li>
       </ul>
 
     </div>
