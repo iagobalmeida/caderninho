@@ -163,7 +163,7 @@ async def http_error_exception_handler(request: fastapi.Request, ex: HTTPExcepti
         logger.warning('Não autorizado')
     else:
         logger.exception(ex)
-    redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
+        redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
     return await value_error_exception_handler(request, ex, redirect_to=redirect_to)
 
 

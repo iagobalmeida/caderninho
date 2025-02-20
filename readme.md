@@ -168,16 +168,25 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 # v1.4
 - [X] Melhoria descrição de movimentação `Uso em Receita`
 - [X] Instalação de `loguru` para logs em arquivo rotativo e logs aprimorados
-- [ ] Alerta "Sobre essa página" com link para documentação completa
-  - [ ] Home
-  - [ ] Vendas
-  - [ ] Estoque
-  - [ ] Receitas
-  - [ ] Detalhe de Receita
-  - [ ] Insumos
-  - [ ] Organização
-- [ ] Documentação completa agregando todas as docs
-- [ ] Tornar alerta "apagavel" (metadata de usuário em JSON talvez?)
+- [X] Alerta "Sobre essa página" com link para documentação completa
+  - [X] Home
+  - [X] Vendas
+  - [X] Estoque
+  - [X] Receitas
+  - [X] Detalhe de Receita
+  - [X] Insumos
+  - [X] Organização
+- [X] Documentação completa agregando todas as docs
+  - [X] Referências para docs completa
+- [X] Tornar alerta "apagavel" (metadata de usuário em JSON talvez?)
+  - [X] LocalStorage deu conta do recado
+
+# v1.5
+- [ ] Gerar QR PIX em detalhamento de vendas
+- [ ] Campo `plano` em Organização
+  - [ ] Limitar número de registros por plano em `create`
+  - [ ] Exibir plano atual
+  - [ ] Botão para upgrade de plano
 
 # v2.0
 - [ ] Filtro em tabelas

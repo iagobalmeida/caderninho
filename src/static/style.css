@@ -87,3 +87,9 @@ a[disabled="true"] {
 html:not(:has(.modal.show)) {
     overflow-y: scroll;
 }
+
+a[target="_blank"]:has(.material-symbols-outlined) {
+    span {
+        font-size: 16px;
+    }
+}

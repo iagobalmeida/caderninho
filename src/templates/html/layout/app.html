@@ -125,15 +125,10 @@
                   </a>
                   <!-- <a href="#" class="dropdown-item">Feedback</a> -->
                   <div class="dropdown-divider"></div>
-                  <a href="{{url_for('get_documentacao_completa')}}" class="dropdown-item cursor-pointer">
+                  <a href="{{url_for('get_como_usar')}}" class="dropdown-item cursor-pointer">
                     {{ material_symbol('help') | safe }}
                     &nbsp;
-                    Documentação Completa
-                  </a>
-                  <a href="{{url_for('get_sobre')}}" class="dropdown-item cursor-pointer">
-                    {{ material_symbol('info') | safe }}
-                    &nbsp;
-                    Sobre o Kderninho
+                    Como Usar
                   </a>
                   <div class="dropdown-divider"></div>
                   <!-- <a href="./settings.html" class="dropdown-item">Settings</a> -->
@@ -272,7 +267,7 @@
                 </div>
               {% endif %}
               {% if sobre_essa_pagina_html %}
-                <div class="alert alert-info" role="alert" id="alerta-sobre-essa-pagina">
+                <div class="alert alert-info d-none" role="alert" id="alerta-sobre-essa-pagina">
                   <div class="d-flex align-items-center justify-content-start mb-2">
                     {{ material_symbol('help') | safe }}
                     <b>Sobre essa página</b>

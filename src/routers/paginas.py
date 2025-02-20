@@ -42,16 +42,16 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     })
 
 
-@router.get('/sobre', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
-async def get_sobre(request: fastapi.Request, session: Session = DBSESSAO_DEP):
-    context_header = Context.Header(pretitle='Caderninho', title='Sobre', symbol='info')
-    return render(request, 'sobre.html', session, context={'header': context_header})
+# @router.get('/sobre', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
+# async def get_sobre(request: fastapi.Request, session: Session = DBSESSAO_DEP):
+#     context_header = Context.Header(pretitle='Caderninho', title='Sobre', symbol='info')
+#     return render(request, 'sobre.html', session, context={'header': context_header})
 
 
-@router.get('/documentacao', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
-async def get_documentacao_completa(request: fastapi.Request, session: Session = DBSESSAO_DEP):
+@router.get('/como_usar', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
+async def get_como_usar(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     context_header = Context.Header(pretitle='Caderninho', title='Documentação Completa', symbol='help')
-    return render(request, 'documentacao.html', session, {
+    return render(request, 'como_usar.html', session, {
         'header': context_header,
         'sobre_essa_pagina': SOBRE_ESSA_PAGINA
     })

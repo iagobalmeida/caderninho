@@ -112,3 +112,28 @@ document.querySelectorAll('td input[type="checkbox"]').forEach(el => {
         });
     }
 );
+
+
+window.addEventListener('load', () => {
+    const alertaSobreEssaPagina = document.querySelector('#alerta-sobre-essa-pagina');
+    if(!alertaSobreEssaPagina) return;
+
+    const alertaSobreEssaPaginaClose = alertaSobreEssaPagina.querySelector('a[data-bs-dismiss]');
+
+    let alertaSobreIgnorados = [];
+
+    try {
+        alertaSobreIgnorados = JSON.parse(localStorage.getItem('alertaSobreIgnorados')) || [];
+    } catch {
+        console.log('Falha ao carregar avisos lidos');
+    }
+    const currentPage = window.location.href.split('/app/')[1].split('/')[0];
+
+    if(!alertaSobreIgnorados.includes(currentPage)) {
+        alertaSobreEssaPagina.classList.remove('d-none');
+    }
+    alertaSobreEssaPaginaClose.addEventListener('click', (e) => {
+        alertaSobreIgnorados.push(currentPage)
+        localStorage.setItem('alertaSobreIgnorados', JSON.stringify(alertaSobreIgnorados))
+    });
+})

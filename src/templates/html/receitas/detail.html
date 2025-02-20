@@ -69,39 +69,7 @@
   <div class="card">
     <div class="card-header">
       <h5 class="card-title">
-        <span class="material-symbols-outlined"> trending_up </span>
-        Estimativas
-      </h5>
-    </div>
-    <div class="card-body">
-      <div class="datagrid">
-        <div class="datagrid-item text-danger">
-          <div class="datagrid-title">Custo</div>
-          <div class="datagrid-content">
-            <span class="badge bg-danger-lt"> {{receita.custo | format_reais}} </span>
-          </div>
-        </div>
-        <div class="datagrid-item">
-          <div class="datagrid-title">Faturamento</div>
-          <div class="datagrid-content">
-            <span class="badge bg-warning-lt"> {{receita.faturamento | format_reais}} </span>
-          </div>
-        </div>
-        <div class="datagrid-item text-success">
-          <div class="datagrid-title">Lucro</div>
-          <div class="datagrid-content">
-            <span class="badge bg-success-lt"> {{receita.lucro | format_reais}} </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="col-12 col-md-6">
-  <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">
-        <span class="material-symbols-outlined"> currency_exchange </span>
+        <span class="material-symbols-outlined"> sell </span>
         Precificação
       </h5>
     </div>
@@ -122,13 +90,45 @@
         <div class="datagrid-item">
           <div class="datagrid-title">Custo unidade</div>
           <div class="datagrid-content">
-            <span class="badge bg-secondary-lt"> {{receita.custo_unidade | format_reais}} </span>
+            <span class="badge bg-danger-lt"> {{receita.custo_unidade | format_reais}} </span>
           </div>
         </div>
         <div class="datagrid-item">
           <div class="datagrid-title">Preço Sugerido</div>
           <div class="datagrid-content">
-            <span class="badge bg-secondary-lt"> {{receita.preco_sugerido | format_reais}} </span>
+            <span class="badge bg-success-lt"> {{receita.preco_sugerido | format_reais}} </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-12 col-md-6">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title">
+        <span class="material-symbols-outlined"> currency_exchange </span>
+        Estimativas
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="datagrid">
+        <div class="datagrid-item text-danger">
+          <div class="datagrid-title">Custo</div>
+          <div class="datagrid-content">
+            <span class="badge bg-danger-lt"> {{receita.custo | format_reais}} </span>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Faturamento</div>
+          <div class="datagrid-content">
+            <span class="badge bg-primary-lt"> {{receita.faturamento | format_reais}} </span>
+          </div>
+        </div>
+        <div class="datagrid-item text-success">
+          <div class="datagrid-title">Lucro</div>
+          <div class="datagrid-content">
+            <span class="badge bg-success-lt"> {{receita.lucro | format_reais}} </span>
           </div>
         </div>
       </div>

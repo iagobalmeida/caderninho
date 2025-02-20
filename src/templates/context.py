@@ -141,10 +141,11 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
 def render(templates: Jinja2Templates, request: Request, template_name: str, session=None, context: dict = None):
     context = get_context(request=request, session=session, context=context)
 
-    nome_pagina = str(request.url).split('app/')[1].split('/')[0]
-    sobre_essa_pagina = get_sobre_essa_pagina_html(nome_pagina)
-    if sobre_essa_pagina:
-        context.update(sobre_essa_pagina_html=sobre_essa_pagina)
+    if '/app/' in str(request.url):
+        nome_pagina = str(request.url).split('app/')[1].split('/')[0]
+        sobre_essa_pagina = get_sobre_essa_pagina_html(nome_pagina)
+        if sobre_essa_pagina:
+            context.update(sobre_essa_pagina_html=sobre_essa_pagina)
 
     response = templates.TemplateResponse(
         request=request,

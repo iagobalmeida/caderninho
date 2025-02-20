@@ -11,7 +11,11 @@ SOBRE_ESSA_PAGINA = {
     ],
     'vendas': [
         'Uma `Venda` é composta por uma `Data`, uma `Descrição`, um `Valor` e uma configuração que define se a venda já foi `Recebida`.',
-        'Toda venda é criada como `Não Recebida (Pendente)` e você pode atualizar isso clicando em uma venda ou selecionando várias e usando os botões acima. (Também existe um atalho na página `Home` para atualizar a última venda).',
+        'Toda venda é criada como `Não Recebida (Pendente)` e você pode atualizar isso clicando em uma venda ou selecionando várias e usando as ações `Marcar como Pendente`/`Marcar como Recebido`. (Também existe um atalho na página `Home` para atualizar a última venda).',
+        '<a href="/app/documentacao/#como_usar_venda">4.1. O que é uma venda</a>',
+        '<a href="/app/documentacao/#como_usar_cadastrar_venda">4.2. Cadastrando uma venda</a>',
+        '<a href="/app/documentacao/#como_usar_qr_pix">4.3. Gerando um QR PIX</a>',
+        '<a href="/app/documentacao/#como_usar_receber_pagamento">4.4. Recebendo um Pagamento</a>'
     ],
     'estoques': [
         'Uma `Movimentação` pode ser de 4 tipos: `Compra`, `Consumo Insumo`, `Uso em Receita` e `Outros`.',
@@ -19,6 +23,8 @@ SOBRE_ESSA_PAGINA = {
         '`Consumo Insumo` representa o consumo de um `Insumo` (fora de uma receita), então não possuí `Valor Pago` e irá diminuir o estoque.',
         '`Uso em Receita` representa o consumo de todos os `Insumos` que fazem parte de uma `Receita`, facilitando o cadastro de produções de receitas. Irá diminuir o estoque.',
         '`Outros` representa qualquer outro gasto que não afete o estoque.',
+        '<a href="/app/documentacao/#como_usar_movimentacao">2.1. O que é uma movimentação</a>',
+        '<a href="/app/documentacao/#como_usar_cadastrar_compra">2.2. Cadastrando uma Movimentação de Compra</a>',
     ],
     'receitas': [
         'Cadastrar uma `Receita` te permite calcular de forma intuitiva o custo de produção, a quantidade de insumos necessários, o valor de venda, etc.',
@@ -26,6 +32,10 @@ SOBRE_ESSA_PAGINA = {
         '`Peso Unitário` é onde você cadastra peso de cada unidade que a receita produz (Se a receita produz apenas uma unidade, preencha com o mesmo valor do campo `Rendimento`).',
         '`Porcetagem de Lucro` é onde você cadastra qual a porcetagem de lucro que você deseja usar no cáclulo de preço.',
         'Após preencher a lista de `Insumos` e as duas configurações, você poderá verificar em `Estimativas` e `Precificação` os valores cálculados.',
+        '<a href="/app/documentacao/#como_usar_1_1">1.1. O que é uma receita</a>',
+        '<a href="/app/documentacao/#como_usar_precificacao">1.2.1. Precificação</a>',
+        '<a href="/app/documentacao/#como_usar_estimativas">1.2.2. Estimativas</a>',
+        '<a href="/app/documentacao/#como_usar_cadastrar_receita">1.3. Cadastrando uma Receita</a>',
     ],
     'insumos': [
         'Um `Insumo` pode representar tanto um ingrediente quanto uma embalagem ou qualquer material necessário para produzir uma `Receita`.',
@@ -46,10 +56,8 @@ def get_sobre_essa_pagina_html(nome_pagina: str):
         return None
 
     linhas = [
-        f'<p class="mb-1 text-muted">- {linha}</p>'
+        f'<p class="mb-1 text-muted">{"-" if not "<a href" in linha else ""} {linha}</p>'
         for linha in conteudo
-    ] + [
-        f'<p class="mb-1 text-muted">Se ficou com mais alguma dúvida, <a href="/app/documentacao#{nome_pagina}" class="text-primary cursor-pointer">clique aqui para acessar a documentação completa</a>.</p>'
     ]
     conteudo = '\n'.join(linhas)
     conteudo = re.sub(r"`(.*?)`", r"<code>\1</code>", conteudo)
