@@ -6,6 +6,7 @@ from src.db import DBSESSAO_DEP
 from src.domain import repository
 from src.schemas.docs import SOBRE_ESSA_PAGINA
 from src.templates import render
+from src.templates.context import Context
 
 router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
 
@@ -37,11 +38,20 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
         'vendas': db_vendas,
         'pix_qr_code': pix_qr_code,
         'pix_mensagem': pix_mensagem,
-        'pix_venda': pix_venda,
-        'sobre_essa_pagina_html': SOBRE_ESSA_PAGINA['home']
+        'pix_venda': pix_venda
     })
 
 
 @router.get('/sobre', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
 async def get_sobre(request: fastapi.Request, session: Session = DBSESSAO_DEP):
-    return render(request, 'sobre.html', session)
+    context_header = Context.Header(pretitle='Caderninho', title='Sobre', symbol='info')
+    return render(request, 'sobre.html', session, context={'header': context_header})
+
+
+@router.get('/documentacao', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
+async def get_documentacao_completa(request: fastapi.Request, session: Session = DBSESSAO_DEP):
+    context_header = Context.Header(pretitle='Caderninho', title='Documentação Completa', symbol='help')
+    return render(request, 'documentacao.html', session, {
+        'header': context_header,
+        'sobre_essa_pagina': SOBRE_ESSA_PAGINA
+    })

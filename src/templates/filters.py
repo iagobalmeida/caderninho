@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import datetime
 from typing import List, Tuple
 
@@ -10,6 +11,12 @@ def __unit_converter(input: float, unity: str = 'g', converter_kg: bool = False,
         input = input/1000
         unity = 'Kg'
     return (input, unity)
+
+
+def templates_filter_markdown(input: str):
+    input = re.sub(r"`(.*?)`", r"<code>\1</code>", input)
+    input = re.sub(r"__(.*?)__", r"<i>\1</i>", input)
+    return input
 
 
 def templates_filter_strftime(input: datetime):
@@ -76,7 +83,8 @@ BASE_FILTERS = [
     ('format_stock_movement', templates_filter_format_stock_movement),
     ('format_quantity', templates_filter_format_quantity),
     ('format_reais', templates_filter_format_reais),
-    ('json', templates_filter_json)
+    ('json', templates_filter_json),
+    ('markdown', templates_filter_markdown)
 ]
 
 BASE_GLOBALS = [

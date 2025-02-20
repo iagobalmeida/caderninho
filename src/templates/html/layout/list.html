@@ -1,18 +1,6 @@
 {% extends '/layout/app.html' %}
 
 {% block content %}
-  {% if sobre_essa_pagina_html %}
-    <div class="alert alert-info" role="alert" id="alerta-sobre-essa-pagina">
-      <div class="d-flex align-items-center justify-content-start mb-2">
-        {{ material_symbol('help') | safe }}
-        <b>Sobre essa página</b>
-        <a class="ms-auto cursor-pointer text-secondary" data-bs-dismiss="alert" aria-label="close">
-          {{material_symbol('close') | safe}}
-        </a>
-      </div>
-      {{ sobre_essa_pagina_html | safe }}
-    </div>
-  {% endif %}
   {% include 'components/barra_pesquisa.html' %}
   {% include 'components/table.html' %}
   {% include 'components/pagination.html' %}

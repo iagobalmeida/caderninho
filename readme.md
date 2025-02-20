@@ -169,6 +169,13 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Melhoria descrição de movimentação `Uso em Receita`
 - [X] Instalação de `loguru` para logs em arquivo rotativo e logs aprimorados
 - [ ] Alerta "Sobre essa página" com link para documentação completa
+  - [ ] Home
+  - [ ] Vendas
+  - [ ] Estoque
+  - [ ] Receitas
+  - [ ] Detalhe de Receita
+  - [ ] Insumos
+  - [ ] Organização
 - [ ] Documentação completa agregando todas as docs
 - [ ] Tornar alerta "apagavel" (metadata de usuário em JSON talvez?)
 
