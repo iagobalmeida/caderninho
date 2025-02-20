@@ -92,6 +92,7 @@ async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -
 async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if payload.descricao == 'Uso em Receita' and payload.receita_id:
         db_receita, _, _ = repository.get(session, repository.Entities.RECEITA, {'id': payload.receita_id}, first=True)
+        payload.descricao = f'Uso em Receita ({db_receita.nome})'
         for insumo_link in db_receita.insumo_links:
             quantidade = -1 * insumo_link.quantidade * float(payload.quantidade_receita)
             repository.create(session, repository.Entities.ESTOQUE, {

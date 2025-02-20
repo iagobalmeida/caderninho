@@ -6,6 +6,7 @@ from sqlmodel import Session
 from src import auth
 from src.db import DBSESSAO_DEP
 from src.domain import inputs, repository
+from src.schemas.docs import SOBRE_ESSA_PAGINA
 from src.templates import render
 from src.templates.context import Button, Context
 from src.utils import redirect_back
@@ -108,6 +109,7 @@ async def get_vendas_index(request: fastapi.Request, page: int = fastapi.Query(1
             'entradas': entradas,
             'saidas': saidas,
             'caixa': caixa,
+            'sobre_essa_pagina_html': SOBRE_ESSA_PAGINA['vendas']
             # 'filter_data_inicio': filter_data_inicio,
             # 'filter_data_final': filter_data_final
         }

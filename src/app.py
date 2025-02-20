@@ -2,7 +2,6 @@
 import logging
 import random
 import re
-from logging import getLogger
 
 import fastapi
 import fastapi.security
@@ -18,6 +17,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from src import db
 from src.domain import inputs, repository
 from src.modules import send_email
+from src.modules.logger import logger, setup_logger
 from src.routers.autenticacao import router as router_autenticacao
 from src.routers.estoques import router as router_estoques
 from src.routers.insumos import router as router_insumos
@@ -30,7 +30,7 @@ from src.schemas.auth import DBSessaoAutenticada
 from src.templates import render
 from src.utils import url_incluir_query_params
 
-log = getLogger(__name__)
+setup_logger()
 
 SESSION_SECRET_KEY = 'SESSION_SECRET_KEY'
 
@@ -131,7 +131,7 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
 
 @app.exception_handler(IntegrityError)
 async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
-    log.exception(ex)
+    logger.exception(ex)
     if not redirect_to:
         redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
 
@@ -147,7 +147,8 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
 
 @app.exception_handler(ValueError)
 async def value_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
-    log.exception(ex)
+    if not isinstance(ex, HTTPException):
+        logger.exception(ex)
     if not redirect_to:
         redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
     redirect_to = url_incluir_query_params(redirect_to, error=str(ex))
@@ -156,17 +157,19 @@ async def value_error_exception_handler(request: fastapi.Request, ex, redirect_t
 
 @app.exception_handler(HTTPException)
 async def http_error_exception_handler(request: fastapi.Request, ex: HTTPException):
-    log.exception(ex)
-    redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
     if ex.status_code == 401:
         request.session.clear()
         redirect_to = request.url_for('get_app_index')
+        logger.warning('Não autorizado')
+    else:
+        logger.exception(ex)
+    redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
     return await value_error_exception_handler(request, ex, redirect_to=redirect_to)
 
 
 @app.exception_handler(RequestValidationError)
 async def generic_exception_handler(request: fastapi.Request, ex: Exception):
-    log.exception(ex)
+    logger.exception(ex)
     redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
     redirect_to = url_incluir_query_params(redirect_to, error=ex.errors()[0]["msg"])
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)

@@ -47,7 +47,7 @@ def main():
         estoque_quantidade = randint(250, 2000) - randint(250, 2000)
         try_add(Estoque(
             organizacao_id=organizacao.id,
-            descricao='Compra' if estoque_quantidade > 0 else 'Uso em receita',
+            descricao='Compra' if estoque_quantidade > 0 else f'Uso em receita ({cookies.nome})',
             insumo_id=__insumo.id,
             quantidade=estoque_quantidade,
             valor_pago=randint(1, 10) if estoque_quantidade > 0 else 0

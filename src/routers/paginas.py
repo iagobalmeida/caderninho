@@ -4,6 +4,7 @@ from sqlmodel import Session
 from src import auth
 from src.db import DBSESSAO_DEP
 from src.domain import repository
+from src.schemas.docs import SOBRE_ESSA_PAGINA
 from src.templates import render
 
 router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
@@ -36,7 +37,8 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
         'vendas': db_vendas,
         'pix_qr_code': pix_qr_code,
         'pix_mensagem': pix_mensagem,
-        'pix_venda': pix_venda
+        'pix_venda': pix_venda,
+        'sobre_essa_pagina_html': SOBRE_ESSA_PAGINA['home']
     })
 
 

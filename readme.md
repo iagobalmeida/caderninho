@@ -166,6 +166,13 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - [X] Ajustar informações dashboard
 
 # v1.4
+- [X] Melhoria descrição de movimentação `Uso em Receita`
+- [X] Instalação de `loguru` para logs em arquivo rotativo e logs aprimorados
+- [ ] Alerta "Sobre essa página" com link para documentação completa
+- [ ] Documentação completa agregando todas as docs
+- [ ] Tornar alerta "apagavel" (metadata de usuário em JSON talvez?)
+
+# v2.0
 - [ ] Filtro em tabelas
 - [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV
