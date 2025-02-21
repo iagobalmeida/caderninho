@@ -1,14 +1,16 @@
 ![# KDERNIHO](./src/static//logo.svg)
 ![Coverage](./coverage.svg) ![Test Status](https://github.com/iagobalmeida/caderninho/actions/workflows/tests.yml/badge.svg)
 
-#### SASS para gestão simplificada da sua cozinha independente
+#### SASS OpenSource (olha o código ai!) para gestão simplificada da sua cozinha independente
 
 ## Introdução
 
-Essa aplicação não seria possível seu a existência de:
+Essa aplicação não seria possível sem a existência de:
 - [Python](https://python.org)
 - [SQLModel](https://github.com/fastapi/sqlmodel)
+- [Loguru](https://github.com/Delgan/loguru)
 - [TablerCSS](https://tabler.io/)
+- [Material Symbols](https://fonts.google.com/icons)
 - [Railwai.app](https://railway.app/)
 
 ### Funcionalidades
@@ -17,7 +19,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 - Estimar custo, faturamento e lucro de receitas de forma dinâmica
 - Gerenciar o estoque de seus insumos e outros insumos
 - Gerenciar seu fluxo de caixa cadastrando compras, produção de receitas e outros gastos em geral
-- Compartilhar essas informações com outros usuários de sua organização (⚙ Em desenvolvimento)
+- Compartilhar essas informações com outros usuários de sua organização
 - Exportar e importar dados em CSV (⚙ Em desenvolvimento)
 
 ## Como Usar
@@ -33,7 +35,11 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 ### Rodando localmente com dados de exemplo
 1. Inicie a aplicação
 2. Acesse `127.0.0.1:8000/docs`
-3. Execute a rota `/seed` para criar dados de testes no banco
+3. Execute a rota `/reset_db` passando no `Header` a chave `token: batatafrita` para criar dados de testes no banco
+  ```cURL
+  curl --location --request POST 'http://127.0.0.1:8000/scripts/reset_db' \
+  --header 'token: batatafrita'
+  ```
 4. Use a conta `usuario@emai.com` com a senha `123` para acessar como usuário
 5. Use a conta `admin@email.com` com a senha `admin` para acessar como admin
 
@@ -90,8 +96,6 @@ coverage run -m pytest && coverage html && coverage-badge -o coverage.svg
 - [X] Funcionalidade modal `Meu Perfil`
 - [X] Padronizar uso de `HEADER_AUTH` em vez de decorator
   - [X] Apagar decorator
-- [-] Upload e download de CSV (Próxima versão)
-- [-] Tela "Organização" (Próxima versão)
 
 ## vb2.5
 - [X] Tela "sobre a aplicação"
@@ -191,6 +195,7 @@ coverage run -m pytest && coverage html && coverage-badge -o coverage.svg
 - [ ] Testes unitários de todas as rotas do sistema
 
 # v1.5
+- [ ] Exportacação de CSV
 - [ ] Gerar QR PIX em detalhamento de vendas
 - [ ] Campo `plano` em Organização
   - [ ] Limitar número de registros por plano em `create`
