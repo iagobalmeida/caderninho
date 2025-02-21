@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 
 {% block layout %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold text-primary" href="#">
                 <svg width="1012" height="307" viewBox="0 0 1012 307" fill="none" xmlns="http://www.w3.org/2000/svg" class="navbar-brand-image">
@@ -28,32 +28,36 @@
         </div>
     </nav>
 
-    <header class="bg-primary text-white text-center py-5">
+    <header class="text-center py-5 pt-0">
         <div class="container">
-            <h1 class="fw-bold">Facilite a gestão da sua cozinha!</h1>
-            <p class="lead">Esqueça tabelas do excel! Controle e compartilhe o fluxo de caixa e custos de receitas sem complicação.</p>
-            <a href="/app/registrar" class="btn btn-light mt-3 px-6">Experimentar 7 Dias Grátis</a>
+            <img src="{{ url_for('static', path='/imgs/Too-Busy-2--Streamline-Brooklyn.png')}}" alt="">
+            <h1 class="fw-bold text-primary">Descomplique a gestão da sua cozinha!</h1>
+            <p class="lead">Ter uma cozinha independente dá trabalho, e ainda ter que lidar com um sistema super complexo não é a melhor solução.</p>
+            <p class="lead">Que tal gerenciar tudo que você precisa em um único lugar, sem dor de cabeça?</p>
+            <a href="/app/registrar" class="btn btn-primary mt-3 px-6">
+                {{ material_symbol('check') | safe }}
+                Experimentar 7 Dias Grátis
+            </a>
         </div>
     </header>
 
-    <section id="about" class="container py-5 text-center">
-        <h2 class="fw-bold">Sobre o KDerninho</h2>
-        <div class="container">
-            <p class="lead mx-auto" style="max-width: 720px;">O KDerninho surgiu como uma solução "in-house" para simplificar o árduo processo de gerenciar várias tabelas que surge em toda pequena cozinha.</p>
-            <p class="lead mx-auto" style="max-width: 720px;">Pra além de todos os termos difíceis e cálculos complexos de custo, porcetagem de lucro, etc, ter tudo em um único lugar facilita tudo!</p>
-        </div>
-    </section>
-
-    <section id="to-who" class="container py-5 text-center">
-        <h2 class="fw-bold">Para quem é?</h2>
-        <div class="container">
-            <p class="lead mx-auto" style="max-width: 720px;">O KDerninho é focado em quem está começando, mas é uma baita ferramenta para qualquer cozinha que ainda usa tabelas e preenche elas manualmente.</p>
-            <p class="lead mx-auto" style="max-width: 720px;">Ele vai te ajudar apresentando alguns termos importantes e te auxiliando a organizar as informações cruciais para que a coisa dê certo, igual aquele caderninho que a gente anota tudo que não quer esquecer!.</p>
+    <section id="about" class="py-5 container">
+        <div class="row align-items-center justify-content-center text-center text-md-start">
+            <div class="col-md-5">
+                <h2 class="fw-bold">O que é <b class="text-primary">KDerninho</b>?</h2>
+                <p class="lead">O KDerninho surgiu como uma solução "in-house" para simplificar o processo de gerenciar uma cozinha independente.</p>
+                <p class="lead">Quem já está com a mão na massa sabe que não adianta só ter uma boa receita para que tudo dê certo.</p>
+                <p class="lead">Em vez de usar um montão de tabelas ou contratar um sistema caro e complicado, deixe que o KDerninho te ajude com a parte chata!</p>
+            </div>
+            <div class="col-md-5 d-flex align-items-center justify-content-center">
+                <img class="img-fluid" src="{{ url_for('static', path='/imgs/Projection--Streamline-Brooklyn.png')}}" alt="">
+            </div>
         </div>
     </section>
 
     <section id="features" class="container py-5 text-center">
-        <h2 class="fw-bold">Recursos do KDerninho</h2>
+        <h2 class="fw-bold">O que tem no <b class="text-primary">KDerninho</b>?</h2>
+        <p class="lead">Tem muita coisa em um único lugar, dá uma olhada:</p>
         <div class="row mt-4">
             <div class="col-md-4 p-2 text-primary">
                 {{ material_symbol('currency_exchange') | safe }}
@@ -88,14 +92,14 @@
         </div>
     </section>
 
-    <section id="pricing" class="bg-light py-5 text-center">
+    <section id="pricing" class="py-5 text-center">
         <div class="container">
-            <h2 class="fw-bold">Escolha seu Plano</h2>
+            <h2 class="fw-bold">Qual o tamanho do seu <b class="text-primary">KDerninho</b>?</h2>
             <div class="row mt-4">
                 <div class="col-md-4">
                     <div class="card border">
                         <div class="card-body">
-                            <h5 class="card-title">Básico</h5>
+                            <h5 class="card-title">Pequeno</h5>
                             <p class="card-text">Para quem está começando do zero</p>
                             <ul class="list-group mb-3">
                                 <li class="list-group-item"><b>1</b> Conta de Dono</li>
@@ -118,13 +122,19 @@
                             <h5 class="fw-bold text-muted mb-0">Por R$180, você paga</h5>
                             <h2 class="fw-bold text-primary mb-1">R$15/mês</h2>
                             <h5 class="fw-bold text-muted">(Ou R$ 22.50/mês)</h5>
-                            <a href="/app/registrar" class="btn btn-primary">Assinar Plano</a>
+                            <a href="/app/registrar" class="btn btn-primary">
+                                {{ material_symbol('shopping_bag') | safe }}
+                                Assinar Plano
+                            </a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card border-primary">
                         <div class="card-body">
+                            <div class="badge bg-primary-lt position-absolute border border-primary" style="top: -8px; right: -8px; font-size: 14px;">
+                                Mais popular
+                            </div>
                             <h5 class="card-title">Intermediário</h5>
                             <p class="card-text">Para quem já tem um negócio</p>
                             <ul class="list-group mb-3">
@@ -148,13 +158,19 @@
                             <h5 class="fw-bold text-muted mb-0">Por R$588, você paga</h5>
                             <h2 class="fw-bold text-primary mb-1">R$49/mês</h2>
                             <h5 class="fw-bold text-muted">(Ou 12 x R$ 73.50)</h5>
-                            <a href="#" class="btn btn-primary">Assinar Plano</a>
+                            <a href="#" class="btn btn-primary">
+                                {{ material_symbol('shopping_bag') | safe }}
+                                Assinar Plano
+                            </a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card border">
                         <div class="card-body">
+                            <div class="badge bg-green-lt position-absolute border border-success" style="top: -8px; right: -8px; font-size: 14px;">
+                                Melhor custo benefício
+                            </div>
                             <h5 class="card-title">Avançado</h5>
                             <p class="card-text">Para largar de vez as tabelas</p>
                             <ul class="list-group mb-3">
@@ -178,7 +194,10 @@
                             <h5 class="fw-bold text-muted mb-0">Por R$1.188, você paga</h5>
                             <h2 class="fw-bold text-primary mb-1">R$99/mês</h2>
                             <h5 class="fw-bold text-muted">(Ou 12 x R$ 148.50)</h5>
-                            <a href="#" class="btn btn-primary">Assinar Plano</a>
+                            <a href="#" class="btn btn-primary">
+                                {{ material_symbol('shopping_bag') | safe }}
+                                Assinar Plano
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -188,9 +207,12 @@
 
     <section id="cta" class="py-5 text-center text-white bg-primary">
         <div class="container">
-            <h2 class="fw-bold">Experimente Grátis por 7 Dias</h2>
+            <h2 class="fw-bold">Experimente <b>Grátis</b> por 7 Dias</h2>
             <p class="lead">Cadastre-se agora e simplifique sua gestão financeira.</p>
-            <a href="/app/registrar" class="btn btn-light px-6">Criar Conta</a>
+            <a href="/app/registrar" class="btn btn-light px-6">
+                {{ material_symbol('check') | safe }}
+                Criar conta
+            </a>
         </div>
     </section>
 

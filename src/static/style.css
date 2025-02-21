@@ -1,3 +1,7 @@
+[data-bs-theme=light] {
+    --tblr-primary: #38a1ff !important;
+    --tblr-primary-rgb: 56,161,255 !important;
+}
 .card {
     box-shadow: 0px 0px 16px #00000012;
 }
@@ -95,5 +99,13 @@ a[target="_blank"]:has(.material-symbols-outlined) {
     vertical-align: text-top;
     span {
         font-size: 16px;
+    }
+}
+
+body.index {
+    background: linear-gradient(white, #38a1ff);
+    background-size: 100vw 900vh;
+    b {
+        font-weight: 700;
     }
 }

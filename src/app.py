@@ -67,7 +67,9 @@ db.init()
 
 @app.get('/', include_in_schema=False)
 async def get_index(request: fastapi.Request):
-    return render(request, 'index.html', context={})
+    return render(request, 'index.html', context={
+        'body_class': 'index'
+    })
 
 
 @app.get('/app', include_in_schema=False)
