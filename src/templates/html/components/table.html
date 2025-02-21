@@ -12,32 +12,34 @@
           </tr>
         </thead>
         <tbody>
-          {% for data in table_data %}
-            <tr
-            class="cursor-pointer"
-            data-bs-payload="{{data.dict() | json }}" 
-            >
-              <td class="w-1">
-                <input type="checkbox" data-id="{{data.id}}">
-              </td>
-              {% for value in data.row %}
-                <td
-                  {% if table_modal %}
-                    data-bs-toggle="modal"
-                    data-bs-target="{{table_modal}}"
-                  {% elif data.href %}
-                    onclick="window.location = '{{data.href}}'"
-                  {% endif %}
-                >
-                  {{ value | safe }}
+          {% if table_data %}
+            {% for data in table_data %}
+              <tr
+              class="cursor-pointer"
+              data-bs-payload="{{data.dict() | json }}" 
+              >
+                <td class="w-1">
+                  <input type="checkbox" data-id="{{data.id}}">
                 </td>
-              {% endfor %}
-            </tr>
+                {% for value in data.row %}
+                  <td
+                    {% if table_modal %}
+                      data-bs-toggle="modal"
+                      data-bs-target="{{table_modal}}"
+                    {% elif data.href %}
+                      onclick="window.location = '{{data.href}}'"
+                    {% endif %}
+                  >
+                    {{ value | safe }}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
           {% else %}
             <tr>
               <td colspan="6">{{table_no_result}}</td>
             </tr>
-          {% endfor %}
+          {% endif %}
         </tbody>
       </table>
     </div>

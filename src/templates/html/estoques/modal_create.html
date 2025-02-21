@@ -29,12 +29,16 @@
           <div id="datagrid-insumo">
             <div class="mb-3">
               <label for="insumo_id" class="form-label required">Insumo</label>
-              <select class="form-select" name="insumo_id">
-                <option selected value="-1">Selecionar</option>
-                {% for insumo in insumos %}
-                  <option value="{{insumo.id}}" data-custo_p_grama="{{insumo.custo_p_grama}}">{{insumo.nome | title}}</option>
-                {% endfor %}
-              </select>
+              {% if insumos %}
+                <select class="form-select" name="insumo_id">
+                  <option selected value="-1">Selecionar</option>
+                  {% for insumo in insumos %}
+                    <option value="{{insumo.id}}" data-custo_p_grama="{{insumo.custo_p_grama}}">{{insumo.nome | title}}</option>
+                  {% endfor %}
+                </select>
+              {% else %}
+                <p class="text-muted">Nenhum insumo cadastrado</p>
+              {% endif %}
             </div>
             <div class="mb-3" id="fieldset-quantidade-insumo" style="display: none;">
               <label for="quantidade_insumo" class="form-label required">Quantidade</label>
@@ -47,12 +51,16 @@
           <div id="datagrid-receita" style="display: none;">
             <div class="mb-3">
               <label for="receita_id" class="form-label required">Receita</label>
-              <select class="form-select" name="receita_id">
-                <option selected value="-1">Selecionar</option>
-                {% for receita in receitas %}
-                  <option value="{{receita.id}}" data-custo_p_grama="{{receita.custo_p_grama}}">{{receita.nome | title}}</option>
-                {% endfor %}
-              </select>
+              {% if insumos %}
+                <select class="form-select" name="receita_id">
+                  <option selected value="-1">Selecionar</option>
+                  {% for receita in receitas %}
+                    <option value="{{receita.id}}" data-custo_p_grama="{{receita.custo_p_grama}}">{{receita.nome | title}}</option>
+                  {% endfor %}
+                </select>
+              {% else %}
+                <p class="text-muted">Nenhuma receita cadastrado</p>
+              {% endif %}
             </div>
             <div class="mb-3" id="fieldset-quantidade-receita" style="display: none;">
               <label for="quantidade_receita" class="form-label required">Quantidade</label>

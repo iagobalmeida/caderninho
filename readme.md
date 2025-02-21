@@ -29,12 +29,17 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 ### Execução
 1. Inicie a aplicação com `uvicorn src.app:app --reload`
 
-### Testes
+### Rodando localmente com dados de exemplo
 1. Inicie a aplicação
 2. Acesse `127.0.0.1:8000/docs`
 3. Execute a rota `/seed` para criar dados de testes no banco
 4. Use a conta `usuario@emai.com` com a senha `123` para acessar como usuário
 5. Use a conta `admin@email.com` com a senha `admin` para acessar como admin
+
+### Testes
+```
+coverage run -m pytest && coverage html
+```
 
 ## vb1.0
 - [X] Separar `scripts.js`

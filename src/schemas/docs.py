@@ -54,10 +54,7 @@ SOBRE_ESSA_PAGINA = {
 
 
 def get_sobre_essa_pagina_html(nome_pagina: str):
-    conteudo = SOBRE_ESSA_PAGINA.get(nome_pagina, None)
-    if not conteudo:
-        return None
-
+    conteudo = SOBRE_ESSA_PAGINA.get(nome_pagina, [])
     linhas = [
         f'<p class="mb-1 text-muted">{"-" if not "<a href" in linha else ""} {linha}</p>'
         for linha in conteudo

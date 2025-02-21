@@ -11,20 +11,22 @@
             </span>
           {% endif %}
         {% endif %}
-        {% for i in range(table_pages) %}
-          {% if i - 2 < page | int and i + 4 > page | int %}
-            <a href="?page={{i+1}}" class="btn {{'btn-primary' if page|int == i+1 else ''}}">{{i+1}}</a>
+        {% if table_pages %}
+          {% for i in range(table_pages) %}
+            {% if i - 2 < page | int and i + 4 > page | int %}
+              <a href="?page={{i+1}}" class="btn {{'btn-primary' if page|int == i+1 else ''}}">{{i+1}}</a>
+            {% endif %}
+          {% endfor %}
+          {% if page | int <= table_pages - 3 %}
+            {% if page | int < table_pages - 3 %}
+              <span>
+                {{material_symbol('more_horiz') | safe}}
+              </span>
+            {% endif %}
+            <a href="?page={{table_pages}}" class="btn {{'btn-primary' if page|int == table_pages else ''}}">
+              {{table_pages}}
+            </a>
           {% endif %}
-        {% endfor %}
-        {% if page | int <= table_pages - 3 %}
-          {% if page | int < table_pages - 3 %}
-            <span>
-              {{material_symbol('more_horiz') | safe}}
-            </span>
-          {% endif %}
-          <a href="?page={{table_pages}}" class="btn {{'btn-primary' if page|int == table_pages else ''}}">
-            {{table_pages}}
-          </a>
         {% endif %}
       </div>
       <span class="text-secondary">Visualizando 10 de {{table_count}} registros</span>

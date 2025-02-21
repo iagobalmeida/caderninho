@@ -3,11 +3,12 @@ import os
 import fastapi
 
 from src import db
+from src.env import getenv
 from src.scripts import seed
 
 router = fastapi.APIRouter(prefix='/scripts')
 
-SCRIPTS_TOKEN = os.getenv('SCRIPTS_TOKEN', 'batatafrita')
+SCRIPTS_TOKEN = getenv('SCRIPTS_TOKEN', 'batatafrita')
 
 
 @router.post('/seed', tags=['Scripts'])

@@ -5,12 +5,13 @@ from fastapi import Depends, Request
 from sqlalchemy import text
 from sqlmodel import SQLModel, create_engine
 
+from src.env import getenv
 from src.schemas.auth import DBSessaoAutenticada
 
 sqlite_nome_arquivo = "database.db"
 sqlite_url = f"sqlite:///{sqlite_nome_arquivo}"
 
-DATABASE_URL = os.getenv('DATABASE_URL', sqlite_url)
+DATABASE_URL = getenv('DATABASE_URL', sqlite_url)
 
 engine = create_engine(DATABASE_URL, echo=False)
 

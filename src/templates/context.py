@@ -63,9 +63,10 @@ class Context(TypedDict):
 
     @classmethod
     def factory_breadcrumbs(self, request: Request):
-        base_url = f"{request.url.scheme}://{request.url.hostname}"
-        if request.url.port:
-            base_url = f"{base_url}:{request.base_url.port}"
+        protocol = request.url.scheme
+        hostname = request.url.hostname
+        port = f':{request.base_url.port}' if request.base_url.port else ''
+        base_url = f"{protocol}://{hostname}{port}"
         breadcrumbs = [
             # Context.Breadcrumb(
             #     label='Home',

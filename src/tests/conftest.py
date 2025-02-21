@@ -1,7 +1,56 @@
+from datetime import datetime
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
 
+from schemas.auth import SessaoAutenticada
+from src import db
 from src.app import app
+from src.domain import repository
+
+MOCK_USUARIO = repository.Entities.USUARIO.value(
+    id=1,
+    nome='Zé do teste',
+    email='teste@email.com',
+    senha='teste',
+    organizacao_id=1
+)
+
+MOCK_ESTOQUE = repository.Entities.ESTOQUE.value(
+    id=1,
+    organizacao_id=1,
+    descricao='Movimentação teste',
+    data_criacao=datetime.now(),
+    insumo_id=1
+)
+
+MOCK_SESSAO_AUTENTICADA = SessaoAutenticada(
+    valid=True,
+    id=MOCK_USUARIO.id,
+    nome=MOCK_USUARIO.nome,
+    email=MOCK_USUARIO.email,
+    dono=MOCK_USUARIO.dono,
+    administrador=MOCK_USUARIO.administrador,
+    organizacao_id=MOCK_USUARIO.organizacao_id,
+    organizacao_descricao='Organização Teste'
+)
+
+
+def __mock_repository_get_side_effect(session, entity, fisrt: bool = False, *args, **kwargs):
+    ret = None
+    if entity == repository.Entities.USUARIO:
+        ret = [MOCK_USUARIO]
+    if entity == repository.Entities.ESTOQUE:
+        ret = [MOCK_ESTOQUE]
+    return ret[0] if fisrt else ret, None, None
+
+
+@pytest.fixture
+def mock_repository_get():
+    with patch.object(repository, 'get') as patch_repo_get:
+        patch_repo_get.side_effect = __mock_repository_get_side_effect
+        yield
 
 
 @pytest.fixture
