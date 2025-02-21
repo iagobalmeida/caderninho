@@ -1,4 +1,5 @@
 ![# KDERNIHO](./src/static//logo.svg)
+![Coverage](./coverage.svg) ![Test Status](https://github.com/iagobalmeida/herbaria/actions/workflows/tests.yml/badge.svg)
 
 #### SASS para gestão simplificada da sua cozinha independente
 
@@ -38,7 +39,7 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 
 ### Testes
 ```
-coverage run -m pytest && coverage html
+coverage run -m pytest && coverage html && coverage-badge -o coverage.svg
 ```
 
 ## vb1.0
