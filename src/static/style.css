@@ -108,4 +108,9 @@ body.index {
     b {
         font-weight: 700;
     }
+    nav {
+        border: none;
+        outline: none;
+        box-shadow: none;
+    }
 }
