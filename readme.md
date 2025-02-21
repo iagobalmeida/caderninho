@@ -24,6 +24,14 @@ No lugar de tabelas do excel, você pode usar o KDerninho para:
 
 ## Como Usar
 
+### Acesse agora!
+
+O *KDerninho* já tem uma versão rodando no `Railway` que você já pode usar:
+
+[caderninho.up.railway.app](https://caderninho.up.railway.app/)
+
+*Essa é uma demonstração de uma versão que ainda está em desenvolvimento, todos os dados serão apagados no lançamento da próxima versão**
+
 ### Instalação
 1. Crie um ambiente virtual com `python3 -m venv .venv`
 2. Inicie o ambiente virtual cmo `source ./.venv/bin/activate`
