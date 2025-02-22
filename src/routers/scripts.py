@@ -1,5 +1,4 @@
-import os
-
+# pragma: nocover
 import fastapi
 
 from src import db

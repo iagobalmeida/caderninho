@@ -53,7 +53,7 @@ O *KDerninho* já tem uma versão rodando no `Railway` que você já pode usar:
 
 ### Testes
 ```
-coverage run -m pytest && coverage html && coverage-badge -o coverage.svg
+coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o coverage.svg
 ```
 
 ## vb1.0

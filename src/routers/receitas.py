@@ -49,7 +49,7 @@ async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, 
     )
 
     table_columns = repository.Entities.RECEITA.value.columns()
-    table_data = db_receitas
+    table_data = db_receitas if isinstance(db_receitas, list) else [db_receitas]
     table_no_result = 'Nenhum registro encontrado'
 
     return render(
@@ -83,7 +83,6 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
     db_receita, _, _ = repository.get(session, repository.Entities.RECEITA, {'id': id}, first=True)
     if not db_receita:
         raise ValueError(f'Receita com id {id} não encontrada')
-    db_insumos, _, _ = repository.get(session, repository.Entities.INGREDIENTE)
     context_header = Context.Header(
         pretitle='Registros',
         title='Receitas',
