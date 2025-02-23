@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 
 
 def __unit_converter(input: float, unity: str = 'g', converter_kg: bool = False, converter_kg_sempre: bool = False):
-    if (converter_kg and abs(input) > 1000 and unity == 'g') or converter_kg_sempre:
+    if (converter_kg and abs(input) >= 1000 and unity == 'g') or converter_kg_sempre:
         input = input/1000
         unity = 'Kg'
     return (input, unity)

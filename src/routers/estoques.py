@@ -23,9 +23,9 @@ async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -
     if filter_insumo_id >= 0:
         filters.update(insumo_id=filter_insumo_id)
 
-    db_estoques, db_estoques_pages, db_estoques_count = repository.get(session, repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
+    db_estoques, db_estoques_pages, db_estoques_count = repository.get(session=session, entity=repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
 
-    db_insumos, _, _ = repository.get(session, repository.Entities.INGREDIENTE)
+    db_insumos, _, _ = repository.get(session=session, entity=repository.Entities.INGREDIENTE)
     entradas, saidas, caixa = repository.get_fluxo_caixa(session)
 
     context_header = Context.Header(
@@ -91,7 +91,7 @@ async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -
 @router.post('/', include_in_schema=False)
 async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     if payload.descricao == 'Uso em Receita' and payload.receita_id:
-        db_receita, _, _ = repository.get(session, repository.Entities.RECEITA, {'id': payload.receita_id}, first=True)
+        db_receita, _, _ = repository.get(session=session, entity=repository.Entities.RECEITA, filters={'id': payload.receita_id}, first=True)
         payload.descricao = f'Uso em Receita ({db_receita.nome})'
         for insumo_link in db_receita.insumo_links:
             quantidade = -1 * insumo_link.quantidade * float(payload.quantidade_receita)

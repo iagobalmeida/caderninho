@@ -11,7 +11,7 @@ SCRIPTS_TOKEN = getenv('SCRIPTS_TOKEN', 'batatafrita')
 
 
 @router.post('/seed', tags=['Scripts'])
-async def post_scripts_seed(token: str = fastapi.Header(None)):
+async def post_scripts_seed(token: str = fastapi.Header(None)):  # pragma: nocover
     if not token == SCRIPTS_TOKEN:
         raise fastapi.HTTPException(401, 'Não autorizado')
     seed.main()
@@ -19,7 +19,7 @@ async def post_scripts_seed(token: str = fastapi.Header(None)):
 
 
 @router.post('/reset_db', tags=['Scripts'])
-async def post_scripts_reset_db(token: str = fastapi.Header(None)):
+async def post_scripts_reset_db(token: str = fastapi.Header(None)):  # pragma: nocover
     if not token == SCRIPTS_TOKEN:
         raise fastapi.HTTPException(401, 'Não autorizado')
     db.reset()

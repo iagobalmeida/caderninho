@@ -1,25 +1,10 @@
-from math import ceil
-from unittest.mock import MagicMock
 
 import pytest
 
 from src.domain import repository
 
 
-@pytest.fixture
-def mock_session():
-    """Cria um mock da sessão autenticada"""
-    session = MagicMock()
-    session.exec.return_value.all.return_value = ["item1", "item2"]
-    session.exec.return_value.first.return_value = "item1"
-    session.exec.return_value.one.return_value = 2  # Simula count = 2
-    session.sessao_autenticada = MagicMock()
-    session.sessao_autenticada.administrador = False
-    session.sessao_autenticada.organizacao_id = 1
-    return session
-
-
-def test_get(mock_session):
+def test_repository_get(mock_session):
     result = repository.get(
         session=mock_session,
         entity=repository.Entities.ESTOQUE,
@@ -35,7 +20,7 @@ def test_get(mock_session):
     assert result
 
 
-def test_get_order_by_first(mock_session):
+def test_repository_get_order_by_first(mock_session):
     result = repository.get(
         session=mock_session,
         entity=repository.Entities.ESTOQUE,
@@ -46,5 +31,100 @@ def test_get_order_by_first(mock_session):
         },
         order_by='id',
         first=True
+    )
+    assert result
+
+
+def test_repository_update(mock_repository_get, mock_session):
+    def __update(estoque_id: int):
+        return repository.update(
+            session=mock_session,
+            entity=repository.Entities.ESTOQUE,
+            filters={
+                'id': estoque_id
+            },
+            values={
+                'quantidade': 100,
+                'valor_nulo': None
+            }
+        )
+    result = __update(2)
+    assert result
+
+    with pytest.raises(ValueError):  # Registro inexistente
+        __update(-1)
+
+
+def test_repository_update_usuario_senha(mock_repository_get, mock_session):
+    def __update_senha(usuario_id: int, senha_atual: str, senha: str):
+        return repository.update(
+            session=mock_session,
+            entity=repository.Entities.USUARIO,
+            filters={
+                'id': usuario_id
+            },
+            values={
+                'senha': senha,
+                'senha_atual': senha_atual
+            }
+        )
+    result = __update_senha(1, 'teste', 'teste')
+    assert result
+
+    with pytest.raises(ValueError):  # Senha atual incorreta
+        __update_senha(1, 'foo', 'bar')
+
+    with pytest.raises(ValueError):  # Sem permissão (outro usuário)
+        __update_senha(2, 'teste', 'teste')
+
+
+def test_repository_update_organizacao_sem_permissao(mock_repository_get, mock_session):
+    with pytest.raises(ValueError):
+        repository.update(
+            session=mock_session,
+            entity=repository.Entities.ORGANIZACAO,
+            filters={
+                'id': 1
+            },
+            values={
+                'cidade': 'teste'
+            }
+        )
+
+
+def test_repository_delete(mock_repository_get, mock_session):
+    def __delete(id, organizacao: bool = False, usuario: bool = False):
+        entity = repository.Entities.ESTOQUE
+        if organizacao:
+            entity = repository.Entities.ORGANIZACAO
+        if usuario:
+            entity = repository.Entities.USUARIO
+        return repository.delete(
+            session=mock_session,
+            entity=entity,
+            filters={
+                'id': id
+            }
+        )
+    result = __delete(1)
+    assert result
+
+    with pytest.raises(ValueError):  # Registro inexistente
+        __delete(-1)
+
+    with pytest.raises(ValueError):  # Não pode deletar organização
+        __delete(1, organizacao=True)
+
+    with pytest.raises(ValueError):  # Não pode deletar outro usuário
+        __delete(2, usuario=True)
+
+
+def test_repository_create(mock_repository_get, mock_session):
+    result = repository.create(
+        session=mock_session,
+        entity=repository.Entities.RECEITA,
+        values={
+            'nome': 'teste'
+        }
     )
     assert result

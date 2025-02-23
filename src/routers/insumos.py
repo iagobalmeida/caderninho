@@ -15,7 +15,7 @@ router = fastapi.APIRouter(prefix='/app/insumos', dependencies=[auth.HEADER_AUTH
 
 @router.get('/', include_in_schema=False)
 async def get_insumos_index(request: fastapi.Request, session: Session = DBSESSAO_DEP):
-    db_insumos, db_insumos_pages, db_insumos_count = repository.get(session, repository.Entities.INGREDIENTE)
+    db_insumos, db_insumos_pages, db_insumos_count = repository.get(session=session, entity=repository.Entities.INGREDIENTE)
 
     table_columns = repository.Entities.INGREDIENTE.value.columns()
     table_data = db_insumos

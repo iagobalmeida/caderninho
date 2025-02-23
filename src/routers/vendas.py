@@ -15,7 +15,7 @@ router = fastapi.APIRouter(prefix='/app/vendas', dependencies=[auth.HEADER_AUTH]
 
 @router.get('/', include_in_schema=False)
 async def get_vendas_index(request: fastapi.Request, page: int = fastapi.Query(1), session: Session = DBSESSAO_DEP):
-    db_vendas, db_vendas_pages, db_vendas_count = repository.get(session, repository.Entities.VENDA, filters={
+    db_vendas, db_vendas_pages, db_vendas_count = repository.get(session=session, entity=repository.Entities.VENDA, filters={
         # 'data_inicio': filter_data_inicio,
         # 'data_final': filter_data_final
     }, order_by='data_criacao', desc=True, page=page)

@@ -115,7 +115,7 @@ async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Q
 
 @app.post('/app/recuperar_senha', include_in_schema=False)
 async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
-    db_usuario, _, _ = repository.get(session, repository.Entities.USUARIO, {'email': email}, first=True)
+    db_usuario, _, _ = repository.get(session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True)
     if not db_usuario:
         raise ValueError('Não foi encontrado usuário com esse email')
 

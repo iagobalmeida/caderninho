@@ -76,7 +76,7 @@ def get(
 
 
 def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, values: dict = {}):
-    db_entity, _, _ = get(session, entity, filters, first=True)
+    db_entity, _, _ = get(session=session, entity=entity, filters=filters, first=True)
 
     if not db_entity:
         raise ValueError(f'{entity} não encontrado!')
@@ -84,6 +84,7 @@ def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, v
     if entity == Entities.USUARIO and 'senha_atual' in values:
         if db_entity.senha != values['senha_atual']:
             raise ValueError('Senha atual inválida!')
+        del values['senha_atual']
 
     if not session.sessao_autenticada.administrador and not session.sessao_autenticada.dono:
 
@@ -106,7 +107,7 @@ def delete(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}):
     if entity == Entities.ORGANIZACAO:
         raise ValueError('Não é possível excluir uma organização!')
 
-    db_entities, _, _ = get(session, entity, filters)
+    db_entities, _, _ = get(session=session, entity=entity, filters=filters)
 
     if not db_entities:
         raise ValueError(f'{entity} não encontrado!')
@@ -133,10 +134,10 @@ def create(session: DBSessaoAutenticada, entity: Entities, values: dict = {}):
 # Funções otimizadas
 
 def get_venda_qr_code(session: DBSessaoAutenticada, venda_id: int) -> str:
-    organizacao, _, _ = get(session, Entities.ORGANIZACAO, {'id': session.sessao_autenticada.organizacao_id}, first=True)
-    if not organizacao:
+    organizacao, _, _ = get(session=session, entity=Entities.ORGANIZACAO, filters={'id': session.sessao_autenticada.organizacao_id}, first=True)
+    if not organizacao:  # pragma: nocover
         return None
-    venda, _, _ = get(session, Entities.VENDA, {'id': venda_id}, first=True)
+    venda, _, _ = get(session=session, entity=Entities.VENDA, filters={'id': venda_id}, first=True)
     return venda.gerar_qr_code(
         pix_nome=organizacao.descricao,
         pix_cidade=organizacao.cidade,
@@ -155,11 +156,5 @@ def get_fluxo_caixa(session: DBSessaoAutenticada) -> Tuple[float, float, float]:
         query_saidas = query_saidas.filter(Estoque.organizacao_id == session.sessao_autenticada.organizacao_id)
     saidas = session.exec(query_saidas).first()
 
-    if not entradas and entradas != 0:
-        entradas = 0
-
-    if not saidas and saidas != 0:
-        saidas = 0
-
-    caixa = entradas - saidas
+    caixa = (entradas if entradas else 0) - (saidas if saidas else 0)
     return (entradas, saidas, caixa)

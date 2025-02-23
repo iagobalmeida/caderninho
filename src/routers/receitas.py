@@ -15,7 +15,7 @@ router = fastapi.APIRouter(prefix='/app/receitas', dependencies=[auth.HEADER_AUT
 
 @router.get('/', include_in_schema=False)
 async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, session: Session = DBSESSAO_DEP):
-    db_receitas, db_receitas_pages, db_receitas_count = repository.get(session, repository.Entities.RECEITA, {'nome': filter_nome})
+    db_receitas, db_receitas_pages, db_receitas_count = repository.get(session=session, entity=repository.Entities.RECEITA, filters={'nome': filter_nome})
     context_header = Context.Header(
         pretitle='Registros',
         title='Receitas',
@@ -80,7 +80,7 @@ async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form
 
 @router.get('/{id}', include_in_schema=False)
 async def get_receita(request: fastapi.Request, id: int, session: Session = DBSESSAO_DEP):
-    db_receita, _, _ = repository.get(session, repository.Entities.RECEITA, {'id': id}, first=True)
+    db_receita, _, _ = repository.get(session=session, entity=repository.Entities.RECEITA, filters={'id': id}, first=True)
     if not db_receita:
         raise ValueError(f'Receita com id {id} não encontrada')
     context_header = Context.Header(
