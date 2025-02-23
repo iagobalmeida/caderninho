@@ -11,7 +11,7 @@ Essa aplicação não seria possível sem a existência de:
 - [Loguru](https://github.com/Delgan/loguru)
 - [TablerCSS](https://tabler.io/)
 - [Material Symbols](https://fonts.google.com/icons)
-- [Railwai.app](https://railway.app/)
+- [Railway.app](https://railway.app/)
 
 ### Funcionalidades
 
@@ -200,7 +200,11 @@ coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o 
   - [X] LocalStorage deu conta do recado
 
 # v1.4.5
-- [ ] Testes unitários de todas as rotas do sistema
+- [ ] Testes unitários com 100% de cobertura
+
+# v1.4.8
+- [ ] Autenticacao com OAuth2
+- [ ] Senhas haseadas no banco
 
 # v1.5
 - [ ] Exportacação de CSV
@@ -209,6 +213,7 @@ coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o 
   - [ ] Limitar número de registros por plano em `create`
   - [ ] Exibir plano atual
   - [ ] Botão para upgrade de plano
+- [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`
 
 # v2.0
 - [ ] Filtro em tabelas
