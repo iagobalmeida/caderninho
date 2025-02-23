@@ -61,7 +61,7 @@ def templates_filter_format_quantity(input: float, converter_kg: bool = False, c
 
 
 def templates_filter_format_reais(input: float):
-    if input == 0:
+    if input == 0 or not input:
         return '-'
 
     more_decimals = f'{input:.3f}'
