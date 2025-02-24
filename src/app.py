@@ -14,9 +14,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from modules import smpt
 from src import db
 from src.domain import inputs, repository
-from src.modules import send_email
 from src.modules.logger import logger, setup_logger
 from src.routers.autenticacao import router as router_autenticacao
 from src.routers.estoques import router as router_estoques
@@ -126,7 +126,7 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
     db_usuario.hash_senha()
     session.commit()
 
-    send_email.enviar(
+    smpt.enviar(
         assunto='KDerninho - Recuperar Senha',
         corpo=f'Sua nova senha temporária é {nova_senha}',
         para=[db_usuario.email]

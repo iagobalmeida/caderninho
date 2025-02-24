@@ -57,7 +57,6 @@ class Usuario(RegistroOrganizacao, table=True):
     def hash_senha(self) -> str:
         if not self.senha.startswith("$2b$"):  # Verifica se já está hasheada (evita rehash)
             self.senha = pwd_context.hash(self.senha)
-            logger.info('Senha hasheada')
 
     def verificar_senha(self, senha: str) -> bool:
         try:
