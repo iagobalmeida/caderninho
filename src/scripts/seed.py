@@ -1,50 +1,46 @@
 from datetime import datetime
 from random import randint
 
+from loguru import logger
 from sqlmodel import Session
 
 from src.db import engine
-from src.domain.entities import (Estoque, Insumo, Organizacao, Receita,
-                                 ReceitaInsumoLink, Usuario, Venda)
+from src.domain.entities import (Estoque, Insumo, Receita, ReceitaInsumoLink,
+                                 Venda)
+from src.tests import mocks
 
 
 def try_add(obj):
     try:
+        obj.id = None
         with Session(engine) as session:
             session.add(obj)
             session.commit()
-            session.refresh(obj)
+            # session.refresh(obj)
+            logger.info(f'{type(obj).__name__} #{obj.id} inserido')
+            if type(obj).__name__ == 'Usuario':
+                logger.info(obj)
         return obj
     except Exception as ex:
-        print(ex)
+        logger.exception(ex)
         return obj
 
 
 def main():
-    organizacao = try_add(Organizacao(descricao='Herbaria', cidade='Caxias do Sul', chave_pix='347.753.508-11', usuarios=[Usuario(
-        nome='Usuário',
-        email='usuario@email.com',
-        senha='123',
-        dono=True
-    )]))
-
-    try_add(Usuario(
-        nome='Administrador',
-        email='admin@email.com',
-        senha='admin',
-        administrador=True
-    ))
+    organizacao = try_add(mocks.MOCK_ORGANIZACAO)
+    try_add(mocks.MOCK_USUARIO_DONO)
+    try_add(mocks.MOCK_USUARIO_ADMIN)
+    try_add(mocks.MOCK_ESTOQUE)
 
     acucar = try_add(Insumo(organizacao_id=organizacao.id, nome='Açúcar', peso=1000, custo=14))
     manteiga = try_add(Insumo(organizacao_id=organizacao.id, nome='Manteiga', peso=1000, custo=40))
     chocolate = try_add(Insumo(organizacao_id=organizacao.id, nome='Chocolate', peso=1000, custo=57))
     farinha = try_add(Insumo(organizacao_id=organizacao.id, nome='Farinha', peso=1000, custo=4))
-
     cookies = try_add(Receita(organizacao_id=organizacao.id, nome='Cookies', peso_unitario=100))
 
     for __insumo in [acucar, manteiga, chocolate, farinha]:
         try_add(ReceitaInsumoLink(organizacao_id=organizacao.id, quantidade=100, receita_id=cookies.id, insumo_id=__insumo.id))
-        estoque_quantidade = randint(250, 2000) - randint(250, 2000)
+        estoque_quantidade = 75
         try_add(Estoque(
             organizacao_id=organizacao.id,
             descricao='Compra' if estoque_quantidade > 0 else f'Uso em receita ({cookies.nome})',

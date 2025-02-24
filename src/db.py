@@ -1,4 +1,3 @@
-import os
 from typing import List
 
 from fastapi import Depends, Request
@@ -8,12 +7,10 @@ from sqlmodel import SQLModel, create_engine
 from src.env import getenv
 from src.schemas.auth import DBSessaoAutenticada
 
-sqlite_nome_arquivo = "database.db"
-sqlite_url = f"sqlite:///{sqlite_nome_arquivo}"
+database_url = getenv('DATABASE_URL', "sqlite:///database.db")
+engine = create_engine(database_url, echo=False)
 
-DATABASE_URL = getenv('DATABASE_URL', sqlite_url)
-
-engine = create_engine(DATABASE_URL, echo=False)
+DB_SESSION = None
 
 
 def get_session(request: Request):
@@ -38,6 +35,7 @@ def __drop_tables(table_names: List[str], cascade: bool = True):
 
 
 def reset():
+    database_url = getenv('DATABASE_URL', "sqlite:///database.db")
     __drop_tables(
         table_names=[
             'receitainsumolink',
@@ -47,7 +45,7 @@ def reset():
             'insumo',
             'usuario'
         ],
-        cascade='sqlite' not in DATABASE_URL
+        cascade='sqlite' not in database_url
     )
     SQLModel.metadata.drop_all(bind=engine)
     SQLModel.metadata.create_all(bind=engine)

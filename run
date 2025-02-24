@@ -1,0 +1,39 @@
+#!/bin/bash
+if [ "$1" == "coverage" ] ; then
+  source .venv/bin/acivate
+  DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o coverage.svg
+  exit 0
+elif [ "$1" == "tests" ]; then
+  source .venv/bin/activate
+  DATABASE_URL="sqlite:///test.db" python -m pytest -s -x
+  exit 0
+# elif [ "$1" == "up" ] ; then
+#   sudo docker network create -d bridge cypher_network
+#   if [[ -n "$2" ]] ; then
+#     sudo docker compose up $2 --remove-orphans
+#   else
+#     sudo docker compose up -d
+#   fi
+#   exit 0
+# elif [ "$1" == "down" ] ; then
+#   sudo docker compose down
+#   exit 0
+# elif [ "$1" == "list" ] ; then
+#   sudo docker compose ps
+#   exit 0
+# elif [ "$1" == "logs" ]; then
+#   sudo docker logs $2 -f
+# elif [ "$1" == "backend" ]; then
+#   cd backend
+#   ./run $2
+# elif [ "$1" = "git" ] && [ "$2" = "autores" ]; then # Comando secreto!
+#     git shortlog -sn --all | tac
+else
+    if [ "$1" != "" ]; then
+      echo -e "\033[1;31mComando Inválido\033[0m: $0\033[1;32m $@ \033[0m"
+    fi
+    echo Comandos disponíveis:
+    echo -e "\033[1;32m coverage\033[0m:\t\tRoda o teste de cobertura e gera o html e svg de coverage" 
+    echo -e "\033[1;32m tests\033[0m:\t\t\tExecuta os testes via pytest até a primeira falha" 
+    exit 1
+fi

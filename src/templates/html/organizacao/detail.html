@@ -11,7 +11,7 @@
         </div>
         {% if usuario.dono %}
             <div class="card-body">
-                <form action="{{url_for('post_organizacao_index')}}" class="datagrid" method="POST">
+                <form action="{{url_for('post_organizacao_index')}}" class="datagrid" method="POST" id="form-organizacao">
                     <input type="hidden" name="id" value="{{organizacao.id}}">
                     <div class="datagrid-item">
                         <div class="datagrid-title">Descrição</div>
@@ -64,7 +64,7 @@
                 <span class="text-muted text-sm">Clique para expandir/fechar</span>
             </div>
             <div class="card-body collapse show" id="collapse_configuracoes">
-                <form method="POST" action="{{url_for('post_organizacao_configuracoes')}}">
+                <form method="POST" action="{{url_for('post_organizacao_configuracoes')}}" id="form-configuracoes">
                     <input type="hidden" name="id" value="{{organizacao.id}}">
                     <div class="mb-3">
                     <div class="form-label">Unidades de Medida</div>

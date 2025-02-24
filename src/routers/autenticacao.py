@@ -14,8 +14,8 @@ async def post_index(request: fastapi.Request, email: str = fastapi.Form(), senh
 
 
 @router.post('/authenticate')
-async def post_authenticate(email: str = fastapi.Form(), senha: str = fastapi.Form(), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
-    return auth.usuario_autenticar(session, email=email, senha=senha)
+async def post_authenticate(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
+    return auth.usuario_autenticar(session, request=request, email=email, senha=senha)
 
 
 @router.get('/logout', include_in_schema=False)

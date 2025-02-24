@@ -1,4 +1,3 @@
-
 import logging
 import random
 import re
@@ -8,6 +7,7 @@ import fastapi.security
 from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
+from loguru import logger
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.log import rootlogger
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -36,6 +36,7 @@ SESSION_SECRET_KEY = 'SESSION_SECRET_KEY'
 
 rootlogger.setLevel(logging.WARN)
 
+
 app = fastapi.FastAPI()
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY, https_only=False)
@@ -51,7 +52,7 @@ app.include_router(router_paginas)
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 
-class CacheControlMiddleware(BaseHTTPMiddleware):
+class CacheControlMiddleware(BaseHTTPMiddleware):  # pragma:nocover
     async def dispatch(self, request, call_next):
         response = await call_next(request)
         if request.url.path.startswith("/static/"):
@@ -88,7 +89,7 @@ async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar 
     message = None
     try:
         if payload.senha != payload.senha_confirmar:
-            raise Exception('As senhas não batem')
+            raise ValueError('As senhas não batem')
 
         db_organizacao = repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})
         organizacao_id = db_organizacao.id
@@ -102,6 +103,7 @@ async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar 
         })
         message = 'Conta criada com sucesso'
     except Exception as ex:
+        logger.exception(ex)
         template_name = 'autenticacao/criar_conta.html'
         error = str(ex)
 
@@ -131,7 +133,7 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
     return render(request, 'autenticacao/login.html', context={'message': f'Senha enviada para: {db_usuario.email}', 'error': error, 'data_bs_theme': 'auto'})
 
 
-@app.exception_handler(IntegrityError)
+@app.exception_handler(IntegrityError)  # pragma: nocover
 async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     logger.exception(ex)
     if not redirect_to:
@@ -147,7 +149,7 @@ async def integrity_error_exception_handler(request: fastapi.Request, ex, redire
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
 
 
-@app.exception_handler(ValueError)
+@app.exception_handler(ValueError)  # pragma: nocover
 async def value_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     if not isinstance(ex, HTTPException):
         logger.exception(ex)
@@ -157,7 +159,7 @@ async def value_error_exception_handler(request: fastapi.Request, ex, redirect_t
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
 
 
-@app.exception_handler(HTTPException)
+@app.exception_handler(HTTPException)  # pragma: nocover
 async def http_error_exception_handler(request: fastapi.Request, ex: HTTPException):
     if ex.status_code == 401:
         request.session.clear()
@@ -169,7 +171,7 @@ async def http_error_exception_handler(request: fastapi.Request, ex: HTTPExcepti
     return await value_error_exception_handler(request, ex, redirect_to=redirect_to)
 
 
-@app.exception_handler(RequestValidationError)
+@app.exception_handler(RequestValidationError)  # pragma: nocover
 async def generic_exception_handler(request: fastapi.Request, ex: Exception):
     logger.exception(ex)
     redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))

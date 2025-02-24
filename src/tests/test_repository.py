@@ -35,7 +35,7 @@ def test_repository_get_order_by_first(mock_session):
     assert result
 
 
-def test_repository_update(mock_repository_get, mock_session):
+def test_repository_update(mock_session):
     def __update(estoque_id: int):
         return repository.update(
             session=mock_session,
@@ -55,7 +55,7 @@ def test_repository_update(mock_repository_get, mock_session):
         __update(-1)
 
 
-def test_repository_update_usuario_senha(mock_repository_get, mock_session):
+def test_repository_update_usuario_senha(mock_session):
     def __update_senha(usuario_id: int, senha_atual: str, senha: str):
         return repository.update(
             session=mock_session,
@@ -78,7 +78,7 @@ def test_repository_update_usuario_senha(mock_repository_get, mock_session):
         __update_senha(2, 'teste', 'teste')
 
 
-def test_repository_update_organizacao_sem_permissao(mock_repository_get, mock_session):
+def test_repository_update_organizacao_sem_permissao(mock_session):
     with pytest.raises(ValueError):
         repository.update(
             session=mock_session,
@@ -92,7 +92,7 @@ def test_repository_update_organizacao_sem_permissao(mock_repository_get, mock_s
         )
 
 
-def test_repository_delete(mock_repository_get, mock_session):
+def test_repository_delete(mock_session):
     def __delete(id, organizacao: bool = False, usuario: bool = False):
         entity = repository.Entities.ESTOQUE
         if organizacao:
@@ -119,7 +119,7 @@ def test_repository_delete(mock_repository_get, mock_session):
         __delete(2, usuario=True)
 
 
-def test_repository_create(mock_repository_get, mock_session):
+def test_repository_create(mock_session):
     result = repository.create(
         session=mock_session,
         entity=repository.Entities.RECEITA,

@@ -3,6 +3,7 @@ import math
 from datetime import datetime
 from typing import Dict, List, Optional
 
+from loguru import logger
 from pixqrcode import PixQrCode
 from sqlalchemy.orm import validates
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel
@@ -196,7 +197,7 @@ class Venda(RegistroOrganizacao, table=True):
             pix_qr_code = PixQrCode(pix_nome, pix_chave, pix_cidade, f'{self.valor:.2f}')
             return pix_qr_code.export_base64()
         except Exception as ex:
-            print(ex)
+            logger.exception(ex)
             return None
 
 

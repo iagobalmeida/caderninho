@@ -2,28 +2,98 @@ import json
 
 from bs4 import BeautifulSoup
 
+from src.tests.mocks import MOCK_ESTOQUE
 from src.tests.utils import autenticar
 
 
-def test_get_estoques_index(client, mock_repository_get):
-    autenticar(client)
-    response = client.get('/app/estoques', params={
-        'filter_data_inicio': '2025-02-20',
-        'filter_data_final': '2025-02-21',
+def __get_estoques_rows(test_client):
+    response = test_client.get('/app/estoques', params={
+        'filter_data_inicio': '2025-01-01',
+        'filter_data_final': '2025-12-01',
         'filter_insumo_id': 1
     })
-
     soup = BeautifulSoup(response.content, 'html.parser')
-    dom_table = soup.find('table')
+    dom_table = soup.find('table', {'id': 'table-list'})
     assert dom_table
 
     dom_rows = dom_table.find_all('tr')
     assert dom_rows
 
     dom_rows.pop(0)
+    return dom_rows
 
-    for row in dom_rows:
-        if 'Nenhum registro encontrado' in row.text:
-            continue
-        data_bs_payload = json.loads(row.get('data-bs-payload'))
-        assert data_bs_payload.get('id', None) != None
+
+def __assert_row_with_data_bs_payload(test_client, expected_values: dict):
+    dom_rows = __get_estoques_rows(test_client)
+    dom_rows_data_bs_payload = [
+        json.loads(row.get('data-bs-payload', '{}'))
+        for row in dom_rows
+    ]
+    assert any([
+        all([
+            row.get(key, None) == value
+            for key, value in expected_values.items()
+        ])
+        for row in dom_rows_data_bs_payload
+    ])
+
+
+def test_get_estoques_index(client):
+    autenticar(client)
+    __assert_row_with_data_bs_payload(client, json.loads(MOCK_ESTOQUE.model_dump_json()))
+
+
+def test_post_estoque_index_uso_em_receita(client):
+    autenticar(client)
+    response = client.post('/app/estoques', data={
+        'descricao': 'Uso em receita',
+        'receita_id': 1,
+        'quantidade_receita': 2
+    })
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+    alerts = soup.find_all('div', {'role': 'alert'})
+    assert any([
+        'Movimentação criada com sucesso!' in alert.text
+        for alert in alerts
+    ])
+
+    __assert_row_with_data_bs_payload(client, {
+        'descricao': 'Uso em Receita (Cookies)',
+        'quantidade': -200,
+        'insumo_id': 1
+    })
+
+
+def test_post_estoque_index_compra(client):
+    autenticar(client)
+    response = client.post('/app/estoques', data={
+        'descricao': 'Compra',
+        'insumo_id': 1,
+        'quantidade_insumo': 10,
+        'valor_pago': 100
+    })
+    assert response.status_code == 200
+    __assert_row_with_data_bs_payload(client, {
+        'descricao': 'Compra',
+        'insumo_id': 1,
+        'quantidade': 10,
+        'valor_pago': 100
+    })
+
+
+def test_post_estoque_index_outros(client):
+    autenticar(client)
+    response = client.post('/app/estoques', data={
+        'descricao': 'Outros',
+        'descricao_customizada': 'Ingrediente venceu',
+        'insumo_id': 1,
+        'quantidade_insumo': 10
+    })
+    assert response.status_code == 200
+    __assert_row_with_data_bs_payload(client, {
+        'descricao': 'Ingrediente Venceu',
+        'insumo_id': 1,
+        'quantidade': -10
+    })

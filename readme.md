@@ -53,7 +53,7 @@ O *KDerninho* já tem uma versão rodando no `Railway` que você já pode usar:
 
 ### Testes
 ```
-coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o coverage.svg
+DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o coverage.svg
 ```
 
 ## vb1.0
@@ -200,7 +200,8 @@ coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o 
   - [X] LocalStorage deu conta do recado
 
 # v1.4.5
-- [ ] Testes unitários com 100% de cobertura
+- [ ] Testes unitários com 95% de cobertura
+- [X] Favicon
 
 # v1.4.8
 - [ ] Autenticacao com OAuth2

@@ -90,25 +90,26 @@ async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -
 
 @router.post('/', include_in_schema=False)
 async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    if payload.descricao == 'Uso em Receita' and payload.receita_id:
+    descricao = payload.descricao.lower() if payload.descricao else None
+    if descricao == 'uso em receita' and payload.receita_id:
         db_receita, _, _ = repository.get(session=session, entity=repository.Entities.RECEITA, filters={'id': payload.receita_id}, first=True)
-        payload.descricao = f'Uso em Receita ({db_receita.nome})'
+        descricao = f'Uso em Receita ({db_receita.nome})'
         for insumo_link in db_receita.insumo_links:
             quantidade = -1 * insumo_link.quantidade * float(payload.quantidade_receita)
             repository.create(session, repository.Entities.ESTOQUE, {
-                'descricao': payload.descricao,
+                'descricao': descricao,
                 'insumo_id': insumo_link.insumo_id,
                 'quantidade': quantidade,
                 'valor_pago': 0
             })
     else:
         quantidade = float(payload.quantidade_insumo) if payload.quantidade_insumo else None
-        if payload.descricao != 'Compra' and quantidade:
+        if descricao != 'compra' and quantidade:
             quantidade = quantidade * -1
-        if payload.descricao == 'Outros' and payload.descricao_customizada:
-            payload.descricao = payload.descricao_customizada
+        if descricao == 'outros' and payload.descricao_customizada:
+            descricao = payload.descricao_customizada
         repository.create(session, repository.Entities.ESTOQUE, {
-            'descricao': payload.descricao,
+            'descricao': descricao.title(),
             'insumo_id': payload.insumo_id,
             'quantidade': quantidade,
             'valor_pago': float(payload.valor_pago) if payload.valor_pago else 0

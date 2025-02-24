@@ -2,6 +2,7 @@ from enum import Enum
 from math import ceil
 from typing import Tuple
 
+from loguru import logger
 from sqlmodel import func, select
 
 from src.domain.entities import (Estoque, Insumo, Organizacao, Receita,
@@ -128,6 +129,7 @@ def create(session: DBSessaoAutenticada, entity: Entities, values: dict = {}):
         db_entity.organizacao_id = session.sessao_autenticada.organizacao_id
     session.add(db_entity)
     session.commit()
+    logger.info(f'Entidade {entity.value.__name__} #{db_entity.id} criada')
     return db_entity
 
 

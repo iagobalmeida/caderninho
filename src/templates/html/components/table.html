@@ -2,7 +2,7 @@
 <div class="col-12">
   <div class="card">
     <div class="table-responsive">
-      <table class="table table-vcenter table-striped table-hover">
+      <table class="table table-vcenter table-striped table-hover" id="table-list">
         <thead class="sticky-top">
           <tr>
             <th class="w-1"></th>
@@ -16,7 +16,7 @@
             {% for data in table_data %}
               <tr
               class="cursor-pointer"
-              data-bs-payload="{{data.model_dump_json() }}" 
+              data-bs-payload="{{data.model_dump_json()}}" 
               >
                 <td class="w-1">
                   <input type="checkbox" data-id="{{data.id}}">

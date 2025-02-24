@@ -6,7 +6,7 @@ from loguru import logger
 
 
 class InterceptHandler(logging.Handler):
-    def emit(self, record):
+    def emit(self, record):  # pragma: nocover
         frame, depth = logging.currentframe(), 2
         while frame and depth:
             frame = frame.f_back

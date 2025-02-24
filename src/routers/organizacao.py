@@ -79,9 +79,9 @@ async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inp
     if payload.senha != payload.senha_confirmar:
         raise ValueError('As senhas não batem')
 
-    if not payload.organizacao_id:
-        db_organizacao = repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})
-        payload.organizacao_id = db_organizacao.id
+    # if not payload.organizacao_id:
+    #     db_organizacao = repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})
+    #     payload.organizacao_id = db_organizacao.id
 
     repository.create(session, repository.Entities.USUARIO, {
         'nome': payload.nome,

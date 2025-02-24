@@ -21,7 +21,8 @@ def redirect_url_for(request: fastapi.Request, url_name: str, status_code: int =
 
 
 def redirect_back(request: fastapi.Request, status_code: int = 302, message: str = None):
-    url = request.headers['referer']
+    url = request.headers.get('referer', request.url_for('get_home'))
+
     if message:
         url = url_incluir_query_params(url, message=message)
 

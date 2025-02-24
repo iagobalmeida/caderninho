@@ -30,5 +30,6 @@ class DBSessaoAutenticada(Session):
     sessao_autenticada: SessaoAutenticada = None
 
     def __init__(self, *args, request: Request = None, **kwargs):
-        self.sessao_autenticada = SessaoAutenticada.from_request_session(request)
+        if request:
+            self.sessao_autenticada = SessaoAutenticada.from_request_session(request)
         return super().__init__(*args, **kwargs)

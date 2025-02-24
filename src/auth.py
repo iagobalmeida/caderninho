@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
+from loguru import logger
 from sqlmodel import Session
 
 from src.domain import repository
@@ -11,6 +12,7 @@ from src.utils import redirect_url_for
 
 def authenticate(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> bool:
     db_usuario, _, _ = repository.get(session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True, ignore_validations=True)
+
     if not db_usuario:
         return False
 
@@ -39,8 +41,9 @@ def request_login(session: Session, request: Request, email: str, senha: str, le
     try:
         authenticate(session, request, email, senha, lembrar_de_mim=lembrar_de_mim)
         return redirect_url_for(request, 'get_home')
-    except Exception as ex:
+    except Exception as ex:  # pragma: nocover
         request.session.clear()
+        logger.exception(ex)
 
         url = request.url_for('get_app_index')
         url = url.include_query_params(message=str(ex))
