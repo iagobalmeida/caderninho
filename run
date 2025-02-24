@@ -1,5 +1,15 @@
 #!/bin/bash
-if [ "$1" == "coverage" ] ; then
+if [ "$1" == "install" ] ; then
+  python3 -m venv .venv
+  source .venv/bin/activate
+  pip install -r requirements.txt
+  cp src/.env.example src/.env
+  exit 0
+elif [ "$1" == "server" ] ; then
+  source .venv/bin/acivate
+  uvicorn src.app:app --reload
+  exit 0
+elif [ "$1" == "coverage" ] ; then
   source .venv/bin/acivate
   DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o coverage.svg
   exit 0
@@ -12,6 +22,8 @@ else
       echo -e "\033[1;31mComando Inválido\033[0m: $0\033[1;32m $@ \033[0m"
     fi
     echo Comandos disponíveis:
+    echo -e "\033[1;32m install\033[0m:\t\tCria o ambiente virtual e o arquivo de ambiente" 
+    echo -e "\033[1;32m server\033[0m:\t\tInicia a aplicação" 
     echo -e "\033[1;32m coverage\033[0m:\t\tRoda o teste de cobertura e gera o html e svg de coverage" 
     echo -e "\033[1;32m tests\033[0m:\t\t\tExecuta os testes via pytest até a primeira falha" 
     exit 1

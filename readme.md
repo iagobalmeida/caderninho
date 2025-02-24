@@ -33,11 +33,21 @@ O *KDerninho* já tem uma versão rodando no `Railway` que você já pode usar:
 *Essa é uma demonstração de uma versão que ainda está em desenvolvimento, todos os dados serão apagados no lançamento da próxima versão**
 
 ### Instalação
+#### Rápida
+```
+./run install
+```
+#### Manual
 1. Crie um ambiente virtual com `python3 -m venv .venv`
 2. Inicie o ambiente virtual cmo `source ./.venv/bin/activate`
 3. Instale as bibliotecas necessárias com `pip install -r requirements.txt`
 
 ### Execução
+#### Rápida
+```
+./run server
+```
+#### Manual
 1. Inicie a aplicação com `uvicorn src.app:app --reload`
 
 ### Rodando localmente com dados de exemplo
@@ -51,7 +61,22 @@ O *KDerninho* já tem uma versão rodando no `Railway` que você já pode usar:
 4. Use a conta `usuario@emai.com` com a senha `123` para acessar como usuário
 5. Use a conta `admin@email.com` com a senha `admin` para acessar como admin
 
-### Testes
+### Testes Rápidos
+#### Rápida
+```
+./run tests
+```
+#### Manual
+```
+DATABASE_URL="sqlite:///test.db" python -m pytest -s -x
+```
+
+### Testes de Cobertura
+#### Rápida
+```
+./run coverage
+```
+#### Manual
 ```
 DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o coverage.svg
 ```
