@@ -6,20 +6,21 @@ from sqlmodel import Session
 
 from src.db import engine
 from src.domain.entities import (Estoque, Insumo, Receita, ReceitaInsumoLink,
-                                 Venda)
+                                 Usuario, Venda)
 from src.tests import mocks
 
 
 def try_add(obj):
     try:
         obj.id = None
+
         with Session(engine) as session:
             session.add(obj)
             session.commit()
-            # session.refresh(obj)
-            logger.info(f'{type(obj).__name__} #{obj.id} inserido')
+            session.refresh(obj)
             if type(obj).__name__ == 'Usuario':
                 logger.info(obj)
+            logger.info(f'{type(obj).__name__} #{obj.id} inserido')
         return obj
     except Exception as ex:
         logger.exception(ex)

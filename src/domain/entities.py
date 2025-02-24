@@ -4,11 +4,15 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from loguru import logger
+from passlib.context import CryptContext
+from passlib.exc import UnknownHashError
 from pixqrcode import PixQrCode
 from sqlalchemy.orm import validates
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
 from src.templates import filters
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 STRFTIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
@@ -49,6 +53,19 @@ class Usuario(RegistroOrganizacao, table=True):
     senha: Optional[str] = Field(default=None)
     dono: Optional[bool] = Field(default=False)
     administrador: Optional[bool] = Field(default=False)
+
+    def hash_senha(self) -> str:
+        if not self.senha.startswith("$2b$"):  # Verifica se já está hasheada (evita rehash)
+            self.senha = pwd_context.hash(self.senha)
+            logger.info('Senha hasheada')
+
+    def verificar_senha(self, senha: str) -> bool:
+        try:
+            result = pwd_context.verify(senha, self.senha)
+            return result
+        except UnknownHashError as ex:
+            logger.warning(f'Erro ao verificar senha: {senha} - {self.senha}')
+            return False
 
     def dict(self):
         base_dict = self.model_dump()

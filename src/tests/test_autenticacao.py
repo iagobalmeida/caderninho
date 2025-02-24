@@ -1,9 +1,5 @@
-from unittest.mock import patch
-
-import pytest
 from bs4 import BeautifulSoup
 
-from src.domain import repository
 from src.tests.utils import autenticar
 
 
@@ -12,6 +8,7 @@ def test_post_index(client):
         'email': 'teste@email.com',
         'senha': 'teste'
     })
+    soup = BeautifulSoup(response.content, 'html.parser')
     assert b'Home' in response.content
 
 
@@ -51,7 +48,6 @@ def test_post_perfil(client):
         'nome': 'Usuário Atualizado',
         'email': 'teste@email.com',
         'dono': True,
-        'senha': 'teste',
     })
     soup = BeautifulSoup(response.content, 'html.parser')
     dom_alert = soup.find('div', {'role': 'alert'})

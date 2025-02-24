@@ -62,7 +62,8 @@ def get(
             query = query.order_by(entity.value.__dict__[order_by])
 
     if first:
-        return session.exec(query).first(), None, None
+        result = session.exec(query).first()
+        return result, None, None
 
     count_query = select(func.count()).select_from(query.subquery())
     count = session.exec(count_query).one()
@@ -73,7 +74,8 @@ def get(
     query_offset = per_page * (page - 1)
     query = query.limit(query_limit).offset(query_offset)
 
-    return session.exec(query).all(), pages, count
+    result = session.exec(query).all()
+    return result, pages, count
 
 
 def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, values: dict = {}):
@@ -83,7 +85,7 @@ def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, v
         raise ValueError(f'{entity} não encontrado!')
 
     if entity == Entities.USUARIO and 'senha_atual' in values:
-        if db_entity.senha != values['senha_atual']:
+        if not db_entity.verificar_senha(values['senha_atual']):
             raise ValueError('Senha atual inválida!')
         del values['senha_atual']
 
@@ -99,6 +101,9 @@ def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, v
         if value == None:
             continue
         db_entity.__setattr__(key, value)
+
+    if entity == Entities.USUARIO:
+        db_entity.hash_senha()
 
     session.commit()
     return db_entity
@@ -127,6 +132,11 @@ def create(session: DBSessaoAutenticada, entity: Entities, values: dict = {}):
     db_entity = entity.value(**values)
     if not 'organizacao_id' in values and not entity == Entities.ORGANIZACAO:
         db_entity.organizacao_id = session.sessao_autenticada.organizacao_id
+
+    if entity == Entities.USUARIO:
+        db_entity.hash_senha()
+        logger.info(db_entity)
+
     session.add(db_entity)
     session.commit()
     logger.info(f'Entidade {entity.value.__name__} #{db_entity.id} criada')

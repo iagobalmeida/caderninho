@@ -17,6 +17,7 @@ MOCK_USUARIO_DONO = repository.Entities.USUARIO.value(
     senha='teste',
     dono=True
 )
+MOCK_USUARIO_DONO.hash_senha()
 
 MOCK_USUARIO_ADMIN = repository.Entities.USUARIO.value(
     id=2,
@@ -25,6 +26,7 @@ MOCK_USUARIO_ADMIN = repository.Entities.USUARIO.value(
     senha='admin',
     administrador=True
 )
+MOCK_USUARIO_ADMIN.hash_senha()
 
 
 MOCK_ESTOQUE = repository.Entities.ESTOQUE.value(
@@ -48,32 +50,6 @@ MOCK_VENDA = repository.Entities.VENDA.value(
     descricao='Venda teste',
     valor=100.0
 )
-
-
-def repository_get_side_effect(*args, **kwargs):
-    ret = None
-    first = kwargs.get('first', False)
-    entity = kwargs.get('entity', None)
-
-    if entity == repository.Entities.USUARIO:
-        ret = [MOCK_USUARIO_DONO]
-    if entity == repository.Entities.ESTOQUE:
-        ret = [MOCK_ESTOQUE]
-    if entity == repository.Entities.RECEITA:
-        ret = [MOCK_RECEITA]
-    if entity == repository.Entities.ORGANIZACAO:
-        ret = [MOCK_ORGANIZACAO]
-    if entity == repository.Entities.VENDA:
-        ret = [MOCK_VENDA]
-
-    id = kwargs.get('filters', {}).get('id', None)
-    if id and ret:
-        ret[0].id = id
-
-        if id == -1:
-            ret = None
-
-    return (ret[0] if ret and first else ret), None, None
 
 
 class MockSMTPServer():

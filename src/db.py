@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import Depends, Request
+from loguru import logger
 from sqlalchemy import text
 from sqlmodel import SQLModel, create_engine
 
@@ -24,6 +25,7 @@ def init():
 
 
 def __drop_table(conn, table_name: str, cascade: bool = True):
+    logger.info(f'Apagando tabela {table_name}')
     conn.execute(text(f"DROP TABLE IF EXISTS {table_name} {'CASCADE' if cascade else ''};"))
 
 

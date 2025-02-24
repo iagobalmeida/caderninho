@@ -200,7 +200,7 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
   - [X] LocalStorage deu conta do recado
 
 # v1.4.5
-- [ ] Testes unitários com 95% de cobertura
+- [X] Testes unitários com 95% de cobertura
 - [X] Favicon
 
 # v1.4.8

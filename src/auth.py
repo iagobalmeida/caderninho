@@ -16,7 +16,7 @@ def authenticate(session: Session, request: Request, email: str, senha: str, lem
     if not db_usuario:
         return False
 
-    senha_valida = str(senha).strip().lower() == str(db_usuario.senha).strip().lower()
+    senha_valida = db_usuario.verificar_senha(senha)
 
     if not senha_valida:
         return False

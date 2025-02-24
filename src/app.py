@@ -121,8 +121,9 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
     if not db_usuario:
         raise ValueError('Não foi encontrado usuário com esse email')
 
-    nova_senha = random.randint(int('1'*9), int('9'*9))
+    nova_senha = str(random.randint(int('1'*9), int('9'*9)))
     db_usuario.senha = nova_senha
+    db_usuario.hash_senha()
     session.commit()
 
     send_email.enviar(
