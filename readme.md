@@ -203,13 +203,11 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Testes unitários com 95% de cobertura
 - [X] Favicon
 
-# v1.4.8
-- [ ] Autenticacao com OAuth2
-- [ ] Senhas haseadas no banco
-
 # v1.5
-- [ ] Exportacação de CSV
+- [ ] Autenticacao com OAuth2
+- [X] Senhas haseadas no banco
 - [ ] Gerar QR PIX em detalhamento de vendas
+- [ ] Exportacação de CSV
 - [ ] Campo `plano` em Organização
   - [ ] Limitar número de registros por plano em `create`
   - [ ] Exibir plano atual
