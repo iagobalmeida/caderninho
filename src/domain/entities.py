@@ -206,9 +206,17 @@ class Venda(RegistroOrganizacao, table=True):
     def dict(self):
         base_dict = self.model_dump()
         base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
+        base_dict['#img_qr_code'] = self.gerar_qr_code()
         return base_dict
 
-    def gerar_qr_code(self, pix_nome, pix_cidade, pix_chave) -> str:
+    def gerar_qr_code(self, pix_nome=None, pix_cidade=None, pix_chave=None) -> str:
+        if not pix_nome:
+            pix_nome = self.organizacao.descricao
+        if not pix_cidade:
+            pix_cidade = self.organizacao.cidade
+        if not pix_chave:
+            pix_chave = self.organizacao.chave_pix
+
         try:
             pix_qr_code = PixQrCode(pix_nome, pix_chave, pix_cidade, f'{self.valor:.2f}')
             return pix_qr_code.export_base64()

@@ -53,7 +53,12 @@ document.querySelectorAll('.modal').forEach(modal => {
             if(payload_key.includes('#') || payload_key.includes('.')){
                 const target = modal.querySelector(payload_key)
                 if(target) {
-                    target.innerHTML = payload[payload_key];
+                    console.log(target)
+                    if(target.tagName == 'IMG') {
+                        target.setAttribute('src', payload[payload_key]);
+                    } else {
+                        target.innerHTML = payload[payload_key];
+                    }
                 }
             }
         });
