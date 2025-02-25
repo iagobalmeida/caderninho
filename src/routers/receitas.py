@@ -6,66 +6,26 @@ from sqlmodel import Session
 from src import auth
 from src.db import DBSESSAO_DEP
 from src.domain import inputs, repository
+from src.services import delete_entity, list_entity
 from src.templates import render
-from src.templates.context import Button, Context
+from src.templates.context import Context
 from src.utils import redirect_back, redirect_url_for
 
 router = fastapi.APIRouter(prefix='/app/receitas', dependencies=[auth.HEADER_AUTH])
 
 
 @router.get('/', include_in_schema=False)
-async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, session: Session = DBSESSAO_DEP):
-    auth_session = getattr(request.state, 'auth', None)
-    db_receitas, db_receitas_pages, db_receitas_count = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'nome': filter_nome})
-    context_header = Context.Header(
-        pretitle='Registros',
-        title='Receitas',
-        symbol='library_books',
-        buttons=[
-            Button(
-                content='Excluír Selecionados',
-                classname='btn',
-                symbol='delete',
-                attributes={
-                    'id': 'btn-excluir-selecionados',
-                    'disabled': 'true',
-                    'data-bs-toggle': 'modal',
-                    'data-bs-target': '#modalConfirm',
-                    'data-bs-payload': json.dumps({
-                        'action': str(request.url_for('post_receita_deletar')),
-                        '.text-secondary': 'Excluir receitas selecionadas?'
-                    }),
-                }
-            ),
-            Button(
-                content='Criar Receita',
-                classname='btn btn-success',
-                symbol='add',
-                attributes={
-                    'data-bs-toggle': 'modal',
-                    'data-bs-target': '#modalCreateReceita'
-                }
-            )
-        ]
-    )
+async def get_receitas_index(request: fastapi.Request, page: int = fastapi.Query(1), filter_nome: str = None, db_session: Session = DBSESSAO_DEP):
+    filters = {}
+    if filter_nome:
+        filters.update(nome=filter_nome)
 
-    table_columns = repository.Entities.RECEITA.value.columns()
-    table_data = db_receitas if isinstance(db_receitas, list) else [db_receitas]
-    table_no_result = 'Nenhum registro encontrado'
-
-    return render(
-        session=session,
+    return list_entity(
         request=request,
-        template_name='layout/list.html',
-        context={
-            'header': context_header,
-            'table_columns': table_columns,
-            'table_data': table_data,
-            'table_no_result': table_no_result,
-            'table_pages': db_receitas_pages,
-            'table_count': db_receitas_count,
-            'filter_nome': filter_nome
-        }
+        db_session=db_session,
+        entity=repository.Entities.RECEITA,
+        page=page,
+        filters=filters
     )
 
 
@@ -138,13 +98,14 @@ async def post_receita_atualizar(request: fastapi.Request, payload: inputs.Recei
     return redirect_back(request, message='Receita atualizada com sucesso!')
 
 
-@router.post('/deletar', include_in_schema=False)
-async def post_receita_deletar(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    auth_session = getattr(request.state, 'auth', None)
-    if selecionados_ids:
-        for id in selecionados_ids.split(','):
-            repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': id})
-    return redirect_url_for(request, 'get_receitas_index')
+@router.post('/excluir', include_in_schema=False)
+async def post_receita_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    return delete_entity(
+        request=request,
+        db_session=session,
+        entity=repository.Entities.RECEITA,
+        ids=selecionados_ids.split(',')
+    )
 
 
 @router.post('/insumos/incluir', include_in_schema=False)
@@ -176,7 +137,7 @@ async def post_receita_insumos_atualizar(request: fastapi.Request, payload: inpu
         repository.update(
             auth_session=auth_session,
             db_session=session,
-            entity=repository.Entities.INGREDIENTE,
+            entity=repository.Entities.INSUMO,
             filters={
                 'id': payload.insumo_id
             },

@@ -229,15 +229,17 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Favicon
 
 # v1.5
-- [ ] Autenticacao com OAuth2
 - [X] Senhas haseadas no banco
 - [X] Gerar QR PIX em detalhamento de vendas
-- [ ] Exportacação de CSV
+- [X] Modularizar rotas
+- [X] Ajustar fluxo de caixa para últimos 30 dias
 - [ ] Campo `plano` em Organização
   - [ ] Limitar número de registros por plano em `create`
   - [ ] Exibir plano atual
   - [ ] Botão para upgrade de plano
 - [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`
+- [ ] Exportacação de CSV
+- [ ] Autenticacao com OAuth2
 
 # v2.0
 - [ ] Filtro em tabelas

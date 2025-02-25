@@ -6,16 +6,14 @@ from sqlmodel import Session
 from src import auth
 from src.db import DBSESSAO_DEP
 from src.domain import inputs, repository
-from src.templates import render
-from src.templates.context import Button, Context
+from src.services import delete_entity, list_entity
 from src.utils import redirect_back
 
 router = fastapi.APIRouter(prefix='/app/estoques', dependencies=[auth.HEADER_AUTH])
 
 
 @router.get('/', include_in_schema=False)
-async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
-    auth_session = getattr(request.state, 'auth', None)
+async def get_estoques_index(request: fastapi.Request, page: int = fastapi.Query(1), filter_insumo_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, db_session: Session = DBSESSAO_DEP):
     filters = {}
     if filter_data_inicio:
         filters.update(data_inicio=filter_data_inicio)
@@ -24,69 +22,12 @@ async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -
     if filter_insumo_id >= 0:
         filters.update(insumo_id=filter_insumo_id)
 
-    db_estoques, db_estoques_pages, db_estoques_count = repository.get(auth_session=auth_session, db_session=session,
-                                                                       entity=repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
-
-    db_insumos, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.INGREDIENTE)
-    entradas, saidas, caixa = repository.get_fluxo_caixa(auth_session=auth_session, db_session=session)
-
-    context_header = Context.Header(
-        pretitle='Registros',
-        title='Estoque',
-        symbol='inventory_2',
-        buttons=[
-            Button(
-                content='Excluír Selecionados',
-                classname='btn',
-                symbol='delete',
-                attributes={
-                    'id': 'btn-excluir-selecionados',
-                    'disabled': 'true',
-                    'data-bs-toggle': 'modal',
-                    'data-bs-target': '#modalConfirm',
-                    'data-bs-payload': json.dumps({
-                        'action': str(request.url_for('post_estoques_excluir')),
-                        '.text-secondary': 'Excluir movimentações selecionadas?'
-                    })
-                }
-            ),
-            Button(
-                content='Criar Movimentação',
-                classname='btn btn-success',
-                symbol='add',
-                attributes={
-                    'data-bs-toggle': 'modal',
-                    'data-bs-target': '#modalCreateEstoque'
-                }
-            )
-        ]
-    )
-
-    table_columns = repository.Entities.ESTOQUE.value.columns()
-    table_data = db_estoques
-    table_no_result = 'Nenhum registro encontrado'
-    table_modal = '#modalEditEstoque'
-
-    return render(
-        session=session,
+    return list_entity(
         request=request,
-        template_name='layout/list.html',
-        context={
-            'header': context_header,
-            'table_columns': table_columns,
-            'table_data': table_data,
-            'table_no_result': table_no_result,
-            'table_modal': table_modal,
-            'table_pages': db_estoques_pages,
-            'table_count': db_estoques_count,
-            'insumos': db_insumos,
-            'entradas': entradas,
-            'saidas': saidas,
-            'caixa': caixa,
-            'filter_insumo_id': filter_insumo_id,
-            'filter_data_inicio': filter_data_inicio,
-            'filter_data_final': filter_data_final
-        }
+        db_session=db_session,
+        entity=repository.Entities.ESTOQUE,
+        page=page,
+        filters=filters
     )
 
 
@@ -121,12 +62,13 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
 
 
 @router.post('/excluir', include_in_schema=False)
-async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    auth_session = getattr(request.state, 'auth', None)
-    selecionados_ids = selecionados_ids.split(',')
-    for id in selecionados_ids:
-        repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE, filters={'id': id})
-    return redirect_back(request, message=f'{len(selecionados_ids)} registros excluídos com sucesso!')
+async def post_estoque_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    return delete_entity(
+        request=request,
+        db_session=session,
+        entity=repository.Entities.ESTOQUE,
+        ids=selecionados_ids.split(',')
+    )
 
 
 @router.post('/atualizar', include_in_schema=False)

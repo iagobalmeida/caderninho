@@ -15,7 +15,7 @@ router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
 async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
     db_receitas = repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA)
-    db_insumos = repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.INGREDIENTE)
+    db_insumos = repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.INSUMO)
     db_estoques = repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE)
     db_vendas = repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA)
 

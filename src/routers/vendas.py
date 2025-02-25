@@ -6,6 +6,7 @@ from sqlmodel import Session
 from src import auth
 from src.db import DBSESSAO_DEP
 from src.domain import inputs, repository
+from src.services import delete_entity, list_entity
 from src.templates import render
 from src.templates.context import Button, Context
 from src.utils import redirect_back
@@ -14,104 +15,13 @@ router = fastapi.APIRouter(prefix='/app/vendas', dependencies=[auth.HEADER_AUTH]
 
 
 @router.get('/', include_in_schema=False)
-async def get_vendas_index(request: fastapi.Request, page: int = fastapi.Query(1), session: Session = DBSESSAO_DEP):
-    auth_session = getattr(request.state, 'auth', None)
-    db_vendas, db_vendas_pages, db_vendas_count = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA, filters={
-        # 'data_inicio': filter_data_inicio,
-        # 'data_final': filter_data_final
-    }, order_by='data_criacao', desc=True, page=page)
-
-    entradas, saidas, caixa = repository.get_fluxo_caixa(auth_session=auth_session, db_session=session)
-    context_header = Context.Header(
-        pretitle='Registros',
-        title='Vendas',
-        symbol='shopping_cart',
-        buttons=[
-            Button(
-                content='Excluír Selecionados',
-                classname='btn',
-                symbol='delete',
-                attributes={
-                    'disabled': 'true',
-                    'data-bs-toggle': 'modal',
-                    'id': 'btn-excluir-selecionados',
-                    'data-bs-target': '#modalConfirm',
-                    'data-bs-payload': json.dumps({
-                        'action': str(request.url_for('post_vendas_excluir')),
-                        '.text-secondary': 'Excluir vendas selecionadas?',
-                        '.btn-danger': 'Excluir selecionadas'
-                    }),
-                }
-            ),
-            Button(
-                content='Marcar como Recebido',
-                classname='btn',
-                symbol='done_all',
-                attributes={
-                    'disabled': 'true',
-                    'data-bs-toggle': 'modal',
-                    'data-depends-selected': 'true',
-                    'id': 'btn-excluir-selecionados',
-                    'data-bs-target': '#modalConfirm',
-                    'data-bs-payload': json.dumps({
-                        'action': str(request.url_for('post_vendas_marcar_recebido')),
-                        '.text-secondary': 'Marcar vendas selecionadas como <kbd>Recebido</kbd>?',
-                        '.btn-danger': 'Alterar selecionadas'
-                    }),
-                }
-            ),
-            Button(
-                content='Marcar como Pendente',
-                classname='btn',
-                symbol='more_horiz',
-                attributes={
-                    'disabled': 'true',
-                    'data-bs-toggle': 'modal',
-                    'data-depends-selected': 'true',
-                    'id': 'btn-excluir-selecionados',
-                    'data-bs-target': '#modalConfirm',
-                    'data-bs-payload': json.dumps({
-                        'action': str(request.url_for('post_vendas_marcar_pendente')),
-                        '.text-secondary': 'Marcar vendas selecionadas como <kbd>Pendente</kbd>?',
-                        '.btn-danger': 'Alterar selecionadas'
-                    }),
-                }
-            ),
-            Button(
-                content='Criar Venda',
-                classname='btn btn-success',
-                symbol='add',
-                attributes={
-                    'data-bs-toggle': 'modal',
-                    'data-bs-target': '#modalCreateVenda'
-                }
-            )
-        ]
-    )
-
-    table_columns = repository.Entities.VENDA.value.columns()
-    table_data = db_vendas
-    table_no_result = 'Nenhum registro encontrado'
-    table_modal = '#modalEditVenda'
-
-    return render(
-        session=session,
+async def get_vendas_index(request: fastapi.Request, page: int = fastapi.Query(1), db_session: Session = DBSESSAO_DEP):
+    return list_entity(
         request=request,
-        template_name='layout/list.html',
-        context={
-            'header': context_header,
-            'table_columns': table_columns,
-            'table_data': table_data,
-            'table_no_result': table_no_result,
-            'table_modal': table_modal,
-            'table_pages': db_vendas_pages,
-            'table_count': db_vendas_count,
-            'entradas': entradas,
-            'saidas': saidas,
-            'caixa': caixa
-            # 'filter_data_inicio': filter_data_inicio,
-            # 'filter_data_final': filter_data_final
-        }
+        db_session=db_session,
+        entity=repository.Entities.VENDA,
+        page=page,
+        filters={}
     )
 
 
@@ -126,12 +36,13 @@ async def post_vendas_index(request: fastapi.Request, payload: inputs.VendaCriar
 
 
 @router.post('/excluir', include_in_schema=False)
-async def post_vendas_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    auth_session = getattr(request.state, 'auth', None)
-    if selecionados_ids:
-        for id in selecionados_ids.split(','):
-            repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA, filters={'id': id})
-    return redirect_back(request, message='Venda(s) excluída(s) com sucesso!')
+async def post_venda_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), db_session: Session = DBSESSAO_DEP):
+    return delete_entity(
+        request=request,
+        db_session=db_session,
+        entity=repository.Entities.VENDA,
+        ids=selecionados_ids.split(',')
+    )
 
 
 @router.post('/marcar/recebido', include_in_schema=False)

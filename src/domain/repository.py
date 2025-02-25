@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from enum import Enum
 from math import ceil
 from typing import Tuple
@@ -16,7 +17,7 @@ class Entities(Enum):
     RECEITA_INGREDIENTE = ReceitaInsumoLink
     ESTOQUE = Estoque
     VENDA = Venda
-    INGREDIENTE = Insumo
+    INSUMO = Insumo
     RECEITA = Receita
 
 
@@ -131,9 +132,10 @@ def delete(db_session: Session, entity: Entities, filters: dict = {}, auth_sessi
 
 def create(db_session: Session, entity: Entities, values: dict = {}, auth_session: AuthSession = None):
     db_entity = entity.value(**values)
-
     if auth_session:
         if not 'organizacao_id' in values and not entity == Entities.ORGANIZACAO:
+            if auth_session.administrador:
+                raise ValueError('Administrador não pode criar registros pois não faz parte uma organização')
             db_entity.organizacao_id = auth_session.organizacao_id
 
     if entity == Entities.USUARIO:
@@ -161,12 +163,14 @@ def get_venda_qr_code(auth_session: AuthSession, db_session: Session, venda_id: 
 
 
 def get_fluxo_caixa(auth_session: AuthSession, db_session: Session) -> Tuple[float, float, float]:
-    query_entradas = select(func.sum(Venda.valor))
+    data_limite = datetime.now() - timedelta(days=30)
+
+    query_entradas = select(func.sum(Venda.valor)).where(Venda.data_criacao >= data_limite)
     if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
         query_entradas = query_entradas.filter(Venda.organizacao_id == auth_session.organizacao_id)
     entradas = db_session.exec(query_entradas).first()
 
-    query_saidas = select(func.sum(Estoque.valor_pago))
+    query_saidas = select(func.sum(Estoque.valor_pago)).where(Venda.data_criacao >= data_limite)
     if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
         query_saidas = query_saidas.filter(Estoque.organizacao_id == auth_session.organizacao_id)
     saidas = db_session.exec(query_saidas).first()
