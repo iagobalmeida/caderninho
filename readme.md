@@ -1,6 +1,5 @@
 ![# KDERNIHO](./src/static//logo.svg)
-<!--![Test Status](https://github.com/iagobalmeida/caderninho/actions/workflows/tests.yml/badge.svg) -->
-![Coverage](./coverage.svg)
+![Coverage](./coverage.svg) ![Test Status](https://github.com/iagobalmeida/caderninho/actions/workflows/tests.yml/badge.svg)
 
 #### SAAS OpenSource (olha o código ai!) para gestão simplificada da sua cozinha independente
 
