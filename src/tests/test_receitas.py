@@ -89,7 +89,7 @@ def test_post_receitas_insumos_remover(client):
 
 def test_post_receitas_deletar(client):
     autenticar(client)
-    response = client.post('/app/receitas/deletar', data={
+    response = client.post('/app/receitas/excluir', data={
         'selecionados_ids': '1'
     })
     assert response.status_code == 200

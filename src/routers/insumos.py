@@ -66,5 +66,5 @@ async def post_insumo_excluir(request: fastapi.Request, selecionados_ids: str = 
         request=request,
         db_session=session,
         entity=repository.Entities.INSUMO,
-        ids=selecionados_ids.split(',')
+        ids=selecionados_ids
     )
