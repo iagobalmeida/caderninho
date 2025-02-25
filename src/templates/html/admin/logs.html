@@ -1,0 +1,33 @@
+{% extends '/layout/app.html' %}
+
+{% block content %}
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">
+              {{ material_symbol('android') | safe }}
+              Logs da Aplicação
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="bg-dark text-white rounded p-2" style="max-height: 400px; overflow-y: auto;" id="logs-wrapper">
+                {% for log in logs %}
+                    <p class="mb-0 font-monospace">{{log | format_log | safe}}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    setTimeout(() => {
+        document.querySelector('#logs-wrapper').scroll({
+            top: 99999,
+            behavior: 'smooth'
+        })
+    }, 500)
+</script>
+{% endblock %}
+
