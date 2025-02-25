@@ -16,7 +16,7 @@ ENTITY_SYMBOLS = {
 }
 
 
-def list_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, page: int = 1, filters: dict = {}):
+def list_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, page: int = 1, filters: dict = {}, table_modal: bool = True):
     auth_session = getattr(request.state, 'auth', None)
     title = entity.value.__name__.title()
 
@@ -39,7 +39,6 @@ def list_entity(request: fastapi.Request, db_session: Session, entity: repositor
     table_columns = entity.value.columns()
     table_data = entities
     table_no_result = 'Nenhum registro encontrado'
-    table_modal = f'#modalEdit{title}'
 
     delete_url = str(request.url_for(f'post_{title.lower()}_excluir'))
 
@@ -78,26 +77,30 @@ def list_entity(request: fastapi.Request, db_session: Session, entity: repositor
     db_insumos, _, _ = repository.get(auth_session=auth_session, db_session=db_session, entity=repository.Entities.INSUMO)
     entradas, saidas, caixa = repository.get_fluxo_caixa(auth_session=auth_session, db_session=db_session)
 
+    context = {
+        'header': context_header,
+        'table_columns': table_columns,
+        'table_data': table_data,
+        'table_no_result': table_no_result,
+        'table_pages': pages,
+        'table_count': count,
+        'insumos': db_insumos,
+        'entradas': entradas,
+        'saidas': saidas,
+        'caixa': caixa,
+        'filter_insumo_id': filters.get('insumo_id', None),
+        'filter_data_inicio': filters.get('data_inicio', None),
+        'filter_data_final': filters.get('data_final', None)
+    }
+
+    if table_modal:
+        context.update(table_modal=f'#modalEdit{title}')
+
     return render(
         session=db_session,
         request=request,
         template_name='layout/list.html',
-        context={
-            'header': context_header,
-            'table_columns': table_columns,
-            'table_data': table_data,
-            'table_no_result': table_no_result,
-            'table_modal': table_modal,
-            'table_pages': pages,
-            'table_count': count,
-            'insumos': db_insumos,
-            'entradas': entradas,
-            'saidas': saidas,
-            'caixa': caixa,
-            'filter_insumo_id': filters.get('insumo_id', None),
-            'filter_data_inicio': filters.get('data_inicio', None),
-            'filter_data_final': filters.get('data_final', None)
-        }
+        context=context
     )
 
 

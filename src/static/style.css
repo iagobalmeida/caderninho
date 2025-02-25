@@ -114,3 +114,7 @@ body.index {
         box-shadow: none;
     }
 }
+
+body.modal-open {
+    overflow-y: scroll !important;
+}

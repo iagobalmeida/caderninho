@@ -142,3 +142,14 @@ window.addEventListener('load', () => {
         localStorage.setItem('alertaSobreIgnorados', JSON.stringify(alertaSobreIgnorados))
     });
 })
+
+let currentScrollTop = window.scrollY;
+document.addEventListener('show.bs.modal', () => {
+    currentScrollTop = window.scrollY;
+});
+document.addEventListener('hidden.bs.modal', () => {
+    window.scroll({
+        top: currentScrollTop,
+        behavior: 'smooth'
+    })
+});

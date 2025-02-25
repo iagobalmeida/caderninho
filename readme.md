@@ -234,6 +234,7 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Modularizar rotas
 - [X] Ajustar fluxo de caixa para últimos 30 dias
 - [X] Página de Logs
+- [X] Scroll voltando após fechar modal
 - [ ] Campo `plano` em Organização
   - [ ] Limitar número de registros por plano em `create`
   - [ ] Exibir plano atual

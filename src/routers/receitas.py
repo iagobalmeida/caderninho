@@ -25,6 +25,7 @@ async def get_receitas_index(request: fastapi.Request, page: int = fastapi.Query
         db_session=db_session,
         entity=repository.Entities.RECEITA,
         page=page,
+        table_modal=False,
         filters=filters
     )
 
