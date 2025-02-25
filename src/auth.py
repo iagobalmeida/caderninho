@@ -12,7 +12,6 @@ from src.utils import redirect_url_for
 
 def authenticate(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> bool:
     db_usuario, _, _ = repository.get(session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True, ignore_validations=True)
-
     if not db_usuario:
         return False
 

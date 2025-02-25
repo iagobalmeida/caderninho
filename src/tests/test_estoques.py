@@ -29,18 +29,21 @@ def __assert_row_with_data_bs_payload(test_client, expected_values: dict):
         json.loads(row.get('data-bs-payload', '{}'))
         for row in dom_rows
     ]
-    assert any([
+    result = any([
         all([
             row.get(key, None) == value
             for key, value in expected_values.items()
         ])
         for row in dom_rows_data_bs_payload
     ])
+    if not result:
+        breakpoint()
+    assert result
 
 
 def test_get_estoques_index(client):
     autenticar(client)
-    __assert_row_with_data_bs_payload(client, json.loads(MOCK_ESTOQUE.model_dump_json()))
+    __assert_row_with_data_bs_payload(client, MOCK_ESTOQUE.dict())
 
 
 def test_post_estoque_index_uso_em_receita(client):
