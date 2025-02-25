@@ -15,12 +15,13 @@ router = fastapi.APIRouter(prefix='/app/vendas', dependencies=[auth.HEADER_AUTH]
 
 @router.get('/', include_in_schema=False)
 async def get_vendas_index(request: fastapi.Request, page: int = fastapi.Query(1), session: Session = DBSESSAO_DEP):
-    db_vendas, db_vendas_pages, db_vendas_count = repository.get(session=session, entity=repository.Entities.VENDA, filters={
+    auth_session = getattr(request.state, 'auth', None)
+    db_vendas, db_vendas_pages, db_vendas_count = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA, filters={
         # 'data_inicio': filter_data_inicio,
         # 'data_final': filter_data_final
     }, order_by='data_criacao', desc=True, page=page)
 
-    entradas, saidas, caixa = repository.get_fluxo_caixa(session)
+    entradas, saidas, caixa = repository.get_fluxo_caixa(auth_session=auth_session, db_session=session)
     context_header = Context.Header(
         pretitle='Registros',
         title='Vendas',
@@ -116,7 +117,8 @@ async def get_vendas_index(request: fastapi.Request, page: int = fastapi.Query(1
 
 @router.post('/', include_in_schema=False)
 async def post_vendas_index(request: fastapi.Request, payload: inputs.VendaCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.create(session, repository.Entities.VENDA, {
+    auth_session = getattr(request.state, 'auth', None)
+    repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA, values={
         'descricao': payload.descricao,
         'valor': payload.valor
     })
@@ -125,32 +127,37 @@ async def post_vendas_index(request: fastapi.Request, payload: inputs.VendaCriar
 
 @router.post('/excluir', include_in_schema=False)
 async def post_vendas_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            repository.delete(session, repository.Entities.VENDA, {'id': id})
+            repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA, filters={'id': id})
     return redirect_back(request, message='Venda(s) excluída(s) com sucesso!')
 
 
 @router.post('/marcar/recebido', include_in_schema=False)
 async def post_vendas_marcar_recebido(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            repository.update(session, repository.Entities.VENDA, {'id': id}, {'recebido': True})
+            repository.update(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA, filters={'id': id}, values={'recebido': True})
     return redirect_back(request, message='Venda(s) atualizada(s) com sucesso!')
 
 
 @router.post('/marcar/pendente', include_in_schema=False)
 async def post_vendas_marcar_pendente(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            repository.update(session, repository.Entities.VENDA, {'id': id}, {'recebido': False})
+            repository.update(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA, filters={'id': id}, values={'recebido': False})
     return redirect_back(request, message='Venda(s) atualizada(s) com sucesso!')
 
 
 @router.post('/atualizar', include_in_schema=False)
 async def post_vendas_atualizar(request: fastapi.Request, payload: inputs.VendaAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     repository.update(
-        session=session,
+        auth_session=auth_session,
+        db_session=session,
         entity=repository.Entities.VENDA,
         filters={
             'id': payload.id

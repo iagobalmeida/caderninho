@@ -4,7 +4,6 @@ from sqlmodel import Session
 from src import auth
 from src.db import DBSESSAO_DEP
 from src.domain import inputs, repository
-from src.schemas.auth import DBSessaoAutenticada
 from src.templates import render
 from src.templates.context import Context
 from src.utils import redirect_back
@@ -19,12 +18,12 @@ context_header = Context.Header(
 
 
 @router.get('/', include_in_schema=False)
-async def get_organizacao_index(request: fastapi.Request, session: DBSessaoAutenticada = DBSESSAO_DEP):
-    usuario = session.sessao_autenticada
-    context_header['title'] = usuario.organizacao_descricao
+async def get_organizacao_index(request: fastapi.Request, session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
+    context_header['title'] = auth_session.organizacao_descricao
 
-    db_usuarios, _, _ = repository.get(session=session, entity=repository.Entities.USUARIO)
-    db_organizacao, _, _ = repository.get(session=session, entity=repository.Entities.ORGANIZACAO, filters={'id': usuario.organizacao_id}, first=True)
+    db_usuarios, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO)
+    db_organizacao, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
 
     return render(
         session=session,
@@ -40,8 +39,10 @@ async def get_organizacao_index(request: fastapi.Request, session: DBSessaoAuten
 
 @router.post('/', include_in_schema=False)
 async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.Form(), descricao: str = fastapi.Form(), cidade: str = fastapi.Form(), chave_pix: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     repository.update(
-        session=session,
+        auth_session=auth_session,
+        db_session=session,
         entity=repository.Entities.ORGANIZACAO,
         filters={
             'id': id
@@ -57,8 +58,10 @@ async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.For
 
 @router.post('/configuracoes', include_in_schema=False)
 async def post_organizacao_configuracoes(request: fastapi.Request, id: int = fastapi.Form(), converter_kg: bool = fastapi.Form(False), converter_kg_sempre: bool = fastapi.Form(False), usar_custo_med: bool = fastapi.Form(False), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     repository.update(
-        session=session,
+        auth_session=auth_session,
+        db_session=session,
         entity=repository.Entities.ORGANIZACAO,
         filters={
             'id': id
@@ -76,6 +79,7 @@ async def post_organizacao_configuracoes(request: fastapi.Request, id: int = fas
 
 @router.post('/usuarios/criar', include_in_schema=False)
 async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     if payload.senha != payload.senha_confirmar:
         raise ValueError('As senhas não batem')
 
@@ -83,7 +87,7 @@ async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inp
     #     db_organizacao = repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})
     #     payload.organizacao_id = db_organizacao.id
 
-    repository.create(session, repository.Entities.USUARIO, {
+    repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, values={
         'nome': payload.nome,
         'email': payload.email,
         'senha': payload.senha,
@@ -95,8 +99,10 @@ async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inp
 
 @router.post('/usuarios/editar', include_in_schema=False)
 async def post_organizacao_usuarios_editar(request: fastapi.Request, payload: inputs.UsuarioEditar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     repository.update(
-        session=session,
+        auth_session=auth_session,
+        db_session=session,
         entity=repository.Entities.USUARIO,
         filters={
             'id': payload.id
@@ -113,7 +119,8 @@ async def post_organizacao_usuarios_editar(request: fastapi.Request, payload: in
 
 @router.post('/usuarios/excluir', include_in_schema=False)
 async def post_organizacao_usuarios_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            repository.delete(session, repository.Entities.USUARIO, {'id': id})
+            repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'id': id})
     return redirect_back(request, message='Usuário excluído com sucesso!')

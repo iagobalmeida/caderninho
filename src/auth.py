@@ -11,7 +11,8 @@ from src.utils import redirect_url_for
 
 
 def authenticate(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> bool:
-    db_usuario, _, _ = repository.get(session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True, ignore_validations=True)
+    auth_session = getattr(request.state, 'auth', None)
+    db_usuario, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True, ignore_validations=True)
     if not db_usuario:
         return False
 
@@ -21,7 +22,7 @@ def authenticate(session: Session, request: Request, email: str, senha: str, lem
         return False
 
     sessao = SessaoAutenticada(
-        **db_usuario.dict(),
+        **db_usuario.model_dump(),
         valid=True
     )
 
@@ -57,12 +58,13 @@ def request_logout(request: Request) -> RedirectResponse:
 
 
 def header_authorization(request: Request) -> str:
-    sessao_autenticada = SessaoAutenticada.from_request_session(request)
-    if not sessao_autenticada:
+    request.state.auth = SessaoAutenticada.from_request_session(request)
+
+    if not request.state.auth:
         request.session.clear()
         raise HTTPException(401, 'Não autorizado!')
 
-    if sessao_autenticada.expires and datetime.fromtimestamp(sessao_autenticada.expires) <= datetime.now():
+    if request.state.auth.expires and datetime.fromtimestamp(request.state.auth.expires) <= datetime.now():
         request.session.clear()
         raise HTTPException(401, 'Sessão expirada!')
 

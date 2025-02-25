@@ -3,11 +3,11 @@ from math import ceil
 from typing import Tuple
 
 from loguru import logger
-from sqlmodel import func, select
+from sqlmodel import Session, func, select
 
 from src.domain.entities import (Estoque, Insumo, Organizacao, Receita,
                                  ReceitaInsumoLink, Usuario, Venda)
-from src.schemas.auth import DBSessaoAutenticada
+from src.schemas.auth import SessaoAutenticada
 
 
 class Entities(Enum):
@@ -20,15 +20,15 @@ class Entities(Enum):
     RECEITA = Receita
 
 
-def count_all(session: DBSessaoAutenticada, entity: Entities):
+def count_all(db_session: Session, entity: Entities, auth_session: SessaoAutenticada = None):
     count_query = select(func.count()).select_from(entity.value)
-    if not session.sessao_autenticada.administrador:
-        count_query = count_query.filter(entity.value.organizacao_id == session.sessao_autenticada.organizacao_id)
-    return session.exec(count_query).one()
+    if auth_session and not auth_session.administrador:
+        count_query = count_query.filter(entity.value.organizacao_id == auth_session.organizacao_id)
+    return db_session.exec(count_query).one()
 
 
 def get(
-        session: DBSessaoAutenticada,
+        db_session: Session,
         entity: Entities,
         filters: dict = {},
         first: bool = False,
@@ -36,6 +36,7 @@ def get(
         desc: bool = False,
         per_page: int = 10,
         page: int = 1,
+        auth_session: SessaoAutenticada = None,
         ignore_validations: bool = False
 ):
     query = select(entity.value)
@@ -51,9 +52,9 @@ def get(
             else:
                 query = query.filter(entity.value.__dict__[key] == value)
 
-    if getattr(session, 'sessao_autenticada', False) and not ignore_validations:
-        if not session.sessao_autenticada.administrador and entity != Entities.ORGANIZACAO:
-            query = query.filter(entity.value.organizacao_id == session.sessao_autenticada.organizacao_id)
+    if auth_session and not ignore_validations:
+        if not auth_session.administrador and entity != Entities.ORGANIZACAO:
+            query = query.filter(entity.value.organizacao_id == auth_session.organizacao_id)
 
     if order_by:
         if desc:
@@ -62,11 +63,11 @@ def get(
             query = query.order_by(entity.value.__dict__[order_by])
 
     if first:
-        result = session.exec(query).first()
+        result = db_session.exec(query).first()
         return result, None, None
 
     count_query = select(func.count()).select_from(query.subquery())
-    count = session.exec(count_query).one()
+    count = db_session.exec(count_query).one()
 
     pages = ceil(count / per_page) if per_page else 1
 
@@ -74,13 +75,12 @@ def get(
     query_offset = per_page * (page - 1)
     query = query.limit(query_limit).offset(query_offset)
 
-    result = session.exec(query).all()
+    result = db_session.exec(query).all()
     return result, pages, count
 
 
-def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, values: dict = {}):
-    db_entity, _, _ = get(session=session, entity=entity, filters=filters, first=True)
-
+def update(db_session: Session, entity: Entities, filters: dict = {}, values: dict = {}, auth_session: SessaoAutenticada = None):
+    db_entity, _, _ = get(auth_session=auth_session, db_session=db_session, entity=entity, filters=filters, first=True)
     if not db_entity:
         raise ValueError(f'{entity} não encontrado!')
 
@@ -89,13 +89,13 @@ def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, v
             raise ValueError('Senha atual inválida!')
         del values['senha_atual']
 
-    if not session.sessao_autenticada.administrador and not session.sessao_autenticada.dono:
+    if auth_session:
+        if not auth_session.administrador and not auth_session.dono:
+            if entity == Entities.USUARIO and db_entity.id != auth_session.id:
+                raise ValueError('Sem permissão para alterar os dados do usuário!')
 
-        if entity == Entities.USUARIO and db_entity.id != session.sessao_autenticada.id:
-            raise ValueError('Sem permissão para alterar os dados do usuário!')
-
-        if entity == Entities.ORGANIZACAO:
-            raise ValueError('Sem permissão para alterar as informações da organização!')
+            if entity == Entities.ORGANIZACAO:
+                raise ValueError('Sem permissão para alterar as informações da organização!')
 
     for key, value in values.items():
         if value == None:
@@ -105,51 +105,54 @@ def update(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}, v
     if entity == Entities.USUARIO:
         db_entity.hash_senha()
 
-    session.commit()
+    db_session.commit()
     return db_entity
 
 
-def delete(session: DBSessaoAutenticada, entity: Entities, filters: dict = {}):
+def delete(db_session: Session, entity: Entities, filters: dict = {}, auth_session: SessaoAutenticada = None):
     if entity == Entities.ORGANIZACAO:
         raise ValueError('Não é possível excluir uma organização!')
 
-    db_entities, _, _ = get(session=session, entity=entity, filters=filters)
+    db_entities, _, _ = get(auth_session=auth_session, db_session=db_session, entity=entity, filters=filters)
 
     if not db_entities:
         raise ValueError(f'{entity} não encontrado!')
 
     for db_entity in db_entities:
-        if not session.sessao_autenticada.administrador and not session.sessao_autenticada.dono:
-            if entity == Entities.USUARIO and db_entity.id != session.sessao_autenticada.id:
-                raise ValueError('Sem permissão para excluir o usuário!')
-        session.delete(db_entity)
+        if auth_session:
+            if not auth_session.administrador and not auth_session.dono:
+                if entity == Entities.USUARIO and db_entity.id != auth_session.id:
+                    raise ValueError('Sem permissão para excluir o usuário!')
+        db_session.delete(db_entity)
 
-    session.commit()
+    db_session.commit()
     return True
 
 
-def create(session: DBSessaoAutenticada, entity: Entities, values: dict = {}):
+def create(db_session: Session, entity: Entities, values: dict = {}, auth_session: SessaoAutenticada = None):
     db_entity = entity.value(**values)
-    if not 'organizacao_id' in values and not entity == Entities.ORGANIZACAO:
-        db_entity.organizacao_id = session.sessao_autenticada.organizacao_id
+
+    if auth_session:
+        if not 'organizacao_id' in values and not entity == Entities.ORGANIZACAO:
+            db_entity.organizacao_id = auth_session.organizacao_id
 
     if entity == Entities.USUARIO:
         db_entity.hash_senha()
         logger.info(db_entity)
 
-    session.add(db_entity)
-    session.commit()
+    db_session.add(db_entity)
+    db_session.commit()
     logger.info(f'Entidade {entity.value.__name__} #{db_entity.id} criada')
     return db_entity
 
 
 # Funções otimizadas
 
-def get_venda_qr_code(session: DBSessaoAutenticada, venda_id: int) -> str:
-    organizacao, _, _ = get(session=session, entity=Entities.ORGANIZACAO, filters={'id': session.sessao_autenticada.organizacao_id}, first=True)
+def get_venda_qr_code(auth_session: SessaoAutenticada, db_session: Session, venda_id: int) -> str:
+    organizacao, _, _ = get(auth_session=auth_session, db_session=db_session, entity=Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
     if not organizacao:  # pragma: nocover
         return None
-    venda, _, _ = get(session=session, entity=Entities.VENDA, filters={'id': venda_id}, first=True)
+    venda, _, _ = get(auth_session=auth_session, db_session=db_session, entity=Entities.VENDA, filters={'id': venda_id}, first=True)
     return venda.gerar_qr_code(
         pix_nome=organizacao.descricao,
         pix_cidade=organizacao.cidade,
@@ -157,16 +160,16 @@ def get_venda_qr_code(session: DBSessaoAutenticada, venda_id: int) -> str:
     )
 
 
-def get_fluxo_caixa(session: DBSessaoAutenticada) -> Tuple[float, float, float]:
+def get_fluxo_caixa(auth_session: SessaoAutenticada, db_session: Session) -> Tuple[float, float, float]:
     query_entradas = select(func.sum(Venda.valor))
-    if not session.sessao_autenticada.administrador:
-        query_entradas = query_entradas.filter(Venda.organizacao_id == session.sessao_autenticada.organizacao_id)
-    entradas = session.exec(query_entradas).first()
+    if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
+        query_entradas = query_entradas.filter(Venda.organizacao_id == auth_session.organizacao_id)
+    entradas = db_session.exec(query_entradas).first()
 
     query_saidas = select(func.sum(Estoque.valor_pago))
-    if not session.sessao_autenticada.administrador:
-        query_saidas = query_saidas.filter(Estoque.organizacao_id == session.sessao_autenticada.organizacao_id)
-    saidas = session.exec(query_saidas).first()
+    if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
+        query_saidas = query_saidas.filter(Estoque.organizacao_id == auth_session.organizacao_id)
+    saidas = db_session.exec(query_saidas).first()
 
     caixa = (entradas if entradas else 0) - (saidas if saidas else 0)
     return (entradas, saidas, caixa)

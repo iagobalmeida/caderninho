@@ -26,7 +26,6 @@ from src.routers.paginas import router as router_paginas
 from src.routers.receitas import router as router_receitas
 from src.routers.scripts import router as router_scripts
 from src.routers.vendas import router as router_vendas
-from src.schemas.auth import DBSessaoAutenticada
 from src.templates import render
 from src.utils import url_incluir_query_params
 
@@ -37,7 +36,12 @@ SESSION_SECRET_KEY = 'SESSION_SECRET_KEY'
 rootlogger.setLevel(logging.WARN)
 
 
-app = fastapi.FastAPI()
+def lifespan(app):
+    with db.init_session():
+        yield
+
+
+app = fastapi.FastAPI(lifespan=lifespan)
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY, https_only=False)
 
@@ -84,17 +88,18 @@ async def get_registrar(request: fastapi.Request, message: str = fastapi.Query(N
 
 
 @app.post('/app/registrar', include_in_schema=False)
-async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
+async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.Session = db.DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     template_name = 'autenticacao/login.html'
     message = None
     try:
         if payload.senha != payload.senha_confirmar:
             raise ValueError('As senhas não batem')
 
-        db_organizacao = repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})
+        db_organizacao = repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, values={'descricao': payload.organizacao_descricao})
         organizacao_id = db_organizacao.id
 
-        repository.create(session, repository.Entities.USUARIO, {
+        repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, values={
             'nome': payload.nome,
             'email': payload.email,
             'senha': payload.senha,
@@ -116,8 +121,9 @@ async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Q
 
 
 @app.post('/app/recuperar_senha', include_in_schema=False)
-async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: DBSessaoAutenticada = db.DBSESSAO_DEP):
-    db_usuario, _, _ = repository.get(session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True)
+async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: db.Session = db.DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
+    db_usuario, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True)
     if not db_usuario:
         raise ValueError('Não foi encontrado usuário com esse email')
 

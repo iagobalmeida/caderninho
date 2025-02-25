@@ -15,6 +15,7 @@ router = fastapi.APIRouter(prefix='/app/estoques', dependencies=[auth.HEADER_AUT
 
 @router.get('/', include_in_schema=False)
 async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -1, filter_data_inicio: str = None, filter_data_final: str = None, session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     filters = {}
     if filter_data_inicio:
         filters.update(data_inicio=filter_data_inicio)
@@ -23,10 +24,11 @@ async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -
     if filter_insumo_id >= 0:
         filters.update(insumo_id=filter_insumo_id)
 
-    db_estoques, db_estoques_pages, db_estoques_count = repository.get(session=session, entity=repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
+    db_estoques, db_estoques_pages, db_estoques_count = repository.get(auth_session=auth_session, db_session=session,
+                                                                       entity=repository.Entities.ESTOQUE, filters=filters, order_by='data_criacao', desc=True)
 
-    db_insumos, _, _ = repository.get(session=session, entity=repository.Entities.INGREDIENTE)
-    entradas, saidas, caixa = repository.get_fluxo_caixa(session)
+    db_insumos, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.INGREDIENTE)
+    entradas, saidas, caixa = repository.get_fluxo_caixa(auth_session=auth_session, db_session=session)
 
     context_header = Context.Header(
         pretitle='Registros',
@@ -90,13 +92,14 @@ async def get_estoques_index(request: fastapi.Request, filter_insumo_id: int = -
 
 @router.post('/', include_in_schema=False)
 async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     descricao = payload.descricao.lower() if payload.descricao else None
     if descricao == 'uso em receita' and payload.receita_id:
-        db_receita, _, _ = repository.get(session=session, entity=repository.Entities.RECEITA, filters={'id': payload.receita_id}, first=True)
+        db_receita, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': payload.receita_id}, first=True)
         descricao = f'Uso em Receita ({db_receita.nome})'
         for insumo_link in db_receita.insumo_links:
             quantidade = -1 * insumo_link.quantidade * float(payload.quantidade_receita)
-            repository.create(session, repository.Entities.ESTOQUE, {
+            repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE, values={
                 'descricao': descricao,
                 'insumo_id': insumo_link.insumo_id,
                 'quantidade': quantidade,
@@ -108,7 +111,7 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
             quantidade = quantidade * -1
         if descricao == 'outros' and payload.descricao_customizada:
             descricao = payload.descricao_customizada
-        repository.create(session, repository.Entities.ESTOQUE, {
+        repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE, values={
             'descricao': descricao.title(),
             'insumo_id': payload.insumo_id,
             'quantidade': quantidade,
@@ -119,16 +122,19 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
 
 @router.post('/excluir', include_in_schema=False)
 async def post_estoques_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     selecionados_ids = selecionados_ids.split(',')
     for id in selecionados_ids:
-        repository.delete(session, repository.Entities.ESTOQUE, {'id': id})
+        repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE, filters={'id': id})
     return redirect_back(request, message=f'{len(selecionados_ids)} registros excluídos com sucesso!')
 
 
 @router.post('/atualizar', include_in_schema=False)
 async def post_estoques_atualizar(request: fastapi.Request, payload: inputs.EstoqueAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     repository.update(
-        session=session,
+        auth_session=auth_session,
+        db_session=session,
         entity=repository.Entities.ESTOQUE,
         filters={
             'id': payload.id
