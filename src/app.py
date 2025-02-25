@@ -14,9 +14,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from modules import smpt
 from src import db
 from src.domain import inputs, repository
+from src.modules import smpt
 from src.modules.logger import logger, setup_logger
 from src.routers.autenticacao import router as router_autenticacao
 from src.routers.estoques import router as router_estoques
