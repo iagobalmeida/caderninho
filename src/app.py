@@ -36,12 +36,7 @@ SESSION_SECRET_KEY = 'SESSION_SECRET_KEY'
 rootlogger.setLevel(logging.WARN)
 
 
-def lifespan(app):
-    with db.init_session():
-        yield
-
-
-app = fastapi.FastAPI(lifespan=lifespan)
+app = fastapi.FastAPI()
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY, https_only=False)
 

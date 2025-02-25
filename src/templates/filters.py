@@ -78,11 +78,17 @@ def templates_filter_json(input: str):
 
 
 def templates_filter_format_log(input: str):
-    places = input.split(' | ')
-    if len(places) == 1:
-        return input
-    subplaces = places[2].split(' - ')
-    return f'<b class="text-success">{places[0]}</b> | {places[1]} | <span class="text-primary">{subplaces[0]}</span> - {subplaces[1]}'
+    result = input
+    try:
+        places = input.split(' | ')
+        if len(places) == 1:
+            return input
+        subplaces = places[2].split(' - ')
+        result = f'<b class="text-success">{places[0]}</b> | {places[1]} | <span class="text-primary">{subplaces[0]}</span> - {subplaces[1]}'
+    except Exception as ex:
+        pass
+    finally:
+        return result
 
 
 BASE_FILTERS = [

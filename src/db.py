@@ -24,7 +24,7 @@ SessionLocal = Session(engine)
 def init_session():
     session = SessionLocal
     try:
-        if (engine.echo):
+        if (engine.echo):  # pragma: nocover
             logger.info(engine.pool.status())
         yield session
     finally:

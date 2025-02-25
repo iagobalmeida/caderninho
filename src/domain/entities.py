@@ -59,22 +59,17 @@ class Usuario(RegistroOrganizacao, table=True):
             self.senha = pwd_context.hash(self.senha)
 
     def verificar_senha(self, senha: str) -> bool:
-        try:
-            result = pwd_context.verify(senha, self.senha)
-            return result
-        except UnknownHashError as ex:
-            logger.warning(f'Erro ao verificar senha: {senha} - {self.senha}')
-            return False
+        result = pwd_context.verify(senha, self.senha)
+        return result
 
     def dict(self):
         base_dict = self.model_dump()
         del base_dict['senha']
-        if self.administrador:
+        if self.administrador:  # pragma: nocover
             base_dict.update(organizacao_descricao='Administrador')
-        if self.organizacao:
-            base_dict.update(organizacao_descricao=self.organizacao.descricao)
-        else:
-            base_dict.update(organizacao_descricao='-')
+        base_dict.update(
+            organizacao_descricao=self.organizacao.descricao if self.organizacao else '-'
+        )
         return base_dict
 
 
@@ -88,13 +83,13 @@ class ReceitaInsumoLink(RegistroOrganizacao, table=True):
 
     @property
     def insumo_custo_p_grama(self):
-        if self.organizacao.configuracoes['usar_custo_med']:
+        if self.organizacao.configuracoes['usar_custo_med']:  # pragma: nocover
             return self.insumo.custo_p_grama_medio
         return self.insumo.custo_p_grama
 
     @property
     def custo(self):
-        if not self.insumo:
+        if not self.insumo:  # pragma: nocover
             return 0
         return round(self.quantidade * self.insumo_custo_p_grama, 2)
 

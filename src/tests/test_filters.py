@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
 
+import bs4
+
 from src.templates import filters
 
 
@@ -58,3 +60,15 @@ def test_filters_format_reais():
 
 def test_filters_json():
     assert filters.templates_filter_json(None) == None
+
+
+def test_filters_format_log():
+    result = filters.templates_filter_format_log('horario | nivel | local - mensagem')
+    soup = bs4.BeautifulSoup(result, 'html.parser')
+    assert soup.find('b', text='horario')
+    assert soup.find('span', text='local')
+
+
+def test_filters_format_log():
+    result = filters.templates_filter_format_log('horario | nivel | local mensagem')
+    assert result == 'horario | nivel | local mensagem'

@@ -1,6 +1,6 @@
 import json
+from unittest.mock import patch
 
-import pytest
 from bs4 import BeautifulSoup
 
 from src.tests.mocks import MOCK_ORGANIZACAO
@@ -99,3 +99,8 @@ def test_post_organizacao_usuarios_criar_senhas_nao_batem(client):
     dom_alert = soup.find('div', {'role': 'alert '})
     # breakpoint()
     # assert 'As senhas não batem' in dom_alert.text
+
+
+def test_organizacao_chave_pix_valida_exception(client):
+    with patch.object(MOCK_ORGANIZACAO, 'cidade', return_value=Exception('Erro teste')):
+        assert MOCK_ORGANIZACAO.chave_pix_valida == False

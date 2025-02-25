@@ -1,7 +1,9 @@
 import json
+from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 
+from src.tests.mocks import MOCK_VENDA
 from src.tests.utils import autenticar
 
 
@@ -84,3 +86,8 @@ def test_post_vendas_atualizar(client):
     assert response.status_code == 200
     dom_rows = __get_receitas_rows(client)
     # TODO: Aprimorar assert para conteúdos da tela
+
+
+def test_organizacao_chave_pix_valida_exception(client):
+    with patch.object(MOCK_VENDA, 'valor', return_value=Exception('Erro teste')):
+        assert MOCK_VENDA.gerar_qr_code('foo', 'bar', 'far') == None

@@ -2,6 +2,7 @@ import json
 
 from bs4 import BeautifulSoup
 
+from src.tests.mocks import MOCK_RECEITA
 from src.tests.utils import autenticar
 
 
@@ -95,3 +96,7 @@ def test_post_receitas_deletar(client):
     assert response.status_code == 200
     dom_rows = __get_receitas_rows(client)
     # TODO: Aprimorar assert para conteúdos da tela
+
+
+def test_receita_href():
+    assert MOCK_RECEITA.href == f'/app/receitas/{MOCK_RECEITA.id}'

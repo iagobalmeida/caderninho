@@ -22,7 +22,7 @@ def list_entity(request: fastapi.Request, db_session: Session, entity: repositor
 
     order_by = None
     desc = False
-    if hasattr(entity, 'data_criacao'):
+    if hasattr(entity.value, 'data_criacao'):
         order_by = 'data_criacao'
         desc = True
 
