@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import fastapi
 from sqlmodel import Session
 
@@ -9,6 +11,8 @@ from src.templates import render
 from src.templates.context import Context
 
 router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
+
+LOG_FILE = "logs/app.log"
 
 
 @router.get('/home', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
@@ -55,4 +59,25 @@ async def get_como_usar(request: fastapi.Request, session: Session = DBSESSAO_DE
     return render(request, 'como_usar.html', session, {
         'header': context_header,
         'sobre_essa_pagina': SOBRE_ESSA_PAGINA
+    })
+
+
+@router.get('/admin/logs', include_in_schema=False, dependencies=[auth.HEADER_AUTH])
+async def get_admin_logs(request: fastapi.Request, lines: int = 100, session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
+    if not auth_session.administrador:
+        raise ValueError('Sem permissão para acessar esta página')
+
+    log_path = Path(LOG_FILE)
+
+    if not log_path.exists():
+        raise ValueError("Arquivo de logs não encontrado")
+
+    with log_path.open("r", encoding="utf-8") as f:
+        log_lines = f.readlines()
+
+    lines = min(1000, lines)
+
+    return render(request, 'admin/logs.html', session, context={
+        'logs': log_lines[-lines:]
     })

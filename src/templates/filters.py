@@ -77,12 +77,21 @@ def templates_filter_json(input: str):
     return json.dumps(input)
 
 
+def templates_filter_format_log(input: str):
+    places = input.split(' | ')
+    if len(places) == 1:
+        return input
+    subplaces = places[2].split(' - ')
+    return f'<b class="text-success">{places[0]}</b> | {places[1]} | <span class="text-primary">{subplaces[0]}</span> - {subplaces[1]}'
+
+
 BASE_FILTERS = [
     ('strftime', templates_filter_strftime),
     ('format_stock', templates_filter_format_stock),
     ('format_stock_movement', templates_filter_format_stock_movement),
     ('format_quantity', templates_filter_format_quantity),
     ('format_reais', templates_filter_format_reais),
+    ('format_log', templates_filter_format_log),
     ('json', templates_filter_json),
     ('markdown', templates_filter_markdown)
 ]

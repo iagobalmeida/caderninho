@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from typing import List
 
-from fastapi import Depends, Request
+from fastapi import Depends
 from loguru import logger
 from sqlalchemy import text
 from sqlmodel import Session, SQLModel, create_engine
@@ -9,30 +9,31 @@ from sqlmodel import Session, SQLModel, create_engine
 from src.env import getenv
 
 database_url = getenv('DATABASE_URL', "sqlite:///database.db")
-engine = create_engine(database_url, echo=False)
-
-DB_SESSION = None
+engine = create_engine(
+    database_url,
+    pool_size=10,
+    max_overflow=5,
+    pool_timeout=30,
+    pool_recycle=1800,
+    echo=False
+)
+SessionLocal = Session(engine)
 
 
 @contextmanager
 def init_session():
-    global DB_SESSION
-    DB_SESSION = Session(engine)
-    logger.info('DB_SESSION started')
+    session = SessionLocal
     try:
-        yield
-    except Exception as ex:
-        pass
+        if (engine.echo):
+            logger.info(engine.pool.status())
+        yield session
     finally:
-        logger.info('DB_SESSION closed')
-        DB_SESSION.close()
+        session.close()
 
 
-def get_session(request: Request):
-    global DB_SESSION
-    # __session = DB_SESSION
-    # setattr(__session, 'sessao_autenticada', getattr(request.state, 'auth', None))  # TODO: Que poggzão!
-    return DB_SESSION
+def get_session():
+    with init_session() as session:
+        yield session
 
 
 def init():

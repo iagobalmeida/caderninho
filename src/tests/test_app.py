@@ -4,6 +4,7 @@ from unittest.mock import patch
 from bs4 import BeautifulSoup
 
 from src.tests.mocks import MockSMTPServer
+from src.tests.utils import autenticar_admin
 
 
 def test_get_index(client):
@@ -78,3 +79,9 @@ def test_app_post_recuperar_senha(client):
         soup = BeautifulSoup(response.content, 'html.parser')
         alert = soup.find('h4', {'role': 'alert'})
         assert 'Senha enviada para: teste_app@teste.com' in alert.text
+
+
+def test_app_get_admin_logs(client):
+    autenticar_admin(client)
+    response = client.get('/app/admin/logs')
+    assert response.status_code == 200

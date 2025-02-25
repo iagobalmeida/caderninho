@@ -233,6 +233,7 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Gerar QR PIX em detalhamento de vendas
 - [X] Modularizar rotas
 - [X] Ajustar fluxo de caixa para últimos 30 dias
+- [X] Página de Logs
 - [ ] Campo `plano` em Organização
   - [ ] Limitar número de registros por plano em `create`
   - [ ] Exibir plano atual

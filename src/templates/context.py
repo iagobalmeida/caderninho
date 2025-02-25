@@ -99,10 +99,17 @@ BASE_NAVBAR_LINKS = [
     ('Organização', 'groups', 'get_organizacao_index'),
 ]
 
+ADMIN_NAVBAR_LINKS = [
+    ('Logs', 'android', 'get_admin_logs')
+]
+
 
 def get_context(request: Request, session=None, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
     auth_session = getattr(request.state, 'auth', None)
     theme = request.session.get('theme', 'light')
+
+    if auth_session and auth_session.administrador:
+        navbar_links = [*navbar_links, *ADMIN_NAVBAR_LINKS]
 
     base_context = Context(
         title='Caderninho',
