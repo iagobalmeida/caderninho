@@ -6,7 +6,7 @@ from loguru import logger
 from sqlmodel import Session
 
 from src.domain import repository
-from src.schemas.auth import SessaoAutenticada
+from src.schemas.auth import AuthSession
 from src.utils import redirect_url_for
 
 
@@ -21,7 +21,7 @@ def authenticate(session: Session, request: Request, email: str, senha: str, lem
     if not senha_valida:
         return False
 
-    sessao = SessaoAutenticada(
+    sessao = AuthSession(
         **db_usuario.model_dump(),
         valid=True
     )
@@ -58,7 +58,7 @@ def request_logout(request: Request) -> RedirectResponse:
 
 
 def header_authorization(request: Request) -> str:
-    request.state.auth = SessaoAutenticada.from_request_session(request)
+    request.state.auth = AuthSession.from_request_session(request)
 
     if not request.state.auth:
         request.session.clear()

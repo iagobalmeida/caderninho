@@ -4,7 +4,7 @@ from fastapi import Request
 from pydantic import BaseModel
 
 
-class SessaoAutenticada(BaseModel):
+class AuthSession(BaseModel):
     valid: bool = False
     id: int = None
     nome: str = None

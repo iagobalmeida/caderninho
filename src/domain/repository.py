@@ -7,7 +7,7 @@ from sqlmodel import Session, func, select
 
 from src.domain.entities import (Estoque, Insumo, Organizacao, Receita,
                                  ReceitaInsumoLink, Usuario, Venda)
-from src.schemas.auth import SessaoAutenticada
+from src.schemas.auth import AuthSession
 
 
 class Entities(Enum):
@@ -20,7 +20,7 @@ class Entities(Enum):
     RECEITA = Receita
 
 
-def count_all(db_session: Session, entity: Entities, auth_session: SessaoAutenticada = None):
+def count_all(db_session: Session, entity: Entities, auth_session: AuthSession = None):
     count_query = select(func.count()).select_from(entity.value)
     if auth_session and not auth_session.administrador:
         count_query = count_query.filter(entity.value.organizacao_id == auth_session.organizacao_id)
@@ -36,7 +36,7 @@ def get(
         desc: bool = False,
         per_page: int = 10,
         page: int = 1,
-        auth_session: SessaoAutenticada = None,
+        auth_session: AuthSession = None,
         ignore_validations: bool = False
 ):
     query = select(entity.value)
@@ -79,7 +79,7 @@ def get(
     return result, pages, count
 
 
-def update(db_session: Session, entity: Entities, filters: dict = {}, values: dict = {}, auth_session: SessaoAutenticada = None):
+def update(db_session: Session, entity: Entities, filters: dict = {}, values: dict = {}, auth_session: AuthSession = None):
     db_entity, _, _ = get(auth_session=auth_session, db_session=db_session, entity=entity, filters=filters, first=True)
     if not db_entity:
         raise ValueError(f'{entity} não encontrado!')
@@ -109,7 +109,7 @@ def update(db_session: Session, entity: Entities, filters: dict = {}, values: di
     return db_entity
 
 
-def delete(db_session: Session, entity: Entities, filters: dict = {}, auth_session: SessaoAutenticada = None):
+def delete(db_session: Session, entity: Entities, filters: dict = {}, auth_session: AuthSession = None):
     if entity == Entities.ORGANIZACAO:
         raise ValueError('Não é possível excluir uma organização!')
 
@@ -129,7 +129,7 @@ def delete(db_session: Session, entity: Entities, filters: dict = {}, auth_sessi
     return True
 
 
-def create(db_session: Session, entity: Entities, values: dict = {}, auth_session: SessaoAutenticada = None):
+def create(db_session: Session, entity: Entities, values: dict = {}, auth_session: AuthSession = None):
     db_entity = entity.value(**values)
 
     if auth_session:
@@ -148,7 +148,7 @@ def create(db_session: Session, entity: Entities, values: dict = {}, auth_sessio
 
 # Funções otimizadas
 
-def get_venda_qr_code(auth_session: SessaoAutenticada, db_session: Session, venda_id: int) -> str:
+def get_venda_qr_code(auth_session: AuthSession, db_session: Session, venda_id: int) -> str:
     organizacao, _, _ = get(auth_session=auth_session, db_session=db_session, entity=Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
     if not organizacao:  # pragma: nocover
         return None
@@ -160,7 +160,7 @@ def get_venda_qr_code(auth_session: SessaoAutenticada, db_session: Session, vend
     )
 
 
-def get_fluxo_caixa(auth_session: SessaoAutenticada, db_session: Session) -> Tuple[float, float, float]:
+def get_fluxo_caixa(auth_session: AuthSession, db_session: Session) -> Tuple[float, float, float]:
     query_entradas = select(func.sum(Venda.valor))
     if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
         query_entradas = query_entradas.filter(Venda.organizacao_id == auth_session.organizacao_id)

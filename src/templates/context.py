@@ -4,7 +4,7 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
 from src.domain import repository
-from src.schemas.auth import SessaoAutenticada
+from src.schemas.auth import AuthSession
 from src.schemas.docs import get_sobre_essa_pagina_html
 from src.templates.filters import \
     templates_global_material_symbol as material_symbol
@@ -43,7 +43,7 @@ class Context(TypedDict):
     navbar: Navbar
     header: Header
     breadcrumbs: List[Breadcrumb]
-    usuario: SessaoAutenticada = None
+    usuario: AuthSession = None
 
     @classmethod
     def factory_navbar_link(self, request: Request, title: str, symbol_name: str, url_name: str, query_params: dict = None):
