@@ -4,7 +4,7 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
 from src.domain import repository
-from src.schemas.auth import SessaoAutenticada
+from src.schemas.auth import AuthSession
 from src.schemas.docs import get_sobre_essa_pagina_html
 from src.templates.filters import \
     templates_global_material_symbol as material_symbol
@@ -43,7 +43,7 @@ class Context(TypedDict):
     navbar: Navbar
     header: Header
     breadcrumbs: List[Breadcrumb]
-    usuario: SessaoAutenticada = None
+    usuario: AuthSession = None
 
     @classmethod
     def factory_navbar_link(self, request: Request, title: str, symbol_name: str, url_name: str, query_params: dict = None):
@@ -101,6 +101,7 @@ BASE_NAVBAR_LINKS = [
 
 
 def get_context(request: Request, session=None, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
+    auth_session = getattr(request.state, 'auth', None)
     theme = request.session.get('theme', 'light')
 
     base_context = Context(
@@ -120,12 +121,12 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
         data_bs_theme=theme
     )
 
-    if session and session.sessao_autenticada:
-        base_context.update(usuario=session.sessao_autenticada)
+    if auth_session:
+        base_context.update(usuario=auth_session)
 
-        db_insumos, _, _ = repository.get(session=session, entity=repository.Entities.INGREDIENTE)
-        db_receitas, _, _ = repository.get(session=session, entity=repository.Entities.RECEITA)
-        entradas, saidas, caixa = repository.get_fluxo_caixa(session)
+        db_insumos, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.INGREDIENTE)
+        db_receitas, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA)
+        entradas, saidas, caixa = repository.get_fluxo_caixa(auth_session=auth_session, db_session=session)
 
         base_context.update(insumos=db_insumos)
         base_context.update(receitas=db_receitas)

@@ -15,7 +15,8 @@ router = fastapi.APIRouter(prefix='/app/receitas', dependencies=[auth.HEADER_AUT
 
 @router.get('/', include_in_schema=False)
 async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, session: Session = DBSESSAO_DEP):
-    db_receitas, db_receitas_pages, db_receitas_count = repository.get(session=session, entity=repository.Entities.RECEITA, filters={'nome': filter_nome})
+    auth_session = getattr(request.state, 'auth', None)
+    db_receitas, db_receitas_pages, db_receitas_count = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'nome': filter_nome})
     context_header = Context.Header(
         pretitle='Registros',
         title='Receitas',
@@ -70,7 +71,8 @@ async def get_receitas_index(request: fastapi.Request, filter_nome: str = None, 
 
 @router.post('/', include_in_schema=False)
 async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    db_receita = repository.create(session, repository.Entities.RECEITA, {
+    auth_session = getattr(request.state, 'auth', None)
+    db_receita = repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, values={
         'nome': nome,
         'peso_unitario': 1,
         'procentagem_lucro': 33
@@ -80,7 +82,8 @@ async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form
 
 @router.get('/{id}', include_in_schema=False)
 async def get_receita(request: fastapi.Request, id: int, session: Session = DBSESSAO_DEP):
-    db_receita, _, _ = repository.get(session=session, entity=repository.Entities.RECEITA, filters={'id': id}, first=True)
+    auth_session = getattr(request.state, 'auth', None)
+    db_receita, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': id}, first=True)
     if not db_receita:
         raise ValueError(f'Receita com id {id} não encontrada')
     context_header = Context.Header(
@@ -118,8 +121,10 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
 
 @router.post('/atualizar', include_in_schema=False)
 async def post_receita_atualizar(request: fastapi.Request, payload: inputs.ReceitaAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     repository.update(
-        session=session,
+        auth_session=auth_session,
+        db_session=session,
         entity=repository.Entities.RECEITA,
         filters={
             'id': payload.id
@@ -135,15 +140,17 @@ async def post_receita_atualizar(request: fastapi.Request, payload: inputs.Recei
 
 @router.post('/deletar', include_in_schema=False)
 async def post_receita_deletar(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            repository.delete(session, repository.Entities.RECEITA, {'id': id})
+            repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': id})
     return redirect_url_for(request, 'get_receitas_index')
 
 
 @router.post('/insumos/incluir', include_in_schema=False)
 async def post_receita_insumos_incluir(request: fastapi.Request, payload: inputs.ReceitaInsumoAdicionar = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    repository.create(session, repository.Entities.RECEITA_INGREDIENTE, {
+    auth_session = getattr(request.state, 'auth', None)
+    repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_INGREDIENTE, values={
         'receita_id': payload.receita_id,
         'insumo_id': payload.insumo_id,
         'quantidade': payload.quantidade
@@ -153,8 +160,10 @@ async def post_receita_insumos_incluir(request: fastapi.Request, payload: inputs
 
 @router.post('/insumos/atualizar', include_in_schema=False)
 async def post_receita_insumos_atualizar(request: fastapi.Request, payload: inputs.ReceitaInsumoAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     repository.update(
-        session=session,
+        auth_session=auth_session,
+        db_session=session,
         entity=repository.Entities.RECEITA_INGREDIENTE,
         filters={
             'id': payload.id
@@ -165,7 +174,8 @@ async def post_receita_insumos_atualizar(request: fastapi.Request, payload: inpu
     )
     if payload.insumo_nome:
         repository.update(
-            session=session,
+            auth_session=auth_session,
+            db_session=session,
             entity=repository.Entities.INGREDIENTE,
             filters={
                 'id': payload.insumo_id
@@ -181,7 +191,8 @@ async def post_receita_insumos_atualizar(request: fastapi.Request, payload: inpu
 
 @router.post('/insumos/remover', include_in_schema=False)
 async def post_receita_insumos_remover(request: fastapi.Request, payload: inputs.ReceitaInsumoRemover = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
     if payload.selecionados_ids:
         for id in payload.selecionados_ids.split(','):
-            repository.delete(session, repository.Entities.RECEITA_INGREDIENTE, {'id': id})
+            repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_INGREDIENTE, filters={'id': id})
     return redirect_url_for(request, 'get_receita', id=payload.receita_id)

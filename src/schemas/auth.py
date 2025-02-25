@@ -2,10 +2,9 @@ from typing import Optional
 
 from fastapi import Request
 from pydantic import BaseModel
-from sqlmodel import Session
 
 
-class SessaoAutenticada(BaseModel):
+class AuthSession(BaseModel):
     valid: bool = False
     id: int = None
     nome: str = None
@@ -24,12 +23,3 @@ class SessaoAutenticada(BaseModel):
 
     def dict(self):
         return self.model_dump()
-
-
-class DBSessaoAutenticada(Session):
-    sessao_autenticada: SessaoAutenticada = None
-
-    def __init__(self, *args, request: Request = None, **kwargs):
-        if request:
-            self.sessao_autenticada = SessaoAutenticada.from_request_session(request)
-        return super().__init__(*args, **kwargs)
