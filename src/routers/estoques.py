@@ -22,7 +22,7 @@ async def get_estoques_index(request: fastapi.Request, page: int = fastapi.Query
     if filter_insumo_id >= 0:
         filters.update(insumo_id=filter_insumo_id)
 
-    return list_entity(
+    return await list_entity(
         request=request,
         db_session=db_session,
         entity=repository.Entities.ESTOQUE,
@@ -36,11 +36,11 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
     auth_session = getattr(request.state, 'auth', None)
     descricao = payload.descricao.lower() if payload.descricao else None
     if descricao == 'uso em receita' and payload.receita_id:
-        db_receita, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': payload.receita_id}, first=True)
+        db_receita, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': payload.receita_id}, first=True)
         descricao = f'Uso em Receita ({db_receita.nome})'
         for insumo_link in db_receita.insumo_links:
             quantidade = -1 * insumo_link.quantidade * float(payload.quantidade_receita)
-            repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE, values={
+            await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE, values={
                 'descricao': descricao,
                 'insumo_id': insumo_link.insumo_id,
                 'quantidade': quantidade,
@@ -52,7 +52,7 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
             quantidade = quantidade * -1
         if descricao == 'outros' and payload.descricao_customizada:
             descricao = payload.descricao_customizada
-        repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE, values={
+        await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE, values={
             'descricao': descricao.title(),
             'insumo_id': payload.insumo_id,
             'quantidade': quantidade,
@@ -63,7 +63,7 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
 
 @router.post('/excluir', include_in_schema=False)
 async def post_estoque_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    return delete_entity(
+    return await delete_entity(
         request=request,
         db_session=session,
         entity=repository.Entities.ESTOQUE,

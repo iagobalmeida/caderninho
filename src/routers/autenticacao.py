@@ -9,23 +9,23 @@ router = fastapi.APIRouter(prefix='/app/auth')
 
 @router.post('/', include_in_schema=False)
 async def post_index(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), lembrar_de_mim: bool = fastapi.Form(False), session: db.Session = db.DBSESSAO_DEP):
-    return auth.request_login(session, request, email=email, senha=senha, lembrar_de_mim=lembrar_de_mim)
+    return await auth.request_login(session, request, email=email, senha=senha, lembrar_de_mim=lembrar_de_mim)
 
 
 @router.post('/authenticate')
 async def post_authenticate(request: fastapi.Request, email: str = fastapi.Form(), senha: str = fastapi.Form(), session: db.Session = db.DBSESSAO_DEP):
-    return auth.usuario_autenticar(session, request=request, email=email, senha=senha)
+    return await auth.usuario_autenticar(session, request=request, email=email, senha=senha)
 
 
 @router.get('/logout', include_in_schema=False)
 async def get_logout(request: fastapi.Request):
-    return auth.request_logout(request)
+    return await auth.request_logout(request)
 
 
 @router.post('/perfil', dependencies=[auth.HEADER_AUTH])
 async def post_perfil(request: fastapi.Request, payload: inputs.UsuarioAtualizar = fastapi.Form(),  session: db.Session = db.DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    repository.update(
+    await repository.update(
         auth_session=auth_session,
         db_session=session,
         entity=repository.Entities.USUARIO,
@@ -48,7 +48,7 @@ async def post_atualizar_senha(request: fastapi.Request, payload: inputs.Atualiz
         raise ValueError('As senhas não batem')
 
     auth_session = getattr(request.state, 'auth', None)
-    repository.update(
+    await repository.update(
         auth_session=auth_session,
         db_session=session,
         entity=repository.Entities.USUARIO,

@@ -10,8 +10,8 @@ init_filters(templates)
 init_globals(templates)
 
 
-def render(request: Request, template_name: str, session=None, context: dict = None):
-    return context_render(
+async def render(request: Request, template_name: str, session=None, context: dict = None):
+    return await context_render(
         templates=templates,
         request=request,
         template_name=template_name,

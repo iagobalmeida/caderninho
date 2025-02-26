@@ -47,7 +47,7 @@ class RegistroOrganizacao(SQLModel, table=False):
 
 
 class Usuario(RegistroOrganizacao, table=True):
-    organizacao: "Organizacao" = Relationship(back_populates="usuarios")
+    organizacao: "Organizacao" = Relationship(back_populates="usuarios", sa_relationship_kwargs={'lazy': 'selectin'})
     nome: str
     email: str
     senha: Optional[str] = Field(default=None)
@@ -79,7 +79,7 @@ class ReceitaInsumoLink(RegistroOrganizacao, table=True):
     insumo_id: Optional[int] = Field(default=None, foreign_key="insumo.id")
     receita: "Receita" = Relationship(back_populates="insumo_links")
     insumo: "Insumo" = Relationship(back_populates="receita_links")
-    organizacao: "Organizacao" = Relationship()
+    organizacao: "Organizacao" = Relationship(sa_relationship_kwargs={'lazy': 'selectin'})
 
     @property
     def insumo_custo_p_grama(self):
@@ -127,7 +127,8 @@ class Estoque(RegistroOrganizacao, table=True):
     insumo: "Insumo" = Relationship(back_populates="estoque_links")
     quantidade: Optional[float] = Field(default=0)
     valor_pago: Optional[float] = Field(default=0)
-    organizacao: "Organizacao" = Relationship()
+    organizacao: "Organizacao" = Relationship(sa_relationship_kwargs={'lazy': 'selectin'}
+                                              )
 
     @classmethod
     def columns(self):
@@ -171,7 +172,7 @@ class Venda(RegistroOrganizacao, table=True):
     descricao: str
     valor: float
     recebido: bool = Field(default=False)
-    organizacao: "Organizacao" = Relationship()
+    organizacao: "Organizacao" = Relationship(sa_relationship_kwargs={'lazy': 'selectin'})
 
     @classmethod
     def columns(self):
@@ -225,9 +226,9 @@ class Insumo(RegistroOrganizacao, table=True):
     peso: float
     custo: float
     unidade: Optional[str] = 'g'
-    receita_links: List['ReceitaInsumoLink'] = Relationship(back_populates='insumo')
-    estoque_links: List['Estoque'] = Relationship(back_populates='insumo')
-    organizacao: "Organizacao" = Relationship()
+    receita_links: List['ReceitaInsumoLink'] = Relationship(back_populates='insumo', sa_relationship_kwargs={'lazy': 'selectin'})
+    estoque_links: List['Estoque'] = Relationship(back_populates='insumo', sa_relationship_kwargs={'lazy': 'selectin'})
+    organizacao: "Organizacao" = Relationship(sa_relationship_kwargs={'lazy': 'selectin'})
 
     @classmethod
     def columns(self):
@@ -309,7 +310,7 @@ class Receita(RegistroOrganizacao, table=True):
     porcentagem_lucro: int = 33
     organizacao: "Organizacao" = Relationship()
 
-    insumo_links: List['ReceitaInsumoLink'] = Relationship(back_populates='receita')
+    insumo_links: List['ReceitaInsumoLink'] = Relationship(back_populates='receita', sa_relationship_kwargs={'lazy': 'selectin'})
 
     @classmethod
     def columns(self):

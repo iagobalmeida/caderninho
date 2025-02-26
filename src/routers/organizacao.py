@@ -22,10 +22,10 @@ async def get_organizacao_index(request: fastapi.Request, session: Session = DBS
     auth_session = getattr(request.state, 'auth', None)
     context_header['title'] = auth_session.organizacao_descricao
 
-    db_usuarios, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO)
-    db_organizacao, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
+    db_usuarios, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO)
+    db_organizacao, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
 
-    return render(
+    return await render(
         session=session,
         request=request,
         template_name='organizacao/detail.html',
@@ -40,7 +40,7 @@ async def get_organizacao_index(request: fastapi.Request, session: Session = DBS
 @router.post('/', include_in_schema=False)
 async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.Form(), descricao: str = fastapi.Form(), cidade: str = fastapi.Form(), chave_pix: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    repository.update(
+    await repository.update(
         auth_session=auth_session,
         db_session=session,
         entity=repository.Entities.ORGANIZACAO,
@@ -59,7 +59,7 @@ async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.For
 @router.post('/configuracoes', include_in_schema=False)
 async def post_organizacao_configuracoes(request: fastapi.Request, id: int = fastapi.Form(), converter_kg: bool = fastapi.Form(False), converter_kg_sempre: bool = fastapi.Form(False), usar_custo_med: bool = fastapi.Form(False), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    repository.update(
+    await repository.update(
         auth_session=auth_session,
         db_session=session,
         entity=repository.Entities.ORGANIZACAO,
@@ -84,10 +84,10 @@ async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inp
         raise ValueError('As senhas não batem')
 
     # if not payload.organizacao_id:
-    #     db_organizacao = repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})
+    #     db_organizacao = await repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})
     #     payload.organizacao_id = db_organizacao.id
 
-    repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, values={
+    await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, values={
         'nome': payload.nome,
         'email': payload.email,
         'senha': payload.senha,
@@ -100,7 +100,7 @@ async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inp
 @router.post('/usuarios/editar', include_in_schema=False)
 async def post_organizacao_usuarios_editar(request: fastapi.Request, payload: inputs.UsuarioEditar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    repository.update(
+    await repository.update(
         auth_session=auth_session,
         db_session=session,
         entity=repository.Entities.USUARIO,
@@ -122,5 +122,5 @@ async def post_organizacao_usuarios_excluir(request: fastapi.Request, selecionad
     auth_session = getattr(request.state, 'auth', None)
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'id': id})
+            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'id': id})
     return redirect_back(request, message='Usuário excluído com sucesso!')

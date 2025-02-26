@@ -13,7 +13,7 @@ router = fastapi.APIRouter(prefix='/app/insumos', dependencies=[auth.HEADER_AUTH
 
 @router.get('/', include_in_schema=False)
 async def get_insumos_index(request: fastapi.Request, page: int = fastapi.Query(1),  db_session: Session = DBSESSAO_DEP):
-    return list_entity(
+    return await list_entity(
         request=request,
         db_session=db_session,
         entity=repository.Entities.INSUMO,
@@ -25,7 +25,7 @@ async def get_insumos_index(request: fastapi.Request, page: int = fastapi.Query(
 @router.post('/', include_in_schema=False)
 async def post_insumos_index(request: fastapi.Request, payload: inputs.InsumoCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.INSUMO, values={
+    await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.INSUMO, values={
         'nome': payload.nome,
         'peso': payload.peso,
         'custo': payload.custo,
@@ -59,10 +59,10 @@ async def post_insumo_excluir(request: fastapi.Request, selecionados_ids: str = 
     selecionados_ids = selecionados_ids.split(',')
     for id in selecionados_ids:
         try:
-            repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_INGREDIENTE, filters={'insumo_id': id})
+            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_INGREDIENTE, filters={'insumo_id': id})
         except ValueError:
             pass
-    return delete_entity(
+    return await delete_entity(
         request=request,
         db_session=session,
         entity=repository.Entities.INSUMO,

@@ -28,6 +28,14 @@ MOCK_USUARIO_ADMIN = repository.Entities.USUARIO.value(
 )
 MOCK_USUARIO_ADMIN.hash_senha()
 
+MOCK_USUARIO_SENHA_RECUPERADA = repository.Entities.USUARIO.value(
+    id=3,
+    nome='Zé do teste (Senha recuperada)',
+    email='teste_2@email.com',
+    senha='teste',
+    administrador=True
+)
+MOCK_USUARIO_ADMIN.hash_senha()
 
 MOCK_ESTOQUE = repository.Entities.ESTOQUE.value(
     id=1,

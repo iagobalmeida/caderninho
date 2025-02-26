@@ -10,9 +10,10 @@ from src.schemas.auth import AuthSession
 from src.utils import redirect_url_for
 
 
-def authenticate(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> bool:
+async def authenticate(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> bool:
     auth_session = getattr(request.state, 'auth', None)
-    db_usuario, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True, ignore_validations=True)
+    db_usuario, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True, ignore_validations=True)
+
     if not db_usuario:
         return False
 
@@ -33,13 +34,13 @@ def authenticate(session: Session, request: Request, email: str, senha: str, lem
     return True
 
 
-def usuario_autenticar(session: Session, request: Request, email: str, senha: str) -> bool:
-    return authenticate(session, request, email, senha)
+async def usuario_autenticar(session: Session, request: Request, email: str, senha: str) -> bool:
+    return await authenticate(session, request, email, senha)
 
 
-def request_login(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> RedirectResponse:
+async def request_login(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> RedirectResponse:
     try:
-        authenticate(session, request, email, senha, lembrar_de_mim=lembrar_de_mim)
+        await authenticate(session, request, email, senha, lembrar_de_mim=lembrar_de_mim)
         return redirect_url_for(request, 'get_home')
     except Exception as ex:  # pragma: nocover
         request.session.clear()
@@ -51,7 +52,7 @@ def request_login(session: Session, request: Request, email: str, senha: str, le
         return RedirectResponse(url, status_code=302)
 
 
-def request_logout(request: Request) -> RedirectResponse:
+async def request_logout(request: Request) -> RedirectResponse:
     response = redirect_url_for(request, 'get_app_index')
     request.session.clear()
     return response

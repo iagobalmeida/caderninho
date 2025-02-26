@@ -4,7 +4,9 @@ from math import ceil
 from typing import Tuple
 
 from loguru import logger
+from sqlalchemy.orm import joinedload
 from sqlmodel import Session, func, select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.domain.entities import (Estoque, Insumo, Organizacao, Receita,
                                  ReceitaInsumoLink, Usuario, Venda)
@@ -21,15 +23,15 @@ class Entities(Enum):
     RECEITA = Receita
 
 
-def count_all(db_session: Session, entity: Entities, auth_session: AuthSession = None):
+async def count_all(db_session: AsyncSession, entity: Entities, auth_session: AuthSession = None):
     count_query = select(func.count()).select_from(entity.value)
     if auth_session and not auth_session.administrador:
         count_query = count_query.filter(entity.value.organizacao_id == auth_session.organizacao_id)
-    return db_session.exec(count_query).one()
+    return (await db_session.exec(count_query)).one()
 
 
-def get(
-        db_session: Session,
+async def get(
+        db_session: AsyncSession,
         entity: Entities,
         filters: dict = {},
         first: bool = False,
@@ -64,11 +66,11 @@ def get(
             query = query.order_by(entity.value.__dict__[order_by])
 
     if first:
-        result = db_session.exec(query).first()
+        result = (await db_session.exec(query)).first()
         return result, None, None
 
     count_query = select(func.count()).select_from(query.subquery())
-    count = db_session.exec(count_query).one()
+    count = (await db_session.exec(count_query)).one()
 
     pages = ceil(count / per_page) if per_page else 1
 
@@ -76,12 +78,13 @@ def get(
     query_offset = per_page * (page - 1)
     query = query.limit(query_limit).offset(query_offset)
 
-    result = db_session.exec(query).all()
+    result = (await db_session.exec(query)).all()
+
     return result, pages, count
 
 
-def update(db_session: Session, entity: Entities, filters: dict = {}, values: dict = {}, auth_session: AuthSession = None):
-    db_entity, _, _ = get(auth_session=auth_session, db_session=db_session, entity=entity, filters=filters, first=True)
+async def update(db_session: AsyncSession, entity: Entities, filters: dict = {}, values: dict = {}, auth_session: AuthSession = None):
+    db_entity, _, _ = await get(auth_session=auth_session, db_session=db_session, entity=entity, filters=filters, first=True)
     if not db_entity:
         raise ValueError(f'{entity} não encontrado!')
 
@@ -106,15 +109,15 @@ def update(db_session: Session, entity: Entities, filters: dict = {}, values: di
     if entity == Entities.USUARIO:
         db_entity.hash_senha()
 
-    db_session.commit()
+    await db_session.commit()
     return db_entity
 
 
-def delete(db_session: Session, entity: Entities, filters: dict = {}, auth_session: AuthSession = None):
+async def delete(db_session: AsyncSession, entity: Entities, filters: dict = {}, auth_session: AuthSession = None):
     if entity == Entities.ORGANIZACAO:
         raise ValueError('Não é possível excluir uma organização!')
 
-    db_entities, _, _ = get(auth_session=auth_session, db_session=db_session, entity=entity, filters=filters)
+    db_entities, _, _ = await get(auth_session=auth_session, db_session=db_session, entity=entity, filters=filters)
 
     if not db_entities:
         raise ValueError(f'{entity} não encontrado!')
@@ -124,13 +127,13 @@ def delete(db_session: Session, entity: Entities, filters: dict = {}, auth_sessi
             if not auth_session.administrador and not auth_session.dono:
                 if entity == Entities.USUARIO and db_entity.id != auth_session.id:
                     raise ValueError('Sem permissão para excluir o usuário!')
-        db_session.delete(db_entity)
+        await db_session.delete(db_entity)
 
-    db_session.commit()
+    await db_session.commit()
     return True
 
 
-def create(db_session: Session, entity: Entities, values: dict = {}, auth_session: AuthSession = None):
+async def create(db_session: AsyncSession, entity: Entities, values: dict = {}, auth_session: AuthSession = None):
     db_entity = entity.value(**values)
     if auth_session:
         if not 'organizacao_id' in values and not entity == Entities.ORGANIZACAO:
@@ -143,18 +146,18 @@ def create(db_session: Session, entity: Entities, values: dict = {}, auth_sessio
         logger.info(db_entity)
 
     db_session.add(db_entity)
-    db_session.commit()
+    await db_session.commit()
     logger.info(f'Entidade {entity.value.__name__} #{db_entity.id} criada')
     return db_entity
 
 
 # Funções otimizadas
 
-def get_venda_qr_code(auth_session: AuthSession, db_session: Session, venda_id: int) -> str:
-    organizacao, _, _ = get(auth_session=auth_session, db_session=db_session, entity=Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
+async def get_venda_qr_code(auth_session: AuthSession, db_session: AsyncSession, venda_id: int) -> str:
+    organizacao, _, _ = await get(auth_session=auth_session, db_session=db_session, entity=Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
     if not organizacao:  # pragma: nocover
         return None
-    venda, _, _ = get(auth_session=auth_session, db_session=db_session, entity=Entities.VENDA, filters={'id': venda_id}, first=True)
+    venda, _, _ = await get(auth_session=auth_session, db_session=db_session, entity=Entities.VENDA, filters={'id': venda_id}, first=True)
     return venda.gerar_qr_code(
         pix_nome=organizacao.descricao,
         pix_cidade=organizacao.cidade,
@@ -162,18 +165,18 @@ def get_venda_qr_code(auth_session: AuthSession, db_session: Session, venda_id: 
     )
 
 
-def get_fluxo_caixa(auth_session: AuthSession, db_session: Session) -> Tuple[float, float, float]:
+async def get_fluxo_caixa(auth_session: AuthSession, db_session: AsyncSession) -> Tuple[float, float, float]:
     data_limite = datetime.now() - timedelta(days=30)
 
     query_entradas = select(func.sum(Venda.valor)).where(Venda.data_criacao >= data_limite)
     if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
         query_entradas = query_entradas.filter(Venda.organizacao_id == auth_session.organizacao_id)
-    entradas = db_session.exec(query_entradas).first()
+    entradas = (await db_session.exec(query_entradas)).first()
 
     query_saidas = select(func.sum(Estoque.valor_pago)).where(Venda.data_criacao >= data_limite)
     if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
         query_saidas = query_saidas.filter(Estoque.organizacao_id == auth_session.organizacao_id)
-    saidas = db_session.exec(query_saidas).first()
+    saidas = (await db_session.exec(query_saidas)).first()
 
     caixa = (entradas if entradas else 0) - (saidas if saidas else 0)
     return (entradas, saidas, caixa)

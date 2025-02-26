@@ -36,7 +36,7 @@ SESSION_SECRET_KEY = 'SESSION_SECRET_KEY'
 rootlogger.setLevel(logging.WARN)
 
 
-app = fastapi.FastAPI()
+app = fastapi.FastAPI(on_startup=[db.init])
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY, https_only=False)
 
@@ -62,24 +62,22 @@ class CacheControlMiddleware(BaseHTTPMiddleware):  # pragma:nocover
 app.add_middleware(CacheControlMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=500)
 
-db.init()
-
 
 @app.get('/', include_in_schema=False)
 async def get_index(request: fastapi.Request):
-    return render(request, 'index.html', context={
+    return await render(request, 'index.html', context={
         'body_class': 'index'
     })
 
 
 @app.get('/app', include_in_schema=False)
 async def get_app_index(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
-    return render(request, 'autenticacao/login.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
+    return await render(request, 'autenticacao/login.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.get('/app/registrar', include_in_schema=False)
 async def get_registrar(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
-    return render(request, 'autenticacao/criar_conta.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
+    return await render(request, 'autenticacao/criar_conta.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.post('/app/registrar', include_in_schema=False)
@@ -91,10 +89,10 @@ async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar 
         if payload.senha != payload.senha_confirmar:
             raise ValueError('As senhas não batem')
 
-        db_organizacao = repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, values={'descricao': payload.organizacao_descricao})
+        db_organizacao = await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, values={'descricao': payload.organizacao_descricao})
         organizacao_id = db_organizacao.id
 
-        repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, values={
+        await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, values={
             'nome': payload.nome,
             'email': payload.email,
             'senha': payload.senha,
@@ -107,32 +105,32 @@ async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar 
         template_name = 'autenticacao/criar_conta.html'
         error = str(ex)
 
-    return render(request, template_name, context={'error': error, 'message': message, 'data_bs_theme': 'auto'})
+    return await render(request, template_name, context={'error': error, 'message': message, 'data_bs_theme': 'auto'})
 
 
 @app.get('/app/recuperar_senha', include_in_schema=False)
 async def get_recuperar_senha(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
-    return render(request, 'autenticacao/recuperar_senha.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
+    return await render(request, 'autenticacao/recuperar_senha.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.post('/app/recuperar_senha', include_in_schema=False)
-async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: db.Session = db.DBSESSAO_DEP):
+async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Form(), message: str = fastapi.Query(None),  error: str = fastapi.Query(None), session: db.AsyncSession = db.DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    db_usuario, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True)
+    db_usuario, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True)
     if not db_usuario:
         raise ValueError('Não foi encontrado usuário com esse email')
 
     nova_senha = str(random.randint(int('1'*9), int('9'*9)))
     db_usuario.senha = nova_senha
     db_usuario.hash_senha()
-    session.commit()
+    await session.commit()
 
     smpt.enviar(
         assunto='KDerninho - Recuperar Senha',
         corpo=f'Sua nova senha temporária é {nova_senha}',
         para=[db_usuario.email]
     )
-    return render(request, 'autenticacao/login.html', context={'message': f'Senha enviada para: {db_usuario.email}', 'error': error, 'data_bs_theme': 'auto'})
+    return await render(request, 'autenticacao/login.html', context={'message': f'Senha enviada para: {db_usuario.email}', 'error': error, 'data_bs_theme': 'auto'})
 
 
 @app.exception_handler(IntegrityError)  # pragma: nocover

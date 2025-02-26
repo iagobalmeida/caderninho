@@ -1,3 +1,4 @@
+import asyncio
 import json
 from typing import List
 
@@ -16,7 +17,7 @@ ENTITY_SYMBOLS = {
 }
 
 
-def list_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, page: int = 1, filters: dict = {}, table_modal: bool = True):
+async def list_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, page: int = 1, filters: dict = {}, table_modal: bool = True):
     auth_session = getattr(request.state, 'auth', None)
     title = entity.value.__name__.title()
 
@@ -26,7 +27,7 @@ def list_entity(request: fastapi.Request, db_session: Session, entity: repositor
         order_by = 'data_criacao'
         desc = True
 
-    entities, pages, count = repository.get(
+    entities, pages, count = await repository.get(
         auth_session=auth_session,
         db_session=db_session,
         entity=entity,
@@ -74,8 +75,8 @@ def list_entity(request: fastapi.Request, db_session: Session, entity: repositor
         ]
     )
 
-    db_insumos, _, _ = repository.get(auth_session=auth_session, db_session=db_session, entity=repository.Entities.INSUMO)
-    entradas, saidas, caixa = repository.get_fluxo_caixa(auth_session=auth_session, db_session=db_session)
+    db_insumos, _, _ = await repository.get(auth_session=auth_session, db_session=db_session, entity=repository.Entities.INSUMO)
+    entradas, saidas, caixa = await repository.get_fluxo_caixa(auth_session=auth_session, db_session=db_session)
 
     context = {
         'header': context_header,
@@ -96,7 +97,7 @@ def list_entity(request: fastapi.Request, db_session: Session, entity: repositor
     if table_modal:
         context.update(table_modal=f'#modalEdit{title}')
 
-    return render(
+    return await render(
         session=db_session,
         request=request,
         template_name='layout/list.html',
@@ -104,8 +105,8 @@ def list_entity(request: fastapi.Request, db_session: Session, entity: repositor
     )
 
 
-def delete_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, ids: List[int]):
+async def delete_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, ids: List[int]):
     auth_session = getattr(request.state, 'auth', None)
     for id in ids:
-        repository.delete(auth_session=auth_session, db_session=db_session, entity=entity, filters={'id': id})
+        await repository.delete(auth_session=auth_session, db_session=db_session, entity=entity, filters={'id': id})
     return redirect_back(request, message=f'{len(ids)} registros excluídos com sucesso!')

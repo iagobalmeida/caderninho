@@ -1,10 +1,12 @@
+import pytest
 from bs4 import BeautifulSoup
 
 from src.tests.utils import autenticar
 
 
-def test_post_index(client):
-    response = client.post('/app/auth', data={
+@pytest.mark.asyncio
+async def test_post_index(client):
+    response = await client.post('/app/auth', data={
         'email': 'teste@email.com',
         'senha': 'teste'
     })
@@ -12,8 +14,9 @@ def test_post_index(client):
     assert b'Home' in response.content
 
 
-def test_post_index_senha_incorreta(client):
-    response = client.post('/app/auth', data={
+@pytest.mark.asyncio
+async def test_post_index_senha_incorreta(client):
+    response = await client.post('/app/auth', data={
         'email': 'teste@email.com',
         'senha': 'senha_incorreta'
     })
@@ -22,8 +25,9 @@ def test_post_index_senha_incorreta(client):
     assert dom_error and '401' in dom_error.text
 
 
-def test_post_index_usuario_inexistente(client):
-    response = client.post('/app/auth', data={
+@pytest.mark.asyncio
+async def test_post_index_usuario_inexistente(client):
+    response = await client.post('/app/auth', data={
         'email': 'nao_existo@email.com',
         'senha': 'senha_incorreta'
     })
@@ -32,8 +36,9 @@ def test_post_index_usuario_inexistente(client):
     assert dom_error and '401' in dom_error.text
 
 
-def test_post_authenticate(client):
-    response = client.post('/app/auth/authenticate', data={
+@pytest.mark.asyncio
+async def test_post_authenticate(client):
+    response = await client.post('/app/auth/authenticate', data={
         'email': 'teste@email.com',
         'senha': 'teste'
     })
@@ -41,9 +46,10 @@ def test_post_authenticate(client):
     assert response.content == b'true'
 
 
-def test_post_perfil(client):
-    autenticar(client)
-    response = client.post('/app/auth/perfil', data={
+@pytest.mark.asyncio
+async def test_post_perfil(client):
+    await autenticar(client)
+    response = await client.post('/app/auth/perfil', data={
         'id': 1,
         'nome': 'Usuário Atualizado',
         'email': 'teste@email.com',
@@ -54,9 +60,10 @@ def test_post_perfil(client):
     assert dom_alert and 'Perfil atualizado com sucesso!' in dom_alert.text
 
 
-def test_post_atualizar_senha(client):
-    autenticar(client)
-    response = client.post('/app/auth/atualizar_senha', data={
+@pytest.mark.asyncio
+async def test_post_atualizar_senha(client):
+    await autenticar(client)
+    response = await client.post('/app/auth/atualizar_senha', data={
         'id': 1,
         'senha_atual': 'teste',
         'senha': 'teste',
@@ -67,9 +74,10 @@ def test_post_atualizar_senha(client):
     assert dom_alert and 'Senha alterada com sucesso!' in dom_alert.text
 
 
-def test_post_atualizar_senha_senhas_nao_batem(client):
-    autenticar(client)
-    response = client.post('/app/auth/atualizar_senha', data={
+@pytest.mark.asyncio
+async def test_post_atualizar_senha_senhas_nao_batem(client):
+    await autenticar(client)
+    response = await client.post('/app/auth/atualizar_senha', data={
         'id': 1,
         'senha_atual': 'teste',
         'senha': 'foo',
@@ -80,7 +88,8 @@ def test_post_atualizar_senha_senhas_nao_batem(client):
     assert dom_alert and 'As senhas não batem' in dom_alert.text
 
 
-def test_post_logout(client):
-    autenticar(client)
-    response = client.get('/app/auth/logout')
+@pytest.mark.asyncio
+async def test_post_logout(client):
+    await autenticar(client)
+    response = await client.get('/app/auth/logout')
     assert response.status_code == 200

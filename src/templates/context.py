@@ -104,7 +104,7 @@ ADMIN_NAVBAR_LINKS = [
 ]
 
 
-def get_context(request: Request, session=None, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
+async def get_context(request: Request, session=None, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
     auth_session = getattr(request.state, 'auth', None)
     theme = request.session.get('theme', 'light')
 
@@ -131,9 +131,9 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
     if auth_session:
         base_context.update(usuario=auth_session)
 
-        db_insumos, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.INSUMO)
-        db_receitas, _, _ = repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA)
-        entradas, saidas, caixa = repository.get_fluxo_caixa(auth_session=auth_session, db_session=session)
+        db_insumos, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.INSUMO)
+        db_receitas, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA)
+        entradas, saidas, caixa = await repository.get_fluxo_caixa(auth_session=auth_session, db_session=session)
 
         base_context.update(insumos=db_insumos)
         base_context.update(receitas=db_receitas)
@@ -147,8 +147,8 @@ def get_context(request: Request, session=None, context: dict = None, navbar_lin
     return base_context
 
 
-def render(templates: Jinja2Templates, request: Request, template_name: str, session=None, context: dict = None):
-    context = get_context(request=request, session=session, context=context)
+async def render(templates: Jinja2Templates, request: Request, template_name: str, session=None, context: dict = None):
+    context = await get_context(request=request, session=session, context=context)
 
     if '/app/' in str(request.url):
         nome_pagina = str(request.url).split('app/')[1].split('/')[0]

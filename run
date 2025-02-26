@@ -11,11 +11,11 @@ elif [ "$1" == "server" ] ; then
   exit 0
 elif [ "$1" == "coverage" ] ; then
   source .venv/bin/acivate
-  DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o coverage.svg
+  DATABASE_URL="sqlite+aiosqlite:///test.db" coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o coverage.svg
   exit 0
 elif [ "$1" == "tests" ]; then
   source .venv/bin/activate
-  DATABASE_URL="sqlite:///test.db" python -m pytest -s -x
+  DATABASE_URL="sqlite+aiosqlite:///test.db" python -m pytest -s -x
   exit 0
 else
     if [ "$1" != "" ]; then
