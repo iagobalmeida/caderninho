@@ -14,7 +14,7 @@ SCRIPTS_TOKEN = getenv('SCRIPTS_TOKEN', 'batatafrita')
 async def post_scripts_seed(token: str = fastapi.Header(None)):  # pragma: nocover
     if not token == SCRIPTS_TOKEN:
         raise fastapi.HTTPException(401, 'Não autorizado')
-    seed.main()
+    await seed.main()
     return True
 
 
@@ -22,6 +22,6 @@ async def post_scripts_seed(token: str = fastapi.Header(None)):  # pragma: nocov
 async def post_scripts_reset_db(token: str = fastapi.Header(None)):  # pragma: nocover
     if not token == SCRIPTS_TOKEN:
         raise fastapi.HTTPException(401, 'Não autorizado')
-    db.reset()
-    seed.main()
+    await db.reset()
+    await seed.main()
     return True
