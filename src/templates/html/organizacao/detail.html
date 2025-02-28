@@ -3,6 +3,23 @@
 {% block content %}
 <div class="col-12">
     <div class="card">
+        <div class="card-header d-flex flex-column align-items-start cursor-pointer" data-bs-toggle="collapse" data-bs-target="#collapse_plano_pagamentos">
+            <h5 class="card-title">
+                {{ material_symbol('payments') | safe }}
+                Plano & Pagamentos
+            </h5>
+            <span class="text-muted text-sm">Clique para expandir/fechar</span>
+        </div>
+        <div class="card-body collapse show" id="collapse_plano_pagamentos">
+            <p>{{organizacao.plano_descricao | safe}}<p>
+            <p>O plano atual é válido até <b>{{organizacao.plano_expiracao | strftime}}</b></p>
+            <button class="btn btn-success">Atualizar plano</button>
+            <button class="btn btn-outline-success">Aumentar validade do plano</button>
+        </div>
+    </div>
+</div>
+<div class="col-12">
+    <div class="card">
         <div class="card-header">
             <h5 class="card-title">
               {{ material_symbol('info') | safe }}
@@ -39,7 +56,7 @@
                     </div>
                 </form>
             </div>
-            {% else %}
+        {% else %}
             <div class="card-body">
                 <div class="datagrid" method="POST">
                     <input type="hidden" name="id" value="{{organizacao.id}}">
@@ -49,11 +66,11 @@
                     </div>
                 </div>
             </div>
-            {% endif %}
-        </div>
+        {% endif %}
     </div>
+</div>
     
-    {% if usuario.dono and organizacao %}
+{% if usuario.dono and organizacao %}
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex flex-column align-items-start cursor-pointer" data-bs-toggle="collapse" data-bs-target="#collapse_configuracoes">

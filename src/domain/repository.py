@@ -4,11 +4,10 @@ from math import ceil
 from typing import Tuple
 
 from loguru import logger
-from sqlalchemy.orm import joinedload
-from sqlmodel import Session, func, select
+from sqlmodel import func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.domain.entities import (Estoque, Insumo, Organizacao, Receita,
+from src.domain.entities import (Estoque, Insumo, Organizacao, Plano, Receita,
                                  ReceitaInsumoLink, Usuario, Venda)
 from src.schemas.auth import AuthSession
 

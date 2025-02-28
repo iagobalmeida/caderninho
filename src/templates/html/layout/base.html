@@ -22,7 +22,14 @@
     </noscript>
   
     <link rel="preload" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js?v=1.0" as="script">
-
+    <link rel="manifest" href="{{ url_for('static', path='/manifest.json') }}">
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("{{ url_for('static', path='/service-worker.js') }}")
+            .then(() => console.log("Service Worker registrado!"))
+            .catch(err => console.error("Erro ao registrar Service Worker:", err));
+    }
+    </script>
     <style>
       /* @import url('https://rsms.me/inter/inter.css');
       :root {
