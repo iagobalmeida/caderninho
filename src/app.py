@@ -1,11 +1,14 @@
 import logging
 import random
 import re
+from datetime import datetime, timedelta
 
 import fastapi
 import fastapi.security
 from fastapi.exceptions import HTTPException, RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
@@ -39,6 +42,15 @@ rootlogger.setLevel(logging.WARN)
 app = fastapi.FastAPI(on_startup=[db.init])
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY, https_only=False)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_methods=['*'],
+    allow_headers=['*'],
+    expose_headers=[
+        'X-Content-Type-Options', 'X-Frame-Options', 'X-XSS-Protection', 'Content-Security-Policy', 'Strict-Transport-Security'
+    ]
+)
 
 app.include_router(router_receitas)
 app.include_router(router_insumos)
@@ -61,6 +73,11 @@ class CacheControlMiddleware(BaseHTTPMiddleware):  # pragma:nocover
 
 app.add_middleware(CacheControlMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=500)
+
+
+@app.get("/android-chrome-192x192.png")
+async def android_chrome_192x192_png(request: fastapi.Request):
+    return RedirectResponse('/static/favicon/android-chrome-192x192.png')
 
 
 @app.get('/', include_in_schema=False)
@@ -89,7 +106,11 @@ async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar 
         if payload.senha != payload.senha_confirmar:
             raise ValueError('As senhas não batem')
 
-        db_organizacao = await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, values={'descricao': payload.organizacao_descricao})
+        db_organizacao = await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, values={
+            'descricao': payload.organizacao_descricao,
+            'plano': payload.plano,
+            'plano_expiracao': datetime.now() + timedelta(days=1)
+        })
         organizacao_id = db_organizacao.id
 
         await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, values={

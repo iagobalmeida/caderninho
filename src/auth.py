@@ -14,6 +14,18 @@ async def authenticate(session: Session, request: Request, email: str, senha: st
     auth_session = getattr(request.state, 'auth', None)
     db_usuario, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True, ignore_validations=True)
 
+    if db_usuario.organizacao.plano_expiracao < datetime.now():
+        await repository.update(
+            auth_session=auth_session,
+            db_session=session,
+            entity=repository.Entities.ORGANIZACAO,
+            filters={'id': db_usuario.organizacao_id},
+            values={
+                'plano_expiracao': datetime.now() + timedelta(days=7),
+                'plano': repository.Plano.BLOQUEADO
+            }
+        )
+
     if not db_usuario:
         return False
 

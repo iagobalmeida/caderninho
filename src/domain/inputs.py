@@ -83,6 +83,7 @@ class UsuarioCriar(BaseModel):
     nome: str
     email: str
     senha: str
+    plano: str
     senha_confirmar: str
     organizacao_id:  Optional[int] = False
     organizacao_descricao: Optional[str] = None

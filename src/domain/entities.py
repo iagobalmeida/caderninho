@@ -1,11 +1,10 @@
-
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
+from enum import Enum
 from typing import Dict, List, Optional
 
 from loguru import logger
 from passlib.context import CryptContext
-from passlib.exc import UnknownHashError
 from pixqrcode import PixQrCode
 from sqlalchemy.orm import validates
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel
@@ -17,12 +16,26 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 STRFTIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
+class Plano(Enum):
+    BLOQUEADO = 'Bloqueado'
+    TESTE = 'Teste'
+    PEQUENO = 'Pequeno'
+    INTERMEDIARIO = 'Intermediário'
+    AVANCADO = 'Avançado'
+
+
 class Organizacao(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    # Dados
     descricao: str
     cidade: Optional[str] = None
     chave_pix: Optional[str] = None
     usuarios: List['Usuario'] = Relationship(back_populates='organizacao')
+    # Plano & pagamento
+    plano: Optional[Plano] = Plano.TESTE
+    plano_expiracao: Optional[datetime] = Field(default=datetime.now() + timedelta(days=7), nullable=False)
+    pagamentos: List['Pagamento'] = Relationship(back_populates='organizacao')
+    # Configurações
     configuracoes: Dict = Field(default_factory=lambda: dict({
         'converter_kg': False,
         'converter_kg_sempre': False,
@@ -31,6 +44,14 @@ class Organizacao(SQLModel, table=True):
 
     class Config:
         arbitrary_types_allowed = True
+
+    @property
+    def plano_descricao(self):
+        if self.plano == Plano.BLOQUEADO:
+            return 'Sua conta está <b>bloqueada</b>, você precisa atualizar seu plano ou extender a validade do plano atual.'
+        elif self.plano == Plano.TESTE:
+            return 'Sua conta está em <b>modo de teste</b>, você pode atualizar seu plano a qualquer momento.'
+        return self.plano.value
 
     @property
     def chave_pix_valida(self):
@@ -44,6 +65,15 @@ class Organizacao(SQLModel, table=True):
 class RegistroOrganizacao(SQLModel, table=False):
     id: Optional[int] = Field(default=None, primary_key=True)
     organizacao_id: Optional[int] = Field(default=None, foreign_key="organizacao.id")
+
+
+class Pagamento(RegistroOrganizacao, table=True):
+    organizacao: "Organizacao" = Relationship(back_populates="pagamentos", sa_relationship_kwargs={'lazy': 'selectin'})
+    id: Optional[int] = Field(default=None, primary_key=True)
+    organizacao_id: Optional[int] = Field(default=None, foreign_key="organizacao.id")
+    data_criacao: datetime = Field(default=datetime.now(), nullable=False)
+    valor: float
+    plano: Plano
 
 
 class Usuario(RegistroOrganizacao, table=True):
@@ -152,9 +182,10 @@ class Estoque(RegistroOrganizacao, table=True):
             col_insumo = self.insumo.nome
 
         col_quantidade = filters.templates_filter_format_quantity(self.quantidade, converter_kg, converter_kg_sempre)
+        col_data_criacao = filters.templates_filter_strftime(self.data_criacao)
 
         return [
-            self.data_criacao.strftime(STRFTIME_FORMAT),
+            col_data_criacao,
             self.descricao,
             col_valor_pago,
             col_insumo,
@@ -185,7 +216,7 @@ class Venda(RegistroOrganizacao, table=True):
 
     @property
     def row(self):
-        col_data_criacao = self.data_criacao.strftime(STRFTIME_FORMAT)
+        col_data_criacao = filters.templates_filter_strftime(self.data_criacao)
         col_valor = filters.templates_filter_format_reais(self.valor)
 
         col_recebido = filters.templates_global_material_symbol('more_horiz', 'text-secondary')

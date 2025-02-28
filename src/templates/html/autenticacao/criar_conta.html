@@ -39,6 +39,32 @@
               <input required type="text" name="organizacao_descricao" class="form-control" placeholder="Minha Cozinha" autocomplete="off">
             </div>
             <hr>
+            <div class="mb-3">
+              <label class="form-label">Escolha seu Plano</label>
+              <select name="plano" id="plano" class="form-select">
+                <option value="TESTE">Testar por 7 dias grátis</option>
+                <option value="PEQUENO">Pequeno</option>
+                <option value="INTERMEDIARIO" selected>Intermediário (Recomendado)</option>
+                <option value="AVANCADO">Avançado</option>
+              </select>
+            </div>
+            <div class="mb-3 d-none" id="wrapper-pagamento-TESTE">
+                <p class="mb-0">Grátis por <b>7 dias</b>.</p>
+                <small class="text-danger">Sua conta fica bloqueada após o período de teste</small>
+            </div>
+            <div class="mb-3 d-none" id="wrapper-pagamento-PEQUENO">
+                <!-- <p>Pagamento único: R$ 100 á vista (você paga 5/mês)</p> -->
+                <p>Você irá pagar <b>R$ 10/mês</b>.</p>
+            </div>
+            <div class="mb-3" id="wrapper-pagamento-INTERMEDIARIO">
+                <!-- <p>Pagamento único: R$ 200 á vista (você paga 15/mês)</p> -->
+                <p>Você irá pagar <b>R$ 20/mês</b>.</p>
+            </div>
+            <div class="mb-3 d-none" id="wrapper-pagamento-AVANCADO">
+                <!-- <p>Pagamento único: R$ 300 á vista (você paga 20/mês)</p> -->
+                <p>Você irá pagar <b>R$ 30/mês</b>.</p>
+            </div>
+            <hr>
             <div class="mb-2">
               <label class="form-label">
                 Senha
@@ -86,5 +112,13 @@
         const currentType = input.getAttribute('type');
         input.setAttribute('type', currentType == 'text' ? 'password' : 'text');
     }
+    document.querySelector('#plano').addEventListener('change', (e) => {
+      let selected = e.target.options[e.target.options.selectedIndex].value;
+      let wrapperId = `#wrapper-pagamento-${selected}`;
+      document.querySelectorAll('[id^="wrapper-pagamento-"]').forEach(el => {
+        el.classList.add('d-none')
+      });
+      document.querySelector(wrapperId).classList.remove('d-none');
+    });
 </script>
 {% endblock %}
