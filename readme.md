@@ -237,7 +237,8 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Scroll voltando após fechar modal
 - [X] Tornar aplicação assíncrona
 - [X] ✨ Transformar aplicação em PWA
-  - [ ] Botão "Baixe o App"
+  - [X] Botão "Baixe o App"
+  - [X] Modal "Baixe o App"
 - [X] Campo `plano` em Organização
   - [ ] Limitar número de registros por plano em `create`
   - [X] Exibir plano atual
