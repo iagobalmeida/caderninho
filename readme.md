@@ -236,10 +236,13 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Página de Logs
 - [X] Scroll voltando após fechar modal
 - [X] Tornar aplicação assíncrona
-- [ ] Campo `plano` em Organização
+- [X] ✨ Transformar aplicação em PWA
+  - [ ] Botão "Baixe o App"
+- [X] Campo `plano` em Organização
   - [ ] Limitar número de registros por plano em `create`
-  - [ ] Exibir plano atual
-  - [ ] Botão para upgrade de plano
+  - [X] Exibir plano atual
+  - [X] Botão para upgrade/extensão de plano
+  - [ ] Modal para upgrade/extensão de plano
 - [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`
 - [ ] Exportacação de CSV
 - [ ] Autenticacao com OAuth2
