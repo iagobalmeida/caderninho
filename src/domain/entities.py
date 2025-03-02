@@ -29,6 +29,11 @@ class GastoTipo(Enum):
     FIXO = 'Fixo'
 
 
+class CaixMovimentacaoTipo(Enum):
+    ENTRADA = 'Entrada'
+    SAIDA = 'Saida'
+
+
 class Organizacao(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     # Dados
@@ -235,10 +240,11 @@ class Estoque(RegistroOrganizacao, table=True):
         return base_dict
 
 
-class Venda(RegistroOrganizacao, table=True):
+class CaixaMovimentacao(RegistroOrganizacao, table=True):
     data_criacao: datetime = Field(default=datetime.now(), nullable=False)
     descricao: str
     valor: float
+    tipo: CaixMovimentacaoTipo = Field(default=CaixMovimentacaoTipo.ENTRADA)
     recebido: bool = Field(default=False)
     organizacao: "Organizacao" = Relationship(sa_relationship_kwargs={'lazy': 'selectin'})
 
@@ -267,10 +273,11 @@ class Venda(RegistroOrganizacao, table=True):
             col_recebido
         ]
 
-    def data_bs_payload(self):
+    def data_bs_payload(self) -> dict:
         base_dict = self.model_dump()
         base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
         base_dict['#img_qr_code'] = self.gerar_qr_code()
+        base_dict['tipo'] = self.tipo.value.title()
         return base_dict
 
     def gerar_qr_code(self, pix_nome=None, pix_cidade=None, pix_chave=None) -> str:
@@ -396,7 +403,7 @@ class Receita(RegistroOrganizacao, table=True):
         try:
             col_rendimento = f'{self.rendimento_unidades} Un.'
             col_preco_sug = filters.templates_filter_format_reais(self.preco_sugerido)
-            col_custo = filters.templates_filter_format_reais(self.custo)
+            col_custo_total = filters.templates_filter_format_reais(self.custo_total)
             col_faturamento = filters.templates_filter_format_reais(self.faturamento)
             col_margem = filters.templates_filter_format_reais(self.margem)
 
@@ -404,7 +411,7 @@ class Receita(RegistroOrganizacao, table=True):
                 self.nome,
                 col_rendimento,
                 col_preco_sug,
-                col_custo,
+                col_custo_total,
                 col_faturamento,
                 col_margem
             ]
@@ -433,7 +440,7 @@ class Receita(RegistroOrganizacao, table=True):
 
     @property
     def margem(self):
-        return round(self.faturamento - self.custo, 2)
+        return round(self.faturamento - self.custo_total, 2)
 
     @property
     def custo_percentual(self):
@@ -450,19 +457,23 @@ class Receita(RegistroOrganizacao, table=True):
             sum([
                 g.custo
                 for g in self.gastos
-                if g.gasto_tipo == GastoTipo.FIXO or g.insumo
+                if g.insumo
             ]), 2)
+
+    @property
+    def custo_fixo(self):
+        return round(
+            sum([
+                g.custo
+                for g in self.gastos
+                if g.gasto_tipo == GastoTipo.FIXO
+            ])
+        )
 
     @property
     def custo_total(self):
         '''Retorna a soma de custo dos insumos usados'''
-        custo = 0
-        for gasto in self.gastos:
-            if gasto.gasto_tipo == GastoTipo.FIXO:
-                custo += gasto.gasto_valor
-            elif gasto.insumo_id:
-                custo += gasto.quantidade * gasto.insumo_custo_p_grama
-
+        custo = self.custo_base + self.custo_fixo
         custo_percentual = (100 + self.custo_percentual)/100
         return round(custo * custo_percentual, 2)
 

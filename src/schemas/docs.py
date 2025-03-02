@@ -11,7 +11,7 @@ SOBRE_ESSA_PAGINA = {
         '<a href="/app/como_usar">Como usar</a>',
     ],
     'vendas': [
-        'Uma `Venda` é composta por uma `Data`, uma `Descrição`, um `Valor` e uma configuração que define se a venda já foi `Recebida`.',
+        'Uma `CaixaMovimentacao` é composta por uma `Data`, uma `Descrição`, um `Valor` e uma configuração que define se a venda já foi `Recebida`.',
         'Toda venda é criada como `Não Recebida (Pendente)` e você pode atualizar isso clicando em uma venda ou selecionando várias e usando as ações `Marcar como Pendente`/`Marcar como Recebido`. (Também existe um atalho na página `Home` para atualizar a última venda).',
         '<a href="/app/como_usar/#como_usar_venda">4.1. O que é uma venda</a>',
         '<a href="/app/como_usar/#como_usar_cadastrar_venda">4.2. Cadastrando uma venda</a>',

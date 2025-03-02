@@ -29,7 +29,7 @@
     </div>
     <div class="card-body">
       <form class="datagrid" method="POST" action="{{ url_for('post_receita_atualizar') }}">
-        <div class="datagrid-item">
+        <div class="datagrid-item d-none">
           <div class="datagrid-title">Código Interno</div>
           <input required readonly type="text" class="form-control" name="id" value="{{receita.id}}" />
         </div>
@@ -65,7 +65,7 @@
     </div>
   </div>
 </div>
-<div class="col-12 col-md-6">
+<div class="col-12 col-md-7">
   <div class="card">
     <div class="card-header">
       <h5 class="card-title">
@@ -79,14 +79,21 @@
         <div class="datagrid-item">
           <div class="datagrid-title">Custo Base</div>
           <div class="datagrid-content">
-            <span class="badge bg-warning-lt"> {{receita.custo_base}} R$ </span>
+            <span class="badge bg-warning-lt"> {{receita.custo_base | format_reais}}  </span>
+          </div>
+        </div>
+
+        <div class="datagrid-item">
+          <div class="datagrid-title">Custo Fixo</div>
+          <div class="datagrid-content">
+            <span class="badge bg-warning-lt">  {{receita.custo_fixo | format_reais}}  </span>
           </div>
         </div>
 
         <div class="datagrid-item">
           <div class="datagrid-title">Custo Perc.</div>
           <div class="datagrid-content">
-            <span class="badge bg-warning-lt"> {{receita.custo_percentual}}% → {{(receita.custo_percentual * receita.custo_base / 100) | format_reais }} </span>
+            <span class="badge bg-warning-lt"> {{receita.custo_percentual}}% ({{(receita.custo_percentual * receita.custo_base / 100) | format_reais }}) </span>
           </div>
         </div>
 
@@ -102,6 +109,7 @@
 
     <div class="card-body">
       <div class="datagrid">
+        <div class="datagrid-item bg-secondary-lt rounded"></div>
         <div class="datagrid-item">
           <div class="datagrid-title">Rendimento</div>
           <div class="datagrid-content">
@@ -114,16 +122,17 @@
             <span class="badge bg-primary-lt"> {{receita.rendimento_unidades}} Un. </span>
           </div>
         </div>
+        <div class="datagrid-item bg-secondary-lt rounded"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="datagrid">
         <div class="datagrid-item">
           <div class="datagrid-title">Custo unidade</div>
           <div class="datagrid-content">
             <span class="badge bg-danger-lt"> {{receita.custo_unidade | format_reais}} </span>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="datagrid">
         <div class="datagrid-item">
           <div class="datagrid-title">Preço Sugerido Un.</div>
           <div class="datagrid-content">
@@ -146,12 +155,12 @@
     </div>
   </div>
 </div>
-<div class="col-12 col-md-6">
+<div class="col-12 col-md-5">
   <div class="card">
     <div class="card-header">
       <h5 class="card-title">
         <span class="material-symbols-outlined"> currency_exchange </span>
-        Custos
+        Gastos
       </h5>
     </div>
     {% with table_data=custos_table_data, table_columns=custos_table_columns, table_data=custos_table_data, table_no_result=custos_table_no_result, table_modal=custos_table_modal %}
@@ -160,18 +169,18 @@
   </div>
 </div>
 <div class="col-12">
-  <div class="card" id="cardGastos">
+  <div class="card" id="cardInsumos">
     <div class="card-header">
       <h5 class="card-title">
         {{ material_symbol('package_2') | safe }}
-        Gastos
+        Insumos
       </h5>
       <div class="ms-auto d-none d-md-flex btn-list">
-        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaGastoModal">
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
           {{material_symbol('chevron_left') | safe }}
-          Incluir Gasto
+          Incluir Insumo
         </button>
-        <button class="btn" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_gastos_remover')}}", ".text-secondary": "Remover gastos selecionados?"}'>
+        <button class="btn" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_gastos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
           {{material_symbol('remove') | safe }}
           Remover Selecionados
         </button>
@@ -179,11 +188,11 @@
       <div class="dropdown ms-auto d-md-none">
         <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
-          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaGastoModal">
+          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
             {{material_symbol('chevron_left') | safe }}
-            Incluir Gasto
+            Incluir Insumo
           </button>
-          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_gastos_remover')}}", ".text-secondary": "Remover gastos selecionados?"}'>
+          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_gastos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
             {{material_symbol('remove') | safe }}
             Remover Selecionados
           </button>

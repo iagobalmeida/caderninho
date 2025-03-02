@@ -1,5 +1,5 @@
-import asyncio
 import json
+import re
 from typing import List
 
 import fastapi
@@ -19,7 +19,8 @@ ENTITY_SYMBOLS = {
 
 async def list_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, page: int = 1, filters: dict = {}, table_modal: bool = True):
     auth_session = getattr(request.state, 'auth', None)
-    title = entity.value.__name__.title()
+    title_parts = re.findall(r'[A-Z][a-z]*', entity.value.__name__)
+    title = '_'.join([p.lower() for p in title_parts])
 
     order_by = None
     desc = False

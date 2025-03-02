@@ -92,7 +92,7 @@ class Context(TypedDict):
 
 BASE_NAVBAR_LINKS = [
     ('Home', 'home', 'get_home'),
-    ('Vendas', 'shopping_cart', 'get_vendas_index', {'page': 1}),
+    ('Caixa', 'payments', 'get_caixa_movimentacoes_index', {'page': 1}),
     ('Estoque', 'inventory_2', 'get_estoques_index'),
     ('Receitas', 'library_books', 'get_receitas_index'),
     ('Insumos', 'package_2', 'get_insumos_index'),

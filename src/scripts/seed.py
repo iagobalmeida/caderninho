@@ -5,7 +5,8 @@ from random import randint
 from loguru import logger
 
 from src import db
-from src.domain.entities import Estoque, Insumo, Receita, ReceitaGasto, Venda
+from src.domain.entities import (CaixaMovimentacao, Estoque, Insumo, Receita,
+                                 ReceitaGasto)
 from src.tests import mocks
 
 
@@ -69,7 +70,7 @@ async def main():
         for _ in range(30):
             quantidade = randint(10, 20)
             data_criacao = datetime.now().replace(day=randint(1, 24), month=randint(1, 12))
-            await try_add(session, Venda(organizacao_id=organizacao.id, descricao=f'{quantidade} x MiniCookies', valor=quantidade*12, data_criacao=data_criacao))
+            await try_add(session, CaixaMovimentacao(organizacao_id=organizacao.id, descricao=f'{quantidade} x MiniCookies', valor=quantidade*12, data_criacao=data_criacao))
         await session.close()
 
 if __name__ == '__main__':

@@ -52,10 +52,10 @@ MOCK_RECEITA = repository.Entities.RECEITA.value(
     peso_unitario=100.0,
 )
 
-MOCK_VENDA = repository.Entities.VENDA.value(
+MOCK_CAIXA_MOVIMENTACAO = repository.Entities.CAIXA_MOVIMENTACAO.value(
     id=1,
     organizacao_id=MOCK_ORGANIZACAO.id,
-    descricao='Venda teste',
+    descricao='CaixaMovimentacao teste',
     valor=100.0
 )
 

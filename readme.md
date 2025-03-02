@@ -90,13 +90,13 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Remover tela `Insumos` (confusa)
 - [X] Usar clique em linha em vez de `editar/excluir`
 - [X] Adicionar checkbox com delete massivo em tabelas
-    - [X] Vendas
+    - [X] Caixa
     - [X] Estoques
     - [X] Receitas
         - [X] Listagem
         - [X] Insumos
 - [X] Adicionar opção excluir em modal de `editar`
-    - [X] Vendas
+    - [X] Caixa
     - [X] Estoque
     - [X] Receitas
         - [X] Listagem
@@ -213,7 +213,7 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Instalação de `loguru` para logs em arquivo rotativo e logs aprimorados
 - [X] Alerta "Sobre essa página" com link para documentação completa
   - [X] Home
-  - [X] Vendas
+  - [X] Caixa
   - [X] Estoque
   - [X] Receitas
   - [X] Detalhe de Receita
@@ -245,11 +245,13 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
   - [X] Botão para upgrade/extensão de plano
   - [ ] Modal para upgrade/extensão de plano
 - [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`
-- [ ] Campo `custo fixo` em receita
-- [ ] Campo `porc. tributária` em receita
+- [X] Campo `custo fixo` em receita
+- [X] Campo `porc. tributária` em receita
+- [ ] Modal para cadastro de `Gasto`
+- [ ] Tabela `Caixa` vira `Fluxo de Caixa` e aceita `Entrada` e `Saída`
+  - [ ] Campo `recebido` / `produzido`
 - [ ] Cadastro de custo recorrente em `Organização`
-- [ ] Tabelas `Entradas` e `Saídas`
-- `Estimavitas` -> `Luco` chama na verdade `Margem`
+  - [ ] Gráfico "fluxo de caixa"
 - [ ] Exportacação de CSV
 - [ ] Autenticacao com OAuth2
 

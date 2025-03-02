@@ -16,7 +16,7 @@
                     {% endif %}
                 </h5>
             </div>
-            <form class="card-body" method="POST" action="{{request.url_for('post_vendas_marcar_recebido')}}">
+            <form class="card-body" method="POST" action="{{request.url_for('post_caixa_movimentacoes_marcar_recebido')}}">
                 <input type="hidden" name="selecionados_ids" value="{{pix_venda.id}}">
                 <p>{{pix_mensagem | safe}}</p>
                 {% if pix_qr_code and not pix_venda.recebido %}
@@ -40,8 +40,8 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
-                {{ material_symbol('shopping_cart') | safe }}
-                Vendas
+                {{ material_symbol('payments') | safe }}
+                Caixa
                 <small class="text-secondary ms-auto">{{vendas}} vendas cadastradas</small>
             </h3>
         </div>
@@ -50,7 +50,7 @@
                 Cadastre as <b>vendas</b> para formalizar as entradas do caixa.
             </p>
             <div class="ms-auto" style="width: fit-content;">
-                <a href="{{ url_for('get_vendas_index') }}" class="btn">Visualizar Vendas</a>
+                <a href="{{ url_for('get_caixa_movimentacoes_index') }}" class="btn">Visualizar Caixa</a>
             </div>
         </div>
     </div>

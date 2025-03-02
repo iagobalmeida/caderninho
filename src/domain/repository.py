@@ -7,8 +7,9 @@ from loguru import logger
 from sqlmodel import func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.domain.entities import (Estoque, Insumo, Organizacao, Plano, Receita,
-                                 ReceitaGasto, Usuario, Venda)
+from src.domain.entities import (CaixaMovimentacao, Estoque, Insumo,
+                                 Organizacao, Plano, Receita, ReceitaGasto,
+                                 Usuario)
 from src.schemas.auth import AuthSession
 
 
@@ -17,7 +18,7 @@ class Entities(Enum):
     USUARIO = Usuario
     RECEITA_GASTO = ReceitaGasto
     ESTOQUE = Estoque
-    VENDA = Venda
+    CAIXA_MOVIMENTACAO = CaixaMovimentacao
     INSUMO = Insumo
     RECEITA = Receita
 
@@ -152,11 +153,11 @@ async def create(db_session: AsyncSession, entity: Entities, values: dict = {}, 
 
 # Funções otimizadas
 
-async def get_venda_qr_code(auth_session: AuthSession, db_session: AsyncSession, venda_id: int) -> str:
+async def get_caixa_movimentacoes_qr_code(auth_session: AuthSession, db_session: AsyncSession, venda_id: int) -> str:
     organizacao, _, _ = await get(auth_session=auth_session, db_session=db_session, entity=Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
     if not organizacao:  # pragma: nocover
         return None
-    venda, _, _ = await get(auth_session=auth_session, db_session=db_session, entity=Entities.VENDA, filters={'id': venda_id}, first=True)
+    venda, _, _ = await get(auth_session=auth_session, db_session=db_session, entity=Entities.CAIXA_MOVIMENTACAO, filters={'id': venda_id}, first=True)
     return venda.gerar_qr_code(
         pix_nome=organizacao.descricao,
         pix_cidade=organizacao.cidade,
@@ -167,12 +168,12 @@ async def get_venda_qr_code(auth_session: AuthSession, db_session: AsyncSession,
 async def get_fluxo_caixa(auth_session: AuthSession, db_session: AsyncSession) -> Tuple[float, float, float]:
     data_limite = datetime.now() - timedelta(days=30)
 
-    query_entradas = select(func.sum(Venda.valor)).where(Venda.data_criacao >= data_limite)
+    query_entradas = select(func.sum(CaixaMovimentacao.valor)).where(CaixaMovimentacao.data_criacao >= data_limite)
     if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
-        query_entradas = query_entradas.filter(Venda.organizacao_id == auth_session.organizacao_id)
+        query_entradas = query_entradas.filter(CaixaMovimentacao.organizacao_id == auth_session.organizacao_id)
     entradas = (await db_session.exec(query_entradas)).first()
 
-    query_saidas = select(func.sum(Estoque.valor_pago)).where(Venda.data_criacao >= data_limite)
+    query_saidas = select(func.sum(Estoque.valor_pago)).where(CaixaMovimentacao.data_criacao >= data_limite)
     if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
         query_saidas = query_saidas.filter(Estoque.organizacao_id == auth_session.organizacao_id)
     saidas = (await db_session.exec(query_saidas)).first()

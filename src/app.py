@@ -17,6 +17,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from routers.caixa_movimentacoes import router as router_vendas
 from src import db
 from src.domain import inputs, repository
 from src.modules import smpt
@@ -28,7 +29,6 @@ from src.routers.organizacao import router as router_organizacao
 from src.routers.paginas import router as router_paginas
 from src.routers.receitas import router as router_receitas
 from src.routers.scripts import router as router_scripts
-from src.routers.vendas import router as router_vendas
 from src.templates import render
 from src.utils import url_incluir_query_params
 
