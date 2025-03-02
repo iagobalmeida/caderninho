@@ -5,8 +5,7 @@ from random import randint
 from loguru import logger
 
 from src import db
-from src.domain.entities import (Estoque, Insumo, Receita, ReceitaInsumoLink,
-                                 Venda)
+from src.domain.entities import Estoque, Insumo, Receita, ReceitaGasto, Venda
 from src.tests import mocks
 
 
@@ -40,7 +39,7 @@ async def main():
         cookies = await try_add(session, Receita(organizacao_id=organizacao.id, nome='Cookies', peso_unitario=100))
 
         for __insumo in [acucar, manteiga, chocolate, farinha]:
-            await try_add(session, ReceitaInsumoLink(organizacao_id=organizacao.id, quantidade=100, receita_id=cookies.id, insumo_id=__insumo.id))
+            await try_add(session, ReceitaGasto(organizacao_id=organizacao.id, quantidade=100, receita_id=cookies.id, insumo_id=__insumo.id))
             estoque_quantidade = 75
             await try_add(session, Estoque(
                 organizacao_id=organizacao.id,

@@ -170,7 +170,7 @@
                                             <td>{{'✔' if usuario.dono else '✖'}}</td>
                                         </tr>
                                     {% else %}
-                                        <tr class="cursor-pointer" data-bs-payload="{{usuario.dict() | json}}">
+                                        <tr class="cursor-pointer" data-bs-payload="{{usuario.data_bs_payload() | json}}">
                                             <td class="w-1">
                                                 <input type="checkbox" name="checkbox_{{usuario.id}}" id="checkbox_{{usuario.id}}" data-id="{{usuario.id}}">
                                             </td>

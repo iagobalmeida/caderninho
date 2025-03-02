@@ -2,9 +2,9 @@
 
 {% include 'receitas/modal_create.html' %}
 
-{% include 'receitas/modal_insumos_incluir.html' %}
-{% include 'receitas/modal_insumos_remover.html' %}
-{% include 'receitas/modal_insumos_atualizar.html' %}
+{% include 'receitas/modal_gastos_incluir.html' %}
+{% include 'receitas/modal_gastos_remover.html' %}
+{% include 'receitas/modal_gastos_atualizar.html' %}
 
 {% include 'insumos/modal_create.html' %}
 
@@ -136,18 +136,18 @@
   </div>
 </div>
 <div class="col-12">
-  <div class="card" id="cardInsumos">
+  <div class="card" id="cardGastos">
     <div class="card-header">
       <h5 class="card-title">
         {{ material_symbol('package_2') | safe }}
-        Insumos
+        Gastos
       </h5>
       <div class="ms-auto d-none d-md-flex btn-list">
-        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaGastoModal">
           {{material_symbol('chevron_left') | safe }}
-          Incluir Insumo
+          Incluir Gasto
         </button>
-        <button class="btn" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_insumos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
+        <button class="btn" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_gastos_remover')}}", ".text-secondary": "Remover gastos selecionados?"}'>
           {{material_symbol('remove') | safe }}
           Remover Selecionados
         </button>
@@ -155,11 +155,11 @@
       <div class="dropdown ms-auto d-md-none">
         <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
-          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
+          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaGastoModal">
             {{material_symbol('chevron_left') | safe }}
-            Incluir Insumo
+            Incluir Gasto
           </button>
-          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_insumos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
+          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_gastos_remover')}}", ".text-secondary": "Remover gastos selecionados?"}'>
             {{material_symbol('remove') | safe }}
             Remover Selecionados
           </button>

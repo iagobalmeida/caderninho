@@ -24,6 +24,11 @@ class Plano(Enum):
     AVANCADO = 'Avançado'
 
 
+class TipoCusto(Enum):
+    PERCENTUAL = 'Percentual'
+    FIXO = 'Fixo'
+
+
 class Organizacao(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     # Dados
@@ -66,6 +71,9 @@ class RegistroOrganizacao(SQLModel, table=False):
     id: Optional[int] = Field(default=None, primary_key=True)
     organizacao_id: Optional[int] = Field(default=None, foreign_key="organizacao.id")
 
+    def data_bs_payload(self):
+        return self.model_dump()
+
 
 class Pagamento(RegistroOrganizacao, table=True):
     organizacao: "Organizacao" = Relationship(back_populates="pagamentos", sa_relationship_kwargs={'lazy': 'selectin'})
@@ -92,7 +100,7 @@ class Usuario(RegistroOrganizacao, table=True):
         result = pwd_context.verify(senha, self.senha)
         return result
 
-    def dict(self):
+    def data_bs_payload(self):
         base_dict = self.model_dump()
         del base_dict['senha']
         if self.administrador:  # pragma: nocover
@@ -103,13 +111,24 @@ class Usuario(RegistroOrganizacao, table=True):
         return base_dict
 
 
-class ReceitaInsumoLink(RegistroOrganizacao, table=True):
-    quantidade: float
+class ReceitaGasto(RegistroOrganizacao, table=True):
+    custo_tipo: Optional[TipoCusto] = Field(None)
+    custo_valor: Optional[float] = Field(None)
+    quantidade: Optional[float] = Field(default=None)
     receita_id: Optional[int] = Field(default=None, foreign_key="receita.id")
     insumo_id: Optional[int] = Field(default=None, foreign_key="insumo.id")
-    receita: "Receita" = Relationship(back_populates="insumo_links")
+    receita: "Receita" = Relationship(back_populates="gastos")
     insumo: "Insumo" = Relationship(back_populates="receita_links")
     organizacao: "Organizacao" = Relationship(sa_relationship_kwargs={'lazy': 'selectin'})
+    descricao: Optional[str] = Field(default='Sem descrição')
+
+    @validates('descricao')
+    def convert_upper(self, key, value):
+        if not value:
+            if not self.insumo:
+                return 'Sem descrição'
+            return self.insumo.nome
+        return value
 
     @property
     def insumo_custo_p_grama(self):
@@ -120,7 +139,7 @@ class ReceitaInsumoLink(RegistroOrganizacao, table=True):
     @property
     def custo(self):
         if not self.insumo:  # pragma: nocover
-            return 0
+            return self.custo_valor
         return round(self.quantidade * self.insumo_custo_p_grama, 2)
 
     @property
@@ -130,7 +149,11 @@ class ReceitaInsumoLink(RegistroOrganizacao, table=True):
 
         col_quantidade = filters.templates_filter_format_quantity(self.quantidade, converter_kg, converter_kg_sempre, unity=self.insumo.unidade)
         col_custo_p_grama = filters.templates_filter_format_reais(self.insumo_custo_p_grama)
-        col_custo = filters.templates_filter_format_reais(self.custo)
+
+        if self.insumo or self.custo_tipo == TipoCusto.FIXO:
+            col_custo = filters.templates_filter_format_reais(self.custo)
+        else:
+            col_custo = f'{self.custo}%'
         col_estoque_atual = filters.templates_filter_format_stock(self.insumo.estoque_atual, converter_kg, converter_kg_sempre, unity=self.insumo.unidade)
 
         return [
@@ -141,12 +164,15 @@ class ReceitaInsumoLink(RegistroOrganizacao, table=True):
             col_estoque_atual
         ]
 
-    def dict(self):
+    def data_bs_payload(self):
         base_dict = self.model_dump()
-        base_dict['insumo_nome'] = self.insumo.nome
-        base_dict['insumo_custo'] = self.insumo.custo
-        base_dict['insumo_peso'] = self.insumo.peso
-        base_dict['#input_quantidade_unidade'] = self.insumo.unidade
+        if self.custo_tipo:
+            base_dict['custo_tipo'] = self.custo_tipo.value
+        elif self.insumo:
+            base_dict['insumo_nome'] = self.insumo.nome
+            base_dict['insumo_custo'] = self.insumo.custo
+            base_dict['insumo_peso'] = self.insumo.peso
+            base_dict['#input_quantidade_unidade'] = self.insumo.unidade
         return base_dict
 
 
@@ -192,7 +218,7 @@ class Estoque(RegistroOrganizacao, table=True):
             col_quantidade
         ]
 
-    def dict(self):
+    def data_bs_payload(self):
         base_dict = self.model_dump()
         base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
         return base_dict
@@ -230,7 +256,7 @@ class Venda(RegistroOrganizacao, table=True):
             col_recebido
         ]
 
-    def dict(self):
+    def data_bs_payload(self):
         base_dict = self.model_dump()
         base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
         base_dict['#img_qr_code'] = self.gerar_qr_code()
@@ -257,7 +283,7 @@ class Insumo(RegistroOrganizacao, table=True):
     peso: float
     custo: float
     unidade: Optional[str] = 'g'
-    receita_links: List['ReceitaInsumoLink'] = Relationship(back_populates='insumo', sa_relationship_kwargs={'lazy': 'selectin'})
+    receita_links: List['ReceitaGasto'] = Relationship(back_populates='insumo', sa_relationship_kwargs={'lazy': 'selectin'})
     estoque_links: List['Estoque'] = Relationship(back_populates='insumo', sa_relationship_kwargs={'lazy': 'selectin'})
     organizacao: "Organizacao" = Relationship(sa_relationship_kwargs={'lazy': 'selectin'})
 
@@ -296,7 +322,7 @@ class Insumo(RegistroOrganizacao, table=True):
             col_estoque
         ]
 
-    def dict(self):
+    def data_bs_payload(self):
         base_dict = self.model_dump()
         receitas_associadas = []
         for r in self.receita_links:
@@ -341,7 +367,7 @@ class Receita(RegistroOrganizacao, table=True):
     porcentagem_lucro: int = 33
     organizacao: "Organizacao" = Relationship()
 
-    insumo_links: List['ReceitaInsumoLink'] = Relationship(back_populates='receita', sa_relationship_kwargs={'lazy': 'selectin'})
+    gastos: List['ReceitaGasto'] = Relationship(back_populates='receita', sa_relationship_kwargs={'lazy': 'selectin'})
 
     @classmethod
     def columns(self):
@@ -388,15 +414,31 @@ class Receita(RegistroOrganizacao, table=True):
         return round(self.faturamento - self.custo, 2)
 
     @property
+    def custo_percentual(self):
+        return round(
+            sum([
+                g.custo
+                for g in self.gastsos
+                if g.custo_itpo == TipoCusto.PERCENTUAL
+            ]), 2)
+
+    @property
     def custo(self):
         '''Retorna a soma de custo dos insumos usados'''
-        custo = sum([i.custo for i in self.insumo_links])
-        return round(custo, 2)
+        custo = 0
+        for gasto in self.gastos:
+            if gasto.custo_tipo == TipoCusto.FIXO:
+                custo += gasto.custo_valor
+            elif gasto.insumo_id:
+                custo += gasto.quantidade * gasto.insumo_custo_p_grama
+
+        custo_percentual = (100 + self.custo_percentual)/100
+        return round(custo * custo_percentual, 2)
 
     @property
     def rendimento(self):
         '''Retorna a soma da quantiadde dos insumos usados (em gramas)'''
-        return max(1, round(sum([i.quantidade for i in self.insumo_links if i.insumo.unidade == 'g']), 2))
+        return max(1, round(sum([i.quantidade for i in self.gastos if i.insumo.unidade == 'g']), 2))
 
     @property
     def rendimento_unidades(self):

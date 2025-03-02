@@ -245,6 +245,11 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
   - [X] Botão para upgrade/extensão de plano
   - [ ] Modal para upgrade/extensão de plano
 - [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`
+- [ ] Campo `custo fixo` em receita
+- [ ] Campo `porc. tributária` em receita
+- [ ] Cadastro de custo recorrente em `Organização`
+- [ ] Tabelas `Entradas` e `Saídas`
+- `Estimavitas` -> `Luco` chama na verdade `Margem`
 - [ ] Exportacação de CSV
 - [ ] Autenticacao com OAuth2
 

@@ -84,11 +84,52 @@ async def test_post_receitas_atualizar(client):
 
 
 @pytest.mark.asyncio
-async def test_post_receitas_insumos_remover(client):
+async def test_post_receitas_gastos_remover(client):
     await autenticar(client)
-    response = await client.post('/app/receitas/insumos/remover', data={
+    response = await client.post('/app/receitas/gastos/remover', data={
         'receita_id': 1,
         'selecionados_ids': '1'
+    })
+    assert response.status_code == 200
+    dom_rows = await __get_receitas_rows(client)
+    # TODO: Aprimorar assert para conteúdos da tela
+
+
+@pytest.mark.asyncio
+async def test_post_receitas_gastos_incluir_insumo(client):
+    await autenticar(client)
+    response = await client.post('/app/receitas/gastos/incluir', data={
+        'receita_id': 1,
+        'insumo_id': 2,
+        'quantidade': 20
+    })
+    assert response.status_code == 200
+    dom_rows = await __get_receitas_rows(client)
+    # TODO: Aprimorar assert para conteúdos da tela
+
+
+@pytest.mark.asyncio
+async def test_post_receitas_gastos_incluir_custo_percentual(client):
+    await autenticar(client)
+    response = await client.post('/app/receitas/gastos/incluir', data={
+        'receita_id': 1,
+        'descricao': 'Taxa fixa de Imposto',
+        'custo_tipo': 'PERCENTUAL',
+        'custo_valor': 3
+    })
+    assert response.status_code == 200
+    dom_rows = await __get_receitas_rows(client)
+    # TODO: Aprimorar assert para conteúdos da tela
+
+
+@pytest.mark.asyncio
+async def test_post_receitas_gastos_incluir_custo_fixo(client):
+    await autenticar(client)
+    response = await client.post('/app/receitas/gastos/incluir', data={
+        'receita_id': 1,
+        'descricao': 'Taxa fixa de Imposto',
+        'custo_tipo': 'FIXO',
+        'custo_valor': 10
     })
     assert response.status_code == 200
     dom_rows = await __get_receitas_rows(client)

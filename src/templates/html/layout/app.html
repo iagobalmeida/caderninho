@@ -113,12 +113,12 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                   <!-- <a href="#" class="dropdown-item">Status</a> -->
-                  <a data-bs-toggle="modal" data-bs-target="#modalPerfil" data-bs-payload="{{usuario.dict() | json}}" class="dropdown-item cursor-pointer">
+                  <a data-bs-toggle="modal" data-bs-target="#modalPerfil" data-bs-payload="{{usuario.data_bs_payload() | json}}" class="dropdown-item cursor-pointer">
                     {{ material_symbol('account_circle') | safe }}
                     &nbsp;
                     Meu pefil
                   </a>
-                  <a data-bs-toggle="modal" data-bs-target="#modalAtualizarSenha" data-bs-payload="{{usuario.dict() | json}}" class="dropdown-item cursor-pointer">
+                  <a data-bs-toggle="modal" data-bs-target="#modalAtualizarSenha" data-bs-payload="{{usuario.data_bs_payload() | json}}" class="dropdown-item cursor-pointer">
                     {{ material_symbol('password') | safe }}
                     &nbsp;
                     Atualizar Senha

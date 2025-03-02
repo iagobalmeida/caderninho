@@ -60,7 +60,7 @@ async def __drop_tables(table_names: List[str], cascade: bool = True):
 async def reset():
     await __drop_tables(
         table_names=[
-            'receitainsumolink',
+            'receitagasto',
             'receita',
             'estoque',
             'venda',

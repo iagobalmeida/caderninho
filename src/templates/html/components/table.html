@@ -16,7 +16,7 @@
             {% for data in table_data %}
               <tr
               class="cursor-pointer"
-              data-bs-payload="{{data.dict() | json}}" 
+              data-bs-payload="{{data.data_bs_payload() | json}}" 
               >
                 <td class="w-1">
                   <input type="checkbox" data-id="{{data.id}}">

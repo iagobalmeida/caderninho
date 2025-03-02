@@ -10,13 +10,16 @@ class ReceitaAtualizar(BaseModel):
     porcentagem_lucro: float
 
 
-class ReceitaInsumoAdicionar(BaseModel):
+class ReceitaGastosAdicionar(BaseModel):
     receita_id: int
-    insumo_id: int
-    quantidade: float
+    insumo_id: Optional[int] = None
+    descricao: Optional[str] = None
+    quantidade: Optional[float] = None
+    custo_tipo: Optional[str] = None  # TODO: Associar a ENUM
+    custo_valor: Optional[float] = None
 
 
-class ReceitaInsumoAtualizar(BaseModel):
+class ReceitaGastosAtualizar(BaseModel):
     id: int
     receita_id: int
     insumo_id: int
@@ -26,7 +29,7 @@ class ReceitaInsumoAtualizar(BaseModel):
     quantidade: float
 
 
-class ReceitaInsumoRemover(BaseModel):
+class ReceitaGastosRemover(BaseModel):
     receita_id: int
     selecionados_ids: str
 
@@ -83,7 +86,7 @@ class UsuarioCriar(BaseModel):
     nome: str
     email: str
     senha: str
-    plano: str
+    plano: Optional[str] = None
     senha_confirmar: str
     organizacao_id:  Optional[int] = False
     organizacao_descricao: Optional[str] = None

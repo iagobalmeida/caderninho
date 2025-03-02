@@ -8,14 +8,14 @@ from sqlmodel import func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.domain.entities import (Estoque, Insumo, Organizacao, Plano, Receita,
-                                 ReceitaInsumoLink, Usuario, Venda)
+                                 ReceitaGasto, Usuario, Venda)
 from src.schemas.auth import AuthSession
 
 
 class Entities(Enum):
     ORGANIZACAO = Organizacao
     USUARIO = Usuario
-    RECEITA_INGREDIENTE = ReceitaInsumoLink
+    RECEITA_GASTO = ReceitaGasto
     ESTOQUE = Estoque
     VENDA = Venda
     INSUMO = Insumo
