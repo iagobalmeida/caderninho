@@ -1,0 +1,32 @@
+<div class="modal fade" id="modalCreateVenda" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_caixa_movimentacoes_index') }}">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title ">
+                      <span class="material-symbols-outlined">
+                        payments
+                      </span>
+                      Nova CaixaMovimentacao
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label required" for="descricao">Descrição</label>
+                    <input required type="text" class="form-control" name="descricao"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label required" for="valor">Valor</label>
+                    <div class="input-group input-group-flat">
+                        <span class="input-group-text"> R$ </span>
+                        <input name="valor" required type="number" step="any" class="form-control text-end" min="1" />
+                    </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" class="btn btn-success">Criar CaixaMovimentacao</button>
+              </div>
+          </div>
+    </form>
+</div>
