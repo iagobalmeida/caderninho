@@ -114,8 +114,8 @@ async def test_post_receitas_gastos_incluir_custo_percentual(client):
     response = await client.post('/app/receitas/gastos/incluir', data={
         'receita_id': 1,
         'descricao': 'Taxa fixa de Imposto',
-        'custo_tipo': 'PERCENTUAL',
-        'custo_valor': 3
+        'gasto_tipo': 'PERCENTUAL',
+        'gasto_valor': 3
     })
     assert response.status_code == 200
     dom_rows = await __get_receitas_rows(client)
@@ -128,8 +128,8 @@ async def test_post_receitas_gastos_incluir_custo_fixo(client):
     response = await client.post('/app/receitas/gastos/incluir', data={
         'receita_id': 1,
         'descricao': 'Taxa fixa de Imposto',
-        'custo_tipo': 'FIXO',
-        'custo_valor': 10
+        'gasto_tipo': 'FIXO',
+        'gasto_valor': 10
     })
     assert response.status_code == 200
     dom_rows = await __get_receitas_rows(client)

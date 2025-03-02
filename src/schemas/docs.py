@@ -31,7 +31,7 @@ SOBRE_ESSA_PAGINA = {
         'Cadastrar uma `Receita` te permite calcular de forma intuitiva o custo de produção, a quantidade de insumos necessários, o valor de venda, etc.',
         'Uma `Receita` é composta por uma lista de `Insumos` e duas configurações: `Peso Unitário` e `Porcetagem de Lucro`.',
         '`Peso Unitário` é onde você cadastra peso de cada unidade que a receita produz (Se a receita produz apenas uma unidade, preencha com o mesmo valor do campo `Rendimento`).',
-        '`Porcetagem de Lucro` é onde você cadastra qual a porcetagem de lucro que você deseja usar no cáclulo de preço.',
+        '`Porcetagem de Lucro` é onde você cadastra qual a porcetagem de margem que você deseja usar no cáclulo de preço.',
         'Após preencher a lista de `Insumos` e as duas configurações, você poderá verificar em `Estimativas` e `Precificação` os valores cálculados.',
         '<a href="/app/como_usar/#como_usar_1_1">1.1. O que é uma receita</a>',
         '<a href="/app/como_usar/#como_usar_precificacao">1.2.1. Precificação</a>',

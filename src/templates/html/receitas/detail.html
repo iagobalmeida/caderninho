@@ -75,16 +75,43 @@
     </div>
     <div class="card-body">
       <div class="datagrid">
+
+        <div class="datagrid-item">
+          <div class="datagrid-title">Custo Base</div>
+          <div class="datagrid-content">
+            <span class="badge bg-warning-lt"> {{receita.custo_base}} R$ </span>
+          </div>
+        </div>
+
+        <div class="datagrid-item">
+          <div class="datagrid-title">Custo Perc.</div>
+          <div class="datagrid-content">
+            <span class="badge bg-warning-lt"> {{receita.custo_percentual}}% → {{(receita.custo_percentual * receita.custo_base / 100) | format_reais }} </span>
+          </div>
+        </div>
+
+        <div class="datagrid-item">
+          <div class="datagrid-title">Custo Total</div>
+          <div class="datagrid-content">
+            <span class="badge bg-danger-lt"> {{receita.custo_total | format_reais}}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="datagrid">
         <div class="datagrid-item">
           <div class="datagrid-title">Rendimento</div>
           <div class="datagrid-content">
-            <span class="badge bg-secondary-lt"> {{receita.rendimento}} g </span>
+            <span class="badge bg-primary-lt"> {{receita.rendimento}} g </span>
           </div>
         </div>
         <div class="datagrid-item">
           <div class="datagrid-title">Rendimento Unidades</div>
           <div class="datagrid-content">
-            <span class="badge bg-secondary-lt"> {{receita.rendimento_unidades}} Un. </span>
+            <span class="badge bg-primary-lt"> {{receita.rendimento_unidades}} Un. </span>
           </div>
         </div>
         <div class="datagrid-item">
@@ -93,10 +120,26 @@
             <span class="badge bg-danger-lt"> {{receita.custo_unidade | format_reais}} </span>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="datagrid">
         <div class="datagrid-item">
-          <div class="datagrid-title">Preço Sugerido</div>
+          <div class="datagrid-title">Preço Sugerido Un.</div>
           <div class="datagrid-content">
             <span class="badge bg-success-lt"> {{receita.preco_sugerido | format_reais}} </span>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Margem Unit.</div>
+          <div class="datagrid-content">
+            <span class="badge bg-success-lt"> {{(receita.preco_sugerido - receita.custo_unidade) | format_reais}} </span>
+          </div>
+        </div>
+        <div class="datagrid-item">
+          <div class="datagrid-title">Margem Receita</div>
+          <div class="datagrid-content">
+            <span class="badge bg-success-lt"> {{(receita.preco_sugerido * receita.rendimento_unidades) | format_reais}} </span>
           </div>
         </div>
       </div>
@@ -108,31 +151,12 @@
     <div class="card-header">
       <h5 class="card-title">
         <span class="material-symbols-outlined"> currency_exchange </span>
-        Estimativas
+        Custos
       </h5>
     </div>
-    <div class="card-body">
-      <div class="datagrid">
-        <div class="datagrid-item text-danger">
-          <div class="datagrid-title">Custo</div>
-          <div class="datagrid-content">
-            <span class="badge bg-danger-lt"> {{receita.custo | format_reais}} </span>
-          </div>
-        </div>
-        <div class="datagrid-item">
-          <div class="datagrid-title">Faturamento</div>
-          <div class="datagrid-content">
-            <span class="badge bg-primary-lt"> {{receita.faturamento | format_reais}} </span>
-          </div>
-        </div>
-        <div class="datagrid-item text-success">
-          <div class="datagrid-title">Lucro</div>
-          <div class="datagrid-content">
-            <span class="badge bg-success-lt"> {{receita.lucro | format_reais}} </span>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% with table_data=custos_table_data, table_columns=custos_table_columns, table_data=custos_table_data, table_no_result=custos_table_no_result, table_modal=custos_table_modal %}
+      {% include 'components/table.html' %}
+    {% endwith %}
   </div>
 </div>
 <div class="col-12">
@@ -167,7 +191,9 @@
       </div>
     </div>
 
-    {% include 'components/table.html' %}
+    {% with table_data=insumos_table_data, table_columns=insumos_table_columns, table_data=insumos_table_data, table_no_result=insumos_table_no_result, table_modal=insumos_table_modal %}
+      {% include 'components/table.html' %}
+    {% endwith %}
   </div>
 </div>
 {% endblock %} {% block script %}

@@ -16,7 +16,7 @@ Essa aplicação não seria possível sem a existência de:
 ### Funcionalidades
 
 No lugar de tabelas do excel, você pode usar o KDerninho para:
-- Estimar custo, faturamento e lucro de receitas de forma dinâmica
+- Estimar custo, faturamento e margem de receitas de forma dinâmica
 - Gerenciar o estoque de seus insumos e outros insumos
 - Gerenciar seu fluxo de caixa cadastrando compras, produção de receitas e outros gastos em geral
 - Compartilhar essas informações com outros usuários de sua organização

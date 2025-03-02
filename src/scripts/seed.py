@@ -48,6 +48,23 @@ async def main():
                 quantidade=estoque_quantidade,
                 valor_pago=randint(1, 10) if estoque_quantidade > 0 else 0
             ))
+        logger.info('Adicionando custo percentual')
+        await try_add(session, ReceitaGasto(
+            organizacao_id=organizacao.id,
+            receita_id=cookies.id,
+            descricao='Gasto percentual',
+            gasto_tipo='PERCENTUAL',
+            gasto_valor=10
+        ))
+
+        logger.info('Adicionando custo fixo')
+        await try_add(session, ReceitaGasto(
+            organizacao_id=organizacao.id,
+            receita_id=cookies.id,
+            descricao='Gasto fixo',
+            gasto_tipo='FIXO',
+            gasto_valor=2
+        ))
 
         for _ in range(30):
             quantidade = randint(10, 20)

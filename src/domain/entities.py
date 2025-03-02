@@ -24,7 +24,7 @@ class Plano(Enum):
     AVANCADO = 'Avançado'
 
 
-class TipoCusto(Enum):
+class GastoTipo(Enum):
     PERCENTUAL = 'Percentual'
     FIXO = 'Fixo'
 
@@ -112,8 +112,8 @@ class Usuario(RegistroOrganizacao, table=True):
 
 
 class ReceitaGasto(RegistroOrganizacao, table=True):
-    custo_tipo: Optional[TipoCusto] = Field(None)
-    custo_valor: Optional[float] = Field(None)
+    gasto_tipo: Optional[GastoTipo] = Field(None)
+    gasto_valor: Optional[float] = Field(None)
     quantidade: Optional[float] = Field(default=None)
     receita_id: Optional[int] = Field(default=None, foreign_key="receita.id")
     insumo_id: Optional[int] = Field(default=None, foreign_key="insumo.id")
@@ -139,7 +139,7 @@ class ReceitaGasto(RegistroOrganizacao, table=True):
     @property
     def custo(self):
         if not self.insumo:  # pragma: nocover
-            return self.custo_valor
+            return self.gasto_valor
         return round(self.quantidade * self.insumo_custo_p_grama, 2)
 
     @property
@@ -147,27 +147,38 @@ class ReceitaGasto(RegistroOrganizacao, table=True):
         converter_kg = self.organizacao.configuracoes.get('converter_kg', False)
         converter_kg_sempre = self.organizacao.configuracoes.get('converter_kg_sempre', False)
 
-        col_quantidade = filters.templates_filter_format_quantity(self.quantidade, converter_kg, converter_kg_sempre, unity=self.insumo.unidade)
-        col_custo_p_grama = filters.templates_filter_format_reais(self.insumo_custo_p_grama)
+        col_descricao = self.descricao
+        if self.insumo_id:
+            col_descricao = self.insumo.nome
 
-        if self.insumo or self.custo_tipo == TipoCusto.FIXO:
+            if self.insumo:
+                col_quantidade = filters.templates_filter_format_quantity(self.quantidade, converter_kg, converter_kg_sempre, unity=self.insumo.unidade)
+                col_custo_p_grama = filters.templates_filter_format_reais(self.insumo_custo_p_grama)
+                col_estoque_atual = filters.templates_filter_format_stock(self.insumo.estoque_atual, converter_kg, converter_kg_sempre, unity=self.insumo.unidade)
+                col_custo = filters.templates_filter_format_reais(self.custo)
+                return [
+                    col_descricao,
+                    col_quantidade,
+                    col_custo_p_grama,
+                    col_custo,
+                    col_estoque_atual
+                ]
+
+        if self.gasto_tipo == GastoTipo.FIXO:
             col_custo = filters.templates_filter_format_reais(self.custo)
         else:
             col_custo = f'{self.custo}%'
-        col_estoque_atual = filters.templates_filter_format_stock(self.insumo.estoque_atual, converter_kg, converter_kg_sempre, unity=self.insumo.unidade)
 
         return [
-            self.insumo.nome,
-            col_quantidade,
-            col_custo_p_grama,
-            col_custo,
-            col_estoque_atual
+            col_descricao,
+            self.gasto_tipo.value.title(),
+            col_custo
         ]
 
     def data_bs_payload(self):
         base_dict = self.model_dump()
-        if self.custo_tipo:
-            base_dict['custo_tipo'] = self.custo_tipo.value
+        if self.gasto_tipo:
+            base_dict['gasto_tipo'] = self.gasto_tipo.value
         elif self.insumo:
             base_dict['insumo_nome'] = self.insumo.nome
             base_dict['insumo_custo'] = self.insumo.custo
@@ -377,25 +388,36 @@ class Receita(RegistroOrganizacao, table=True):
             'Preço Sug. (R$)',
             'Custo (R$)',
             'Faturamento',
-            'Lucro'
+            'Margem'
         ]
 
     @property
     def row(self):
-        col_rendimento = f'{self.rendimento_unidades} Un.'
-        col_preco_sug = filters.templates_filter_format_reais(self.preco_sugerido)
-        col_custo = filters.templates_filter_format_reais(self.custo)
-        col_faturamento = filters.templates_filter_format_reais(self.faturamento)
-        col_lucro = filters.templates_filter_format_reais(self.lucro)
+        try:
+            col_rendimento = f'{self.rendimento_unidades} Un.'
+            col_preco_sug = filters.templates_filter_format_reais(self.preco_sugerido)
+            col_custo = filters.templates_filter_format_reais(self.custo)
+            col_faturamento = filters.templates_filter_format_reais(self.faturamento)
+            col_margem = filters.templates_filter_format_reais(self.margem)
 
-        return [
-            self.nome,
-            col_rendimento,
-            col_preco_sug,
-            col_custo,
-            col_faturamento,
-            col_lucro
-        ]
+            return [
+                self.nome,
+                col_rendimento,
+                col_preco_sug,
+                col_custo,
+                col_faturamento,
+                col_margem
+            ]
+        except Exception as ex:
+            logger.exception(ex)
+            return [
+                self.nome,
+                '-',
+                '-',
+                '-',
+                '-',
+                '-'
+            ]
 
     @property
     def href(self):
@@ -410,7 +432,7 @@ class Receita(RegistroOrganizacao, table=True):
         return self.preco_sugerido*self.rendimento_unidades
 
     @property
-    def lucro(self):
+    def margem(self):
         return round(self.faturamento - self.custo, 2)
 
     @property
@@ -418,17 +440,26 @@ class Receita(RegistroOrganizacao, table=True):
         return round(
             sum([
                 g.custo
-                for g in self.gastsos
-                if g.custo_itpo == TipoCusto.PERCENTUAL
+                for g in self.gastos
+                if g.gasto_tipo == GastoTipo.PERCENTUAL
             ]), 2)
 
     @property
-    def custo(self):
+    def custo_base(self):
+        return round(
+            sum([
+                g.custo
+                for g in self.gastos
+                if g.gasto_tipo == GastoTipo.FIXO or g.insumo
+            ]), 2)
+
+    @property
+    def custo_total(self):
         '''Retorna a soma de custo dos insumos usados'''
         custo = 0
         for gasto in self.gastos:
-            if gasto.custo_tipo == TipoCusto.FIXO:
-                custo += gasto.custo_valor
+            if gasto.gasto_tipo == GastoTipo.FIXO:
+                custo += gasto.gasto_valor
             elif gasto.insumo_id:
                 custo += gasto.quantidade * gasto.insumo_custo_p_grama
 
@@ -438,7 +469,7 @@ class Receita(RegistroOrganizacao, table=True):
     @property
     def rendimento(self):
         '''Retorna a soma da quantiadde dos insumos usados (em gramas)'''
-        return max(1, round(sum([i.quantidade for i in self.gastos if i.insumo.unidade == 'g']), 2))
+        return max(1, round(sum([i.quantidade for i in self.gastos if i.insumo and i.insumo.unidade == 'g']), 2))
 
     @property
     def rendimento_unidades(self):
@@ -448,7 +479,7 @@ class Receita(RegistroOrganizacao, table=True):
     @property
     def custo_unidade(self):
         '''Retorna o custo de cada unidade produzida'''
-        return round(self.custo/self.rendimento_unidades, 2)
+        return round(self.custo_total/self.rendimento_unidades, 2)
 
     @property
     def preco_sugerido(self):

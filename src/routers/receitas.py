@@ -54,16 +54,27 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
         buttons=[]
     )
 
-    table_columns = [
+    gastos = db_receita.gastos
+
+    insumos_table_columns = [
         'Nome',
         'Quantidade (g)',
         'Custo/grama (R$)',
         'Custo Total (R$)',
         'Estoque Atual'
     ]
-    table_data = db_receita.gastos
-    table_no_result = 'Nenhum registro encontrado'
-    table_modal = '#atualizarReceitaInsumoModal'
+    insumos_table_data = [gasto for gasto in gastos if gasto.insumo_id]
+    insumos_table_no_result = 'Nenhum registro encontrado'
+    insumos_table_modal = '#atualizarReceitaGastoModal'
+
+    custos_table_columns = [
+        'Descrição',
+        'Tipo',
+        'Valor'
+    ]
+    custos_table_data = [gasto for gasto in gastos if gasto.gasto_tipo]
+    custos_table_no_result = 'Nenhum registro encontrado'
+    custos_table_modal = '#atualizarReceitaGastoModal'
 
     return await render(
         session=session,
@@ -72,10 +83,14 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
         context={
             'header': context_header,
             'receita': db_receita,
-            'table_columns': table_columns,
-            'table_data': table_data,
-            'table_no_result': table_no_result,
-            'table_modal': table_modal
+            'insumos_table_columns': insumos_table_columns,
+            'insumos_table_data': insumos_table_data,
+            'insumos_table_no_result': insumos_table_no_result,
+            'insumos_table_modal': insumos_table_modal,
+            'custos_table_columns': custos_table_columns,
+            'custos_table_data': custos_table_data,
+            'custos_table_no_result': custos_table_no_result,
+            'custos_table_modal': custos_table_modal
         }
     )
 
@@ -116,8 +131,8 @@ async def post_receita_gastos_incluir(request: fastapi.Request, payload: inputs.
         'receita_id': payload.receita_id,
         'insumo_id': payload.insumo_id,
         'descricao': payload.descricao,
-        'custo_valor': payload.custo_valor,
-        'custo_tipo': payload.custo_tipo,
+        'gasto_valor': payload.gasto_valor,
+        'gasto_tipo': payload.gasto_tipo,
         'quantidade': payload.quantidade
     })
     return redirect_url_for(request, 'get_receita', id=payload.receita_id)

@@ -15,8 +15,8 @@ class ReceitaGastosAdicionar(BaseModel):
     insumo_id: Optional[int] = None
     descricao: Optional[str] = None
     quantidade: Optional[float] = None
-    custo_tipo: Optional[str] = None  # TODO: Associar a ENUM
-    custo_valor: Optional[float] = None
+    gasto_tipo: Optional[str] = None  # TODO: Associar a ENUM
+    gasto_valor: Optional[float] = None
 
 
 class ReceitaGastosAtualizar(BaseModel):
