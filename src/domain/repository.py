@@ -4,12 +4,12 @@ from math import ceil
 from typing import Tuple
 
 from loguru import logger
-from sqlmodel import func, select
+from sqlmodel import and_, case, func, select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.domain.entities import (CaixaMovimentacao, Estoque, Insumo,
-                                 Organizacao, Plano, Receita, ReceitaGasto,
-                                 Usuario)
+from src.domain.entities import (CaixaMovimentacao, CaixMovimentacaoTipo,
+                                 Estoque, Insumo, Organizacao, Plano, Receita,
+                                 ReceitaGasto, Usuario)
 from src.schemas.auth import AuthSession
 
 
@@ -168,15 +168,67 @@ async def get_caixa_movimentacoes_qr_code(auth_session: AuthSession, db_session:
 async def get_fluxo_caixa(auth_session: AuthSession, db_session: AsyncSession) -> Tuple[float, float, float]:
     data_limite = datetime.now() - timedelta(days=30)
 
-    query_entradas = select(func.sum(CaixaMovimentacao.valor)).where(CaixaMovimentacao.data_criacao >= data_limite)
+    query_entradas = select(func.sum(CaixaMovimentacao.valor)).where(and_(CaixaMovimentacao.data_criacao >= data_limite, CaixaMovimentacao.tipo == CaixMovimentacaoTipo.ENTRADA))
     if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
         query_entradas = query_entradas.filter(CaixaMovimentacao.organizacao_id == auth_session.organizacao_id)
     entradas = (await db_session.exec(query_entradas)).first()
 
-    query_saidas = select(func.sum(Estoque.valor_pago)).where(CaixaMovimentacao.data_criacao >= data_limite)
+    query_saidas_caixa_movimentacao = select(func.sum(CaixaMovimentacao.valor)).where(and_(CaixaMovimentacao.data_criacao >= data_limite, CaixaMovimentacao.tipo == CaixMovimentacaoTipo.SAIDA))
     if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
-        query_saidas = query_saidas.filter(Estoque.organizacao_id == auth_session.organizacao_id)
-    saidas = (await db_session.exec(query_saidas)).first()
+        query_saidas_caixa_movimentacao = query_saidas_caixa_movimentacao.filter(CaixaMovimentacao.organizacao_id == auth_session.organizacao_id)
+    saidas_caixa_movimentacao = (await db_session.exec(query_saidas_caixa_movimentacao)).first()
 
+    query_saidas_estoques = select(func.sum(Estoque.valor_pago)).where(Estoque.data_criacao >= data_limite)
+    if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
+        query_saidas_estoques = query_saidas_estoques.filter(Estoque.organizacao_id == auth_session.organizacao_id)
+    saidas_estoques = (await db_session.exec(query_saidas_estoques)).first()
+
+    logger.info(f'entradas: {entradas}')
+    logger.info(f'saidas_caixa_movimentacao: {saidas_caixa_movimentacao}')
+    logger.info(f'saidas_estoques: {saidas_estoques}')
+
+    saidas = (saidas_caixa_movimentacao if saidas_caixa_movimentacao else 0) + (saidas_estoques if saidas_estoques else 0)
     caixa = (entradas if entradas else 0) - (saidas if saidas else 0)
     return (entradas, saidas, caixa)
+
+
+async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: AsyncSession) -> dict:
+    result = {}
+    query_caixa_movimentacao = text(f'''
+        SELECT
+            date(caixamovimentacao.data_criacao) AS dia,
+            sum(CASE WHEN (caixamovimentacao.tipo = "ENTRADA") THEN caixamovimentacao.valor ELSE 0 END) AS entradas,
+            sum(CASE WHEN (caixamovimentacao.tipo = "SAIDA") THEN caixamovimentacao.valor ELSE 0 END) AS saidas,
+            sum(CASE WHEN (caixamovimentacao.tipo = "ENTRADA") THEN caixamovimentacao.valor ELSE 0 END) - sum(CASE WHEN (caixamovimentacao.tipo = "SAIDA") THEN caixamovimentacao.valor ELSE 0 END) AS margem
+        FROM caixamovimentacao
+        WHERE
+            caixamovimentacao.organizacao_id = {auth_session.organizacao_id}
+        GROUP BY
+            date(caixamovimentacao.data_criacao)
+        LIMIT 25
+    ''')
+    result_caixa_movimentacao = (await db_session.exec(query_caixa_movimentacao)).all()
+    for r in result_caixa_movimentacao:
+        result[r[0]] = [r[0], r[1], r[2], r[3]]
+
+    query_estoque = text(f'''
+        SELECT
+            date(estoque.data_criacao) AS dia,
+            sum(0) AS entradas,
+            sum(estoque.valor_pago) AS saidas,
+            -1 * sum(estoque.valor_pago) AS margem
+        FROM estoque
+        WHERE
+            estoque.organizacao_id = {auth_session.organizacao_id} GROUP BY date(estoque.data_criacao)
+        LIMIT 25
+    ''')
+    result_estoque = (await db_session.exec(query_estoque)).all()
+    for r in result_estoque:
+        if not r[0] in result:
+            result[r[0]] = [r[0], r[1], r[2], r[3]]
+        else:
+            result[r[0]][1] += r[1]
+            result[r[0]][2] += r[2]
+            result[r[0]][3] += r[3]
+
+    return [v for v in result.values()]

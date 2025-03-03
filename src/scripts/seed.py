@@ -1,6 +1,6 @@
 import asyncio
 from datetime import datetime
-from random import randint
+from random import choice, randint
 
 from loguru import logger
 
@@ -39,9 +39,11 @@ async def main():
         farinha = await try_add(session, Insumo(organizacao_id=organizacao.id, nome='Farinha', peso=1000, custo=4))
         cookies = await try_add(session, Receita(organizacao_id=organizacao.id, nome='Cookies', peso_unitario=100))
 
-        for __insumo in [acucar, manteiga, chocolate, farinha]:
+        insumos = [acucar, manteiga, chocolate, farinha]
+
+        for __insumo in insumos:
             await try_add(session, ReceitaGasto(organizacao_id=organizacao.id, quantidade=100, receita_id=cookies.id, insumo_id=__insumo.id))
-            estoque_quantidade = 75
+            estoque_quantidade = randint(-100, 100)
             await try_add(session, Estoque(
                 organizacao_id=organizacao.id,
                 descricao='Compra' if estoque_quantidade > 0 else f'Uso em receita ({cookies.nome})',
@@ -68,9 +70,22 @@ async def main():
         ))
 
         for _ in range(30):
-            quantidade = randint(10, 20)
             data_criacao = datetime.now().replace(day=randint(1, 24), month=randint(1, 12))
-            await try_add(session, CaixaMovimentacao(organizacao_id=organizacao.id, descricao=f'{quantidade} x MiniCookies', valor=quantidade*12, data_criacao=data_criacao))
+            if randint(1, 3) >= 2:
+                quantidade = randint(-200, -1)
+                insumo = choice(insumos)
+                quantidade *= -1
+                await try_add(session, Estoque(
+                    data_criacao=data_criacao,
+                    organizacao_id=organizacao.id,
+                    descricao='Compra' if quantidade > 0 else f'Uso em receita ({cookies.nome})',
+                    insumo_id=insumo.id,
+                    quantidade=quantidade,
+                    valor_pago=randint(8, 50) if quantidade > 0 else 0
+                ))
+            if randint(1, 3) >= 2:
+                quantidade = randint(1, 10)
+                await try_add(session, CaixaMovimentacao(organizacao_id=organizacao.id, descricao=f'{quantidade} x MiniCookies', valor=quantidade*12, data_criacao=data_criacao))
         await session.close()
 
 if __name__ == '__main__':

@@ -17,12 +17,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from routers.caixa_movimentacoes import router as router_vendas
 from src import db
 from src.domain import inputs, repository
 from src.modules import smpt
 from src.modules.logger import logger, setup_logger
 from src.routers.autenticacao import router as router_autenticacao
+from src.routers.caixa_movimentacoes import \
+    router as router_caixa_movimentacoes
 from src.routers.estoques import router as router_estoques
 from src.routers.insumos import router as router_insumos
 from src.routers.organizacao import router as router_organizacao
@@ -55,7 +56,7 @@ app.add_middleware(
 app.include_router(router_receitas)
 app.include_router(router_insumos)
 app.include_router(router_estoques)
-app.include_router(router_vendas)
+app.include_router(router_caixa_movimentacoes)
 app.include_router(router_organizacao)
 app.include_router(router_scripts)
 app.include_router(router_autenticacao)

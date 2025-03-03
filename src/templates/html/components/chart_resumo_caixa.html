@@ -1,0 +1,24 @@
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-body">
+            <canvas id="myChart" width="400" height="300"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    const config = {{chart_config | json | safe}}
+
+    if(!config['options']['scales']) config['options']['scales'] = {'y': {}}
+
+    config['options']['scales']['y']['ticks'] = {
+        callback: function(value, index, ticks) {
+            return 'R$ ' + value;
+        }
+    }
+    console.log(config)
+    new Chart(ctx, config);
+</script>

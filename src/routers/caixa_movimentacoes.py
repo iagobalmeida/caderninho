@@ -22,13 +22,14 @@ async def get_caixa_movimentacoes_index(request: fastapi.Request, page: int = fa
 
 
 @router.post('/', include_in_schema=False)
-async def post_caixa_movimentacoes_index(request: fastapi.Request, payload: inputs.VendaCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+async def post_caixa_movimentacoes_index(request: fastapi.Request, payload: inputs.CaixaMovimentacaoCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
     await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.CAIXA_MOVIMENTACAO, values={
         'descricao': payload.descricao,
+        'tipo': payload.tipo.upper(),
         'valor': payload.valor
     })
-    return redirect_back(request, message='CaixaMovimentacao criada com sucesso!')
+    return redirect_back(request, message='Movimentação de caixa criada com sucesso!')
 
 
 @router.post('/excluir', include_in_schema=False)
@@ -60,7 +61,7 @@ async def post_caixa_movimentacoes_marcar_pendente(request: fastapi.Request, sel
 
 
 @router.post('/atualizar', include_in_schema=False)
-async def post_caixa_movimentacoes_atualizar(request: fastapi.Request, payload: inputs.VendaAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+async def post_caixa_movimentacoes_atualizar(request: fastapi.Request, payload: inputs.CaixaMovimentacaoAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
     await repository.update(
         auth_session=auth_session,

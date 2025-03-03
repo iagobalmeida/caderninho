@@ -82,7 +82,7 @@ class Context(TypedDict):
             current_path += f"{b}/"
             breadcrumbs.append(
                 Context.Breadcrumb(
-                    label=b,
+                    label=' '.join(b.split('_')),
                     url=f'{base_url}/{current_path}' if steps else None
                 )
             )

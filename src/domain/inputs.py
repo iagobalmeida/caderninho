@@ -45,12 +45,13 @@ class InsumoAtualizar(InsumoCriar):
     id: int
 
 
-class VendaCriar(BaseModel):
+class CaixaMovimentacaoCriar(BaseModel):
     descricao: str
     valor: float
+    tipo: str
 
 
-class VendaAtualizar(VendaCriar):
+class CaixaMovimentacaoAtualizar(CaixaMovimentacaoCriar):
     id: int
     descricao: str
     valor: float

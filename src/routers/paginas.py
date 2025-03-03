@@ -1,3 +1,5 @@
+import itertools
+from datetime import datetime
 from pathlib import Path
 
 import fastapi
@@ -8,6 +10,7 @@ from src.db import DBSESSAO_DEP
 from src.domain import repository
 from src.schemas.docs import SOBRE_ESSA_PAGINA
 from src.templates import render
+from src.templates.chatjs import chart_fluxo_caixa_config
 from src.templates.context import Context
 
 router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
@@ -36,6 +39,19 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
             pix_qr_code = await repository.get_caixa_movimentacoes_qr_code(auth_session=auth_session, db_session=session, venda_id=db_ultima_venda.id)
             pix_mensagem = f'Use este QR Code para cobrar R$ {db_ultima_venda.valor} referente a <b>{db_ultima_venda.descricao}</b>.'
 
+    chart_datasets = await repository.get_chart_fluxo_caixa_datasets(auth_session=auth_session, db_session=session)
+    margem = [c[3] for c in chart_datasets]
+    chart_config = chart_fluxo_caixa_config(
+        data={
+            'Entradas': [c[1] for c in chart_datasets],
+            'Saídas': [c[2] for c in chart_datasets],
+            'Margem': [c[3] for c in chart_datasets],
+            'Margem Final': list(map(abs, itertools.accumulate(margem)))
+        },
+        labels=[datetime.strptime(cd[0], '%Y-%m-%d').strftime('%d/%m/%Y') for cd in chart_datasets],
+        types=['bar', 'bar', 'line', 'line']
+    )
+
     return await render(request, 'home.html', session, context={
         'len_receitas': db_receitas,
         'len_insumos': db_insumos,
@@ -43,7 +59,8 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
         'vendas': db_vendas,
         'pix_qr_code': pix_qr_code,
         'pix_mensagem': pix_mensagem,
-        'pix_venda': pix_venda
+        'pix_venda': pix_venda,
+        'chart_config': chart_config
     })
 
 

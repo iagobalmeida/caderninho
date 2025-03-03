@@ -253,25 +253,38 @@ class CaixaMovimentacao(RegistroOrganizacao, table=True):
         return [
             'Data',
             'Descrição',
+            'Tipo',
             'Valor',
             'Recebido',
         ]
 
     @property
     def row(self):
-        col_data_criacao = filters.templates_filter_strftime(self.data_criacao)
-        col_valor = filters.templates_filter_format_reais(self.valor)
+        try:
+            col_data_criacao = filters.templates_filter_strftime(self.data_criacao)
+            col_valor = filters.templates_filter_format_reais(self.valor)
+            col_tipo = f'<code>{self.tipo.value}</code>'
+            if self.tipo == CaixMovimentacaoTipo.ENTRADA:
+                col_valor = filters.status_html('status-success', col_valor, 'arrow_upward')
+            elif self.tipo == CaixMovimentacaoTipo.SAIDA:
+                col_valor = filters.status_html('status-danger', col_valor, 'arrow_downward')
+            else:
+                col_valor = filters.status_html('status-secondary', col_valor, 'more_horiz')
 
-        col_recebido = filters.templates_global_material_symbol('more_horiz', 'text-secondary')
-        if self.recebido:
-            col_recebido = filters.templates_global_material_symbol('check', 'text-success')
+            col_recebido = filters.templates_global_material_symbol('more_horiz', 'text-secondary')
+            if self.recebido:
+                col_recebido = filters.templates_global_material_symbol('check', 'text-success')
 
-        return [
-            col_data_criacao,
-            self.descricao,
-            col_valor,
-            col_recebido
-        ]
+            return [
+                col_data_criacao,
+                self.descricao,
+                col_tipo,
+                col_valor,
+                col_recebido
+            ]
+        except Exception as ex:
+            logger.exception(ex)
+            return []
 
     def data_bs_payload(self) -> dict:
         base_dict = self.model_dump()

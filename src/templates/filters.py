@@ -29,7 +29,7 @@ def templates_global_material_symbol(icon_name: str, classnames: str = None):
     return f'''<span class="material-symbols-outlined me-1 {classnames}">{icon_name}</span>'''
 
 
-def __status_html(classname: str, content: str, material_symbol: str = None):
+def status_html(classname: str, content: str, material_symbol: str = None):
     material_symbol_html = f'<span class="material-symbols-outlined"> {material_symbol} </span>' if material_symbol else ''
     return f'''
         <div class="status {classname}">
@@ -50,7 +50,7 @@ def templates_filter_format_stock(input: float, converter_kg: bool = False, conv
         classname = 'status-secondary'
     input, unity = __unit_converter(input, unity, converter_kg, converter_kg_sempre)
 
-    return __status_html(classname, f'{input} {unity}.', material_symbol)
+    return status_html(classname, f'{input} {unity}.', material_symbol)
 
 
 def templates_filter_format_stock_movement(input: float):
@@ -59,7 +59,7 @@ def templates_filter_format_stock_movement(input: float):
 
 def templates_filter_format_quantity(input: float, converter_kg: bool = False, converter_kg_sempre: bool = False, unity: str = 'g'):
     input, unity = __unit_converter(input, unity, converter_kg, converter_kg_sempre)
-    return __status_html('status-primary', f'{input} {unity}.')
+    return status_html('status-primary', f'{input} {unity}.')
 
 
 def templates_filter_format_reais(input: float):

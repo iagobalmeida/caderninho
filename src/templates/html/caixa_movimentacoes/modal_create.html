@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalCreateVenda" tabindex="-1">
+<div class="modal fade" id="modalCreateCaixaMovimentacao" tabindex="-1">
     <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_caixa_movimentacoes_index') }}">
           <div class="modal-content">
               <div class="modal-header">
@@ -6,7 +6,7 @@
                       <span class="material-symbols-outlined">
                         payments
                       </span>
-                      Nova CaixaMovimentacao
+                      Nova Movimentacao
                   </h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
@@ -16,17 +16,50 @@
                     <input required type="text" class="form-control" name="descricao"/>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label required" for="tipo">Tipo</label>
+                    <select class="form-select" name="tipo">
+                        <option value="Entrada">Entrada</option>
+                        <option value="Saida">Saída</option>
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label class="form-label required" for="valor">Valor</label>
-                    <div class="input-group input-group-flat">
-                        <span class="input-group-text"> R$ </span>
-                        <input name="valor" required type="number" step="any" class="form-control text-end" min="1" />
+                    <div class="input-group input-group-flat" id="valor">
+                        <span class="input-group-text border-success text-success"> + R$ </span>
+                        <input name="valor" required type="number" step="any" class="form-control text-end border-success" min="1" />
                     </div>
                 </div>
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn me-auto" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="submit" class="btn btn-success">Criar CaixaMovimentacao</button>
+                  <button type="submit" class="btn btn-success">Criar Movimentacao</button>
               </div>
           </div>
     </form>
 </div>
+
+<script>
+    const modalCreateCaixaMovimentacaoInputValorSpan = document.querySelector('#modalCreateCaixaMovimentacao .input-group#valor span');
+    const modalCreateCaixaMovimentacaoInputValorInput = document.querySelector('#modalCreateCaixaMovimentacao .input-group#valor input');
+    document.querySelector('#modalCreateCaixaMovimentacao select[name="tipo"]').addEventListener('change', (e) => {
+        if(e.target.value == 'Entrada') {
+            modalCreateCaixaMovimentacaoInputValorSpan.innerHTML = '+ R$'
+            modalCreateCaixaMovimentacaoInputValorSpan.classList.remove('border-danger')
+            modalCreateCaixaMovimentacaoInputValorSpan.classList.add('border-success')
+            modalCreateCaixaMovimentacaoInputValorSpan.classList.remove('text-danger')
+            modalCreateCaixaMovimentacaoInputValorSpan.classList.add('text-success')
+
+            modalCreateCaixaMovimentacaoInputValorInput.classList.remove('border-danger')
+            modalCreateCaixaMovimentacaoInputValorInput.classList.add('border-success')
+        } else {
+            modalCreateCaixaMovimentacaoInputValorSpan.innerHTML = '- R$'
+            modalCreateCaixaMovimentacaoInputValorSpan.classList.remove('border-success')
+            modalCreateCaixaMovimentacaoInputValorSpan.classList.add('border-danger')
+            modalCreateCaixaMovimentacaoInputValorSpan.classList.remove('text-success')
+            modalCreateCaixaMovimentacaoInputValorSpan.classList.add('text-danger')
+
+            modalCreateCaixaMovimentacaoInputValorInput.classList.remove('border-success')
+            modalCreateCaixaMovimentacaoInputValorInput.classList.add('border-danger')
+        }
+    });
+</script>

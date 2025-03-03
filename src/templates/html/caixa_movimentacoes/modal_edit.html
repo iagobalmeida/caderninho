@@ -1,10 +1,10 @@
-<div class="modal fade" id="modalEditVenda" tabindex="-1">
+<div class="modal fade" id="modalEditCaixaMovimentacao" tabindex="-1">
     <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_caixa_movimentacoes_atualizar') }}">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title ">
             <span class="material-symbols-outlined"> payments </span>
-            Editar CaixaMovimentacao
+            Editar Movimentação
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -17,6 +17,13 @@
           <div class="mb-3">
             <label class="form-label required" for="descricao">Descricao</label>
             <input required type="text" class="form-control" name="descricao" />
+          </div>
+          <div class="mb-3">
+              <label class="form-label required" for="tipo">Tipo</label>
+              <select class="form-select" name="tipo">
+                  <option value="Entrada">Entrada</option>
+                  <option value="Saida">Saída</option>
+              </select>
           </div>
           <div class="mb-3">
             <label class="form-label required" for="valor">Valor</label>
