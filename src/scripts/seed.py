@@ -69,7 +69,7 @@ async def main():
             gasto_valor=2
         ))
 
-        for _ in range(30):
+        for _ in range(60):
             data_criacao = datetime.now().replace(day=randint(1, 24), month=randint(1, 12))
             if randint(1, 3) >= 2:
                 quantidade = randint(-200, -1)

@@ -8,8 +8,8 @@
 {% if pix_qr_code or pix_mensagem %}
     <div class="col-12 col-lg-4">
         <div class="card">
-            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#card_pix">
-                <h5 class="card-title cursor-pointer">
+            <div class="card-header cursor-pointer" data-bs-toggle="collapse" data-bs-target="#card_pix">
+                <h5 class="card-title">
                     {{ material_symbol('qr_code') | safe }}
                     QR PIX da última venda
                     {% if pix_qr_code %}

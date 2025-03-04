@@ -10,7 +10,7 @@ from src.db import DBSESSAO_DEP
 from src.domain import repository
 from src.schemas.docs import SOBRE_ESSA_PAGINA
 from src.templates import render
-from src.templates.chatjs import chart_fluxo_caixa_config
+from src.templates.chartjs import chart_fluxo_caixa_config
 from src.templates.context import Context
 
 router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
@@ -48,8 +48,7 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
             'Margem': [c[3] for c in chart_datasets],
             'Margem Final': list(map(abs, itertools.accumulate(margem)))
         },
-        labels=[datetime.strptime(cd[0], '%Y-%m-%d').strftime('%d/%m/%Y') for cd in chart_datasets],
-        types=['bar', 'bar', 'line', 'line']
+        labels=[datetime.strptime(cd[0], '%Y-%m-%d').strftime('%d/%m/%Y') for cd in chart_datasets]
     )
 
     return await render(request, 'home.html', session, context={
@@ -60,7 +59,7 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
         'pix_qr_code': pix_qr_code,
         'pix_mensagem': pix_mensagem,
         'pix_venda': pix_venda,
-        'chart_config': chart_config
+        'chart_resumo_caixa_config': chart_config
     })
 
 

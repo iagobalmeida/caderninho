@@ -26,8 +26,6 @@ async_session_maker = sessionmaker(
     expire_on_commit=False,
 )
 
-SessionLocal = Session(engine)
-
 
 @asynccontextmanager
 async def init_session():

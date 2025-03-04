@@ -1,24 +1,31 @@
-
-<div class="col-12">
-    <div class="card">
-        <div class="card-body">
-            <canvas id="myChart" width="400" height="300"></canvas>
+{% if chart_resumo_caixa_config %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header cursor-pointer" data-bs-toggle="collapse" data-bs-target="#collapseChartResumoCaixa">
+                <h5 class="card-title">
+                    {{ material_symbol('monitoring') | safe }}
+                    Gráfico Fluxo de Caixa
+                    <small class="text-secondary ms-auto">Clique para expandir/fechar</small>
+                </h5>
+            </div>
+            <div class="card-body collapse show" id="collapseChartResumoCaixa">
+                <canvas id="myChart" width="400" height="300"></canvas>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    const ctx = document.getElementById('myChart').getContext('2d');
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
 
-    const config = {{chart_config | json | safe}}
+        const config = {{chart_resumo_caixa_config | json | safe}}
 
-    if(!config['options']['scales']) config['options']['scales'] = {'y': {}}
+        if(!config['options']['scales']) config['options']['scales'] = {'y': {}}
 
-    config['options']['scales']['y']['ticks'] = {
-        callback: function(value, index, ticks) {
-            return 'R$ ' + value;
+        config['options']['scales']['y']['ticks'] = {
+            callback: function(value, index, ticks) {
+                return 'R$ ' + value;
+            }
         }
-    }
-    console.log(config)
-    new Chart(ctx, config);
-</script>
+        new Chart(ctx, config);
+    </script>
+{% endif %}
