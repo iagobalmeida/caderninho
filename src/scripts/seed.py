@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import choice, randint
 
 from loguru import logger
@@ -8,6 +8,10 @@ from src import db
 from src.domain.entities import (CaixaMovimentacao, Estoque, Insumo, Receita,
                                  ReceitaGasto)
 from src.tests import mocks
+
+
+def __random_date(starting_off: datetime = datetime.now(), range: int = 30):
+    return starting_off + timedelta(days=randint(range*-1, range))
 
 
 async def try_add(session, obj):
@@ -45,6 +49,7 @@ async def main():
             await try_add(session, ReceitaGasto(organizacao_id=organizacao.id, quantidade=100, receita_id=cookies.id, insumo_id=__insumo.id))
             estoque_quantidade = randint(-100, 100)
             await try_add(session, Estoque(
+                data_criacao=__random_date(),
                 organizacao_id=organizacao.id,
                 descricao='Compra' if estoque_quantidade > 0 else f'Uso em receita ({cookies.nome})',
                 insumo_id=__insumo.id,
@@ -70,7 +75,7 @@ async def main():
         ))
 
         for _ in range(60):
-            data_criacao = datetime.now().replace(day=randint(1, 24), month=randint(1, 12))
+            data_criacao = __random_date()
             if randint(1, 3) >= 2:
                 quantidade = randint(-200, -1)
                 insumo = choice(insumos)

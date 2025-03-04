@@ -20,7 +20,8 @@ context_header = Context.Header(
 @router.get('/', include_in_schema=False)
 async def get_organizacao_index(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    context_header['title'] = auth_session.organizacao_descricao
+    if auth_session.organizacao_descricao:
+        context_header['title'] = auth_session.organizacao_descricao
 
     db_usuarios, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO)
     db_organizacao, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)

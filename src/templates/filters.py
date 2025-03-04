@@ -25,6 +25,10 @@ def templates_filter_strftime(input: datetime):
     return input.strftime('%d/%m/%Y ás %H:%M')
 
 
+def templates_filter_strftime_day(input: datetime):
+    return input.strftime('%d/%m/%Y')
+
+
 def templates_global_material_symbol(icon_name: str, classnames: str = None):
     return f'''<span class="material-symbols-outlined me-1 {classnames}">{icon_name}</span>'''
 
@@ -59,7 +63,9 @@ def templates_filter_format_stock_movement(input: float):
 
 def templates_filter_format_quantity(input: float, converter_kg: bool = False, converter_kg_sempre: bool = False, unity: str = 'g'):
     input, unity = __unit_converter(input, unity, converter_kg, converter_kg_sempre)
-    return status_html('status-primary', f'{input} {unity}.')
+    status = 'status-danger' if input < 0 else 'status-success' if input > 0 else 'status-secondary'
+    symbol = 'arrow_downward' if input < 0 else 'arrow_upward' if input > 0 else 'more_horiz'
+    return status_html(status, f'{abs(input)} {unity}.', symbol)
 
 
 def templates_filter_format_reais(input: float):
@@ -95,6 +101,7 @@ def templates_filter_format_log(input: str):
 
 BASE_FILTERS = [
     ('strftime', templates_filter_strftime),
+    ('strftime_day', templates_filter_strftime_day),
     ('format_stock', templates_filter_format_stock),
     ('format_stock_movement', templates_filter_format_stock_movement),
     ('format_quantity', templates_filter_format_quantity),

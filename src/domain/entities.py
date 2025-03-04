@@ -218,7 +218,8 @@ class Estoque(RegistroOrganizacao, table=True):
         converter_kg_sempre = self.organizacao.configuracoes.get('converter_kg_sempre', False)
 
         col_valor_pago = filters.templates_filter_format_reais(self.valor_pago)
-        col_valor_pago = filters.status_html('status-danger', col_valor_pago, 'arrow_downward')
+        if self.valor_pago:
+            col_valor_pago = filters.status_html('status-danger', col_valor_pago, 'arrow_downward')
 
         col_insumo = '-'
         if self.insumo:

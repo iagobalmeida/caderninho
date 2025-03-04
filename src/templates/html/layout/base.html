@@ -46,6 +46,58 @@
     {% block layout %}
     {% endblock %}
     <script src="{{ url_for('static', path='/scripts.js') }}" defer></script>
+    <div class="modal fade" id="modalBaixarApp" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-primary border-white">
+                <div class="modal-header text-white">
+                    <h5 class="modal-title ">
+                        <span class="material-symbols-outlined">
+                            celebration
+                        </span>
+                        Seu dispositivo é compatível com o App!
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-white">
+                    <p>Seu dispositivo é compátivel com o App do KDerninho, basta clicar no botão abaixo para instalar</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Outra hora</button>
+                    <button id="installPWA" type="submit" class="btn btn-primary">
+                        <span class="material-symbols-outlined me-2">
+                            download
+                        </span>
+                        Instalar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+      let deferredPrompt;
+      window.addEventListener("beforeinstallprompt", (event) => {
+          let installModalIgnorado = parseInt(localStorage.getItem('installModalIgnorado')) || 0;
+          event.preventDefault();
+          deferredPrompt = event;
+          const modalDom = document.getElementById('modalBaixarApp')
+          modalDom.addEventListener('hidden.bs.modal', function () {
+              localStorage.setItem('installModalIgnorado', installModalIgnorado+1);
+          });
+          const modal = new bootstrap.Modal(modalDom);
+          if(installModalIgnorado < 3) {
+              modal.show();
+          }
+          document.querySelectorAll('[data-bs-intall-app]').forEach((el) => {
+              el.addEventListener('click', async () => {
+                  if (deferredPrompt) {
+                      deferredPrompt.prompt(); // Mostra o prompt de instalação
+                      const { outcome } = await deferredPrompt.userChoice;
+                      deferredPrompt = null; // Reseta o evento
+                  }
+              });
+          });
+      });
+    </script>
     {% block script %}
     {% endblock %}
   </div>

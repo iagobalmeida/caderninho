@@ -20,7 +20,7 @@
           </div>
           <div class="mb-3">
               <label class="form-label required" for="tipo">Tipo</label>
-              <select class="form-select" name="tipo">
+              <select class="form-select" name="tipo" readonly>
                   <option value="Entrada">Entrada</option>
                   <option value="Saida">Saída</option>
               </select>
@@ -32,14 +32,14 @@
               <input name="valor" required type="number" step="any" class="form-control text-end" min="1" />
             </div>
           </div>
-          <div class="mb-3">
+          <div class="mb-3 d-none" id="wrapperConfiguracoes">
             <div class="form-label">Configurações</div>
             <label class="form-check form-switch">
               <input name="recebido" class="form-check-input" type="checkbox" >
               <span class="form-check-label">Pagamento Recebido</span>
             </label>
           </div>
-          <div>
+          <div class="d-none" id="wrapperQRPix">
             <div class="form-label">Receber Pagamento via QR PIX</div>
             <img class="d-flex mx-auto" id="img_qr_code" src="" alt="QR Code" style="max-height: 300px" class="mt-3 rounded">
           </div>
@@ -50,3 +50,23 @@
       </div>
     </form>
   </div>
+
+<script>
+  document.querySelector('#modalEditCaixaMovimentacao').addEventListener('show.bs.modal', (e) => {
+    const modal = e.target;
+    const wrapperConfiguracoes = modal.querySelector('#wrapperConfiguracoes');
+    const wrapperQRPix = modal.querySelector('#wrapperQRPix');
+    wrapperConfiguracoes.classList.add('d-none');
+    wrapperQRPix.classList.add('d-none');
+  });
+  document.querySelector('#modalEditCaixaMovimentacao').addEventListener('shown.bs.modal', (e) => {
+    const modal = e.target;
+    const wrapperConfiguracoes = modal.querySelector('#wrapperConfiguracoes');
+    const wrapperQRPix = modal.querySelector('#wrapperQRPix')
+    const tipo = modal.querySelector('select[name="tipo"]').value;
+    if(tipo == 'Entrada') {
+      wrapperConfiguracoes.classList.remove('d-none');
+      wrapperQRPix.classList.remove('d-none');
+    }
+  });
+</script>

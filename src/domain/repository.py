@@ -192,8 +192,12 @@ async def get_fluxo_caixa(auth_session: AuthSession, db_session: AsyncSession) -
     return (entradas, saidas, caixa)
 
 
-async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: AsyncSession) -> dict:
-    result = {}
+async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: AsyncSession, data_inicial: datetime, data_final: datetime) -> dict:
+    dates = [(data_inicial + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((data_final - data_inicial).days + 1)]
+    results = [
+        [data, 0, 0, 0] for data in dates
+    ]
+
     query_caixa_movimentacao = text(f'''
         SELECT
             date(caixamovimentacao.data_criacao) AS dia,
@@ -203,13 +207,17 @@ async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: 
         FROM caixamovimentacao
         WHERE
             caixamovimentacao.organizacao_id = {auth_session.organizacao_id}
-        GROUP BY
-            date(caixamovimentacao.data_criacao)
-        LIMIT 25
+            AND caixamovimentacao.data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
+            AND caixamovimentacao.data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
+        GROUP BY date(caixamovimentacao.data_criacao)
+        ORDER BY dia ASC
+
     ''')
     result_caixa_movimentacao = (await db_session.exec(query_caixa_movimentacao)).all()
-    for r in result_caixa_movimentacao:
-        result[r[0]] = [r[0], r[1], r[2], r[3]]
+    for __row in result_caixa_movimentacao:
+        __row_index = dates.index(__row[0])
+        for __col in range(len(__row) - 1):
+            results[__row_index][__col+1] += __row[__col+1]
 
     query_estoque = text(f'''
         SELECT
@@ -219,16 +227,16 @@ async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: 
             -1 * sum(estoque.valor_pago) AS margem
         FROM estoque
         WHERE
-            estoque.organizacao_id = {auth_session.organizacao_id} GROUP BY date(estoque.data_criacao)
-        LIMIT 25
+            estoque.organizacao_id = {auth_session.organizacao_id}
+            AND estoque.data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
+            AND estoque.data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
+        GROUP BY date(estoque.data_criacao)
+        ORDER BY dia ASC
     ''')
     result_estoque = (await db_session.exec(query_estoque)).all()
-    for r in result_estoque:
-        if not r[0] in result:
-            result[r[0]] = [r[0], r[1], r[2], r[3]]
-        else:
-            result[r[0]][1] += r[1]
-            result[r[0]][2] += r[2]
-            result[r[0]][3] += r[3]
+    for __row in result_estoque:
+        __row_index = dates.index(__row[0])
+        for __col in range(len(__row) - 1):
+            results[__row_index][__col+1] += __row[__col+1]
 
-    return [v for v in result.values()]
+    return results

@@ -4,6 +4,7 @@ from typing import List
 
 import fastapi
 import fastapi.security
+from loguru import logger
 from sqlmodel import Session
 
 from src.domain import repository
@@ -13,7 +14,9 @@ from src.utils import redirect_back
 
 ENTITY_SYMBOLS = {
     'Estoque': 'inventory_2',
-    'Insumo': 'package_2'
+    'Insumo': 'package_2',
+    'Receita': 'library_books',
+    'CaixaMovimentacao': 'payments'
 }
 
 
@@ -44,6 +47,8 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
     table_no_result = 'Nenhum registro encontrado'
 
     delete_url = str(request.url_for(f'post_{title}_excluir'))
+
+    logger.info(entity.value.__name__)
 
     context_header = Context.Header(
         pretitle='Registros',

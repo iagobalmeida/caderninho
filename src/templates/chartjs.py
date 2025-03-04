@@ -4,7 +4,7 @@ DEFAULT_COLORS = [
     [47, 179, 68],
     [214, 57, 57],
     [56, 161, 255],
-    [162, 162, 235],
+    [174, 62, 201],
 ]
 
 
@@ -19,7 +19,7 @@ def chart_fluxo_caixa_config(
     for d in data:
         dataset_index = len(datasets)
         type = types[dataset_index] if types else 'bar'
-        background_color = f'rgba({", ".join(colors[dataset_index])}, {"1" if type == "bar" else "0.15"})'
+        background_color = f'rgba({", ".join(colors[dataset_index])}, {"0.75" if type == "bar" else "0.15"})'
         border_color = f'rgba({", ".join(colors[dataset_index])}, 1)'
         dataset = {
             'label': d,

@@ -247,7 +247,7 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`
 - [X] Campo `custo fixo` em receita
 - [X] Campo `porc. tributária` em receita
-- [X] Modal para cadastro de `Gasto`
+- [ ] Separar modal `Insumo` e `Gasto` em receita
 - [X] Tabela `Caixa` vira `Fluxo de Caixa` e aceita `Entrada` e `Saída`
   - [X] Campo `recebido`
   - [ ] Campo `produzido`
