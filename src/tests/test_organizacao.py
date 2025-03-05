@@ -80,7 +80,7 @@ async def test_post_organizacao_usuarios_criar(client):
     assert response.status_code == 200
 
     soup = await __get_organizacao(client)
-    dom_table = soup.find('table')
+    dom_table = soup.find('table', {'id': 'table_usuarios'})
     dom_table_trs = dom_table.find_all('tr', {'data-bs-payload': True})
     usuarios_nomes = [
         json.loads(tr.get('data-bs-payload'))['nome']

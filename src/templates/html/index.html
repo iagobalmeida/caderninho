@@ -4,7 +4,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold text-primary" href="#">
-                <svg width="1012" height="307" viewBox="0 0 1012 307" fill="none" xmlns="http://www.w3.org/2000/svg" class="navbar-brand-image">
+                <svg width="1012" height="307" viewBox="0 0 1012 307" fill="none" xmlns="http://www.w3.org/2000/svg" class="navbar-brand-image text-primary">
                   <mask id="mask0_53_20" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="438" height="307">
                   <rect width="437.492" height="306.704" fill="currentColor"/>
                   </mask>
@@ -125,7 +125,7 @@
                                 <li class="list-group-item"><b>5</b> Receitas</li>
                                 <li class="list-group-item"><b>40</b> Insumos</li>
                                 <li class="list-group-item">
-                                    Até <b>1.000</b> Vendas/mês
+                                    Até <b>1.000</b> Caixa/mês
                                     <i class="text-danger">*</i>
                                 </li>
                                 <li class="list-group-item">
@@ -161,14 +161,14 @@
                                 <li class="list-group-item"><b>50</b> Receitas</li>
                                 <li class="list-group-item"><b>400</b> Insumos</li>
                                 <li class="list-group-item">
-                                    Até <b>20.000</b> Vendas/mês
+                                    Até <b>20.000</b> Caixa/mês
                                     <i class="text-danger">*</i>
                                 </li>
                                 <li class="list-group-item">
                                     Até <b>20.000</b> Movimentações/mês
                                     <i class="text-danger">*</i>
                                 </li>
-                                <li class="list-group-item bg-primary text-primary" style="--tblr-bg-opacity: .07;">Exportação de <b>Vendas</b> e <b>Movimentações</b></li>
+                                <li class="list-group-item bg-primary text-primary" style="--tblr-bg-opacity: .07;">Exportação de <b>Caixa</b> e <b>Movimentações</b></li>
                             </ul>
                             <p class="card-text text-muted">
                                 <i>* São mantidos por <b>4 meses</b>.</i>
@@ -197,7 +197,7 @@
                                 <li class="list-group-item bg-success text-success" style="--tblr-bg-opacity: .07;">Receitas <b>Ilimitadas</b></li>
                                 <li class="list-group-item bg-success text-success" style="--tblr-bg-opacity: .07;">Insumos <b>Ilimitados</b></li>
                                 <li class="list-group-item">
-                                    Até <b>150.000</b> Vendas/mês
+                                    Até <b>150.000</b> Caixa/mês
                                     <i class="text-danger">*</i>
                                 </li>
                                 <li class="list-group-item">
@@ -240,60 +240,29 @@
 
     <div class="modal fade" id="modalBaixarApp" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
+            <div class="modal-content bg-primary border-white">
+                <div class="modal-header text-white">
                     <h5 class="modal-title ">
                         <span class="material-symbols-outlined">
-                            download
+                            celebration
                         </span>
                         Seu dispositivo é compatível com o App!
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body text-white">
                     <p>Seu dispositivo é compátivel com o App do KDerninho, basta clicar no botão abaixo para instalar</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn me-auto" data-bs-dismiss="modal">Outra hora</button>
-                    <button id="installPWA" type="submit" class="btn btn-primary">Instalar</button>
+                    <button id="installPWA" type="submit" class="btn btn-primary">
+                        <span class="material-symbols-outlined me-2">
+                            download
+                        </span>
+                        Instalar
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block script %}
-<script>
-let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt", (event) => {
-    let installModalIgnorado = Boolean(localStorage.getItem('installModalIgnorado'));
-    event.preventDefault();
-    deferredPrompt = event;
-
-    const modalDom = document.getElementById('modalBaixarApp')
-
-    modalDom.addEventListener('hidden.bs.modal', function () {
-        localStorage.setItem('installModalIgnorado', true);
-    });
-
-
-    const modal = new bootstrap.Modal(modalDom);
-
-    if(!installModalIgnorado) {
-        modal.show();
-    }
-
-    document.querySelectorAll('[data-bs-intall-app]').forEach((el) => {
-        el.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt(); // Mostra o prompt de instalação
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null; // Reseta o evento
-            }
-        });
-    });
-});
-
-</script>
 {% endblock %}

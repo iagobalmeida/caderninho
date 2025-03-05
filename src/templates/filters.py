@@ -1,11 +1,9 @@
-import asyncio
 import json
 import re
 from datetime import datetime
 from typing import List, Tuple
 
 from fastapi.templating import Jinja2Templates
-from jinja2 import pass_context
 
 
 def __unit_converter(input: float, unity: str = 'g', converter_kg: bool = False, converter_kg_sempre: bool = False):
@@ -22,14 +20,22 @@ def templates_filter_markdown(input: str):
 
 
 def templates_filter_strftime(input: datetime):
-    return input.strftime('%d/%m/%Y ás %H:%M')
+    return input.strftime('%d/%m/%Y ás %H:%M:%S')
+
+
+def templates_filter_strftime_day(input: datetime):
+    return input.strftime('%d/%m/%Y')
+
+
+def templates_filter_strftime_input(input: datetime):
+    return input.strftime('%Y-%m-%d')
 
 
 def templates_global_material_symbol(icon_name: str, classnames: str = None):
     return f'''<span class="material-symbols-outlined me-1 {classnames}">{icon_name}</span>'''
 
 
-def __status_html(classname: str, content: str, material_symbol: str = None):
+def status_html(classname: str, content: str, material_symbol: str = None):
     material_symbol_html = f'<span class="material-symbols-outlined"> {material_symbol} </span>' if material_symbol else ''
     return f'''
         <div class="status {classname}">
@@ -50,7 +56,7 @@ def templates_filter_format_stock(input: float, converter_kg: bool = False, conv
         classname = 'status-secondary'
     input, unity = __unit_converter(input, unity, converter_kg, converter_kg_sempre)
 
-    return __status_html(classname, f'{input} {unity}.', material_symbol)
+    return status_html(classname, f'{input} {unity}.', material_symbol)
 
 
 def templates_filter_format_stock_movement(input: float):
@@ -59,7 +65,9 @@ def templates_filter_format_stock_movement(input: float):
 
 def templates_filter_format_quantity(input: float, converter_kg: bool = False, converter_kg_sempre: bool = False, unity: str = 'g'):
     input, unity = __unit_converter(input, unity, converter_kg, converter_kg_sempre)
-    return __status_html('status-primary', f'{input} {unity}.')
+    status = 'status-danger' if input < 0 else 'status-success' if input > 0 else 'status-secondary'
+    symbol = 'arrow_downward' if input < 0 else 'arrow_upward' if input > 0 else 'more_horiz'
+    return status_html(status, f'{abs(input)} {unity}.', symbol)
 
 
 def templates_filter_format_reais(input: float):
@@ -93,8 +101,15 @@ def templates_filter_format_log(input: str):
         return result
 
 
+def templates_filter_len(input: list):
+    return len(input)
+
+
 BASE_FILTERS = [
+    ('len', templates_filter_len),
     ('strftime', templates_filter_strftime),
+    ('strftime_day', templates_filter_strftime_day),
+    ('strftime_input', templates_filter_strftime_input),
     ('format_stock', templates_filter_format_stock),
     ('format_stock_movement', templates_filter_format_stock_movement),
     ('format_quantity', templates_filter_format_quantity),

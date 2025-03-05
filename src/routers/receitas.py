@@ -46,7 +46,7 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
     auth_session = getattr(request.state, 'auth', None)
     db_receita, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': id}, first=True)
     if not db_receita:
-        raise ValueError(f'Receita com id {id} não encontrada')
+        return redirect_url_for(request, 'get_receitas_index', error=f'Receita #{id} não encontrada')
     context_header = Context.Header(
         pretitle='Registros',
         title='Receitas',
@@ -54,16 +54,27 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
         buttons=[]
     )
 
-    table_columns = [
+    gastos = db_receita.gastos
+
+    insumos_table_columns = [
         'Nome',
         'Quantidade (g)',
         'Custo/grama (R$)',
         'Custo Total (R$)',
         'Estoque Atual'
     ]
-    table_data = db_receita.insumo_links
-    table_no_result = 'Nenhum registro encontrado'
-    table_modal = '#atualizarReceitaInsumoModal'
+    insumos_table_data = [gasto for gasto in gastos if gasto.insumo_id]
+    insumos_table_no_result = 'Nenhum registro encontrado'
+    insumos_table_modal = '#atualizarReceitaInsumoModal'
+
+    custos_table_columns = [
+        'Descrição',
+        'Tipo',
+        'Valor'
+    ]
+    custos_table_data = [gasto for gasto in gastos if gasto.gasto_tipo]
+    custos_table_no_result = 'Nenhum registro encontrado'
+    custos_table_modal = '#atualizarReceitaGastoModal'
 
     return await render(
         session=session,
@@ -72,10 +83,14 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
         context={
             'header': context_header,
             'receita': db_receita,
-            'table_columns': table_columns,
-            'table_data': table_data,
-            'table_no_result': table_no_result,
-            'table_modal': table_modal
+            'insumos_table_columns': insumos_table_columns,
+            'insumos_table_data': insumos_table_data,
+            'insumos_table_no_result': insumos_table_no_result,
+            'insumos_table_modal': insumos_table_modal,
+            'custos_table_columns': custos_table_columns,
+            'custos_table_data': custos_table_data,
+            'custos_table_no_result': custos_table_no_result,
+            'custos_table_modal': custos_table_modal
         }
     )
 
@@ -101,32 +116,39 @@ async def post_receita_atualizar(request: fastapi.Request, payload: inputs.Recei
 
 @router.post('/excluir', include_in_schema=False)
 async def post_receita_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    return await delete_entity(
-        request=request,
-        db_session=session,
-        entity=repository.Entities.RECEITA,
-        ids=selecionados_ids.split(',')
-    )
+    try:
+        await delete_entity(
+            request=request,
+            db_session=session,
+            entity=repository.Entities.RECEITA,
+            ids=selecionados_ids.split(',')
+        )
+    except ValueError:
+        pass
+    return redirect_url_for(request, 'get_receitas_index', message='Receita excluída com sucesso!')
 
 
-@router.post('/insumos/incluir', include_in_schema=False)
-async def post_receita_insumos_incluir(request: fastapi.Request, payload: inputs.ReceitaInsumoAdicionar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+@router.post('/gastos/incluir', include_in_schema=False)
+async def post_receita_gastos_incluir(request: fastapi.Request, payload: inputs.ReceitaGastosAdicionar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_INGREDIENTE, values={
+    await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_GASTO, values={
         'receita_id': payload.receita_id,
         'insumo_id': payload.insumo_id,
+        'descricao': payload.descricao,
+        'gasto_valor': payload.gasto_valor,
+        'gasto_tipo': payload.gasto_tipo,
         'quantidade': payload.quantidade
     })
     return redirect_url_for(request, 'get_receita', id=payload.receita_id)
 
 
-@router.post('/insumos/atualizar', include_in_schema=False)
-async def post_receita_insumos_atualizar(request: fastapi.Request, payload: inputs.ReceitaInsumoAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+@router.post('/gastos/atualizar', include_in_schema=False)
+async def post_receita_gastos_atualizar(request: fastapi.Request, payload: inputs.ReceitaGastosAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
     await repository.update(
         auth_session=auth_session,
         db_session=session,
-        entity=repository.Entities.RECEITA_INGREDIENTE,
+        entity=repository.Entities.RECEITA_GASTO,
         filters={
             'id': payload.id
         },
@@ -151,10 +173,10 @@ async def post_receita_insumos_atualizar(request: fastapi.Request, payload: inpu
     return redirect_url_for(request, 'get_receita', id=payload.receita_id)
 
 
-@router.post('/insumos/remover', include_in_schema=False)
-async def post_receita_insumos_remover(request: fastapi.Request, payload: inputs.ReceitaInsumoRemover = fastapi.Form(), session: Session = DBSESSAO_DEP):
+@router.post('/gastos/remover', include_in_schema=False)
+async def post_receita_gastos_remover(request: fastapi.Request, payload: inputs.ReceitaGastosRemover = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
     if payload.selecionados_ids:
         for id in payload.selecionados_ids.split(','):
-            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_INGREDIENTE, filters={'id': id})
+            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_GASTO, filters={'id': id})
     return redirect_url_for(request, 'get_receita', id=payload.receita_id)

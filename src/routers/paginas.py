@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 import fastapi
@@ -21,9 +22,9 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     db_receitas = await repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA)
     db_insumos = await repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.INSUMO)
     db_estoques = await repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE)
-    db_vendas = await repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA)
+    db_vendas = await repository.count_all(auth_session=auth_session, db_session=session, entity=repository.Entities.CAIXA_MOVIMENTACAO)
 
-    db_ultima_venda, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.VENDA, order_by='data_criacao', desc=True, first=True)
+    db_ultima_venda, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.CAIXA_MOVIMENTACAO, order_by='data_criacao', desc=True, first=True)
     pix_qr_code = None
     pix_mensagem = 'Sem vendas para gerar QR Code.'
     pix_venda = None
@@ -31,10 +32,11 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
         pix_venda = db_ultima_venda
         if db_ultima_venda.recebido:
             pix_qr_code = None
-            pix_mensagem = 'A última venda está marcada como <kbd>Recebida</kbd>. Acesse a tela de <a href="/vendas">Vendas</a> para gerar novamente o QR Code caso necessário.'
+            pix_mensagem = 'A última venda está marcada como <kbd>Recebida</kbd>. Acesse a tela de <a href="/vendas">Caixa</a> para gerar novamente o QR Code caso necessário.'
         else:
-            pix_qr_code = await repository.get_venda_qr_code(auth_session=auth_session, db_session=session, venda_id=db_ultima_venda.id)
+            pix_qr_code = await repository.get_caixa_movimentacoes_qr_code(auth_session=auth_session, db_session=session, venda_id=db_ultima_venda.id)
             pix_mensagem = f'Use este QR Code para cobrar R$ {db_ultima_venda.valor} referente a <b>{db_ultima_venda.descricao}</b>.'
+
 
     return await render(request, 'home.html', session, context={
         'len_receitas': db_receitas,

@@ -14,7 +14,10 @@ async def authenticate(session: Session, request: Request, email: str, senha: st
     auth_session = getattr(request.state, 'auth', None)
     db_usuario, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True, ignore_validations=True)
 
-    if db_usuario.organizacao.plano_expiracao < datetime.now():
+    if not db_usuario:
+        return False
+
+    if db_usuario.organizacao and db_usuario.organizacao.plano_expiracao < datetime.now():
         await repository.update(
             auth_session=auth_session,
             db_session=session,
@@ -26,9 +29,6 @@ async def authenticate(session: Session, request: Request, email: str, senha: st
             }
         )
 
-    if not db_usuario:
-        return False
-
     senha_valida = db_usuario.verificar_senha(senha)
 
     if not senha_valida:
@@ -36,13 +36,14 @@ async def authenticate(session: Session, request: Request, email: str, senha: st
 
     sessao = AuthSession(
         **db_usuario.model_dump(),
+        organizacao_descricao=db_usuario.organizacao.descricao,
         valid=True
     )
 
     if not lembrar_de_mim:
         sessao.expires = (datetime.now()+timedelta(hours=1)).timestamp()
 
-    request.session.update(sessao_autenticada=sessao.dict())
+    request.session.update(sessao_autenticada=sessao.data_bs_payload())
     return True
 
 

@@ -37,7 +37,7 @@ async def post_insumos_index(request: fastapi.Request, payload: inputs.InsumoCri
 @router.post('/atualizar', include_in_schema=False)
 async def post_insumos_atualizar(request: fastapi.Request, payload: inputs.InsumoAtualizar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    repository.update(
+    await repository.update(
         auth_session=auth_session,
         db_session=session,
         entity=repository.Entities.INSUMO,
@@ -59,7 +59,7 @@ async def post_insumo_excluir(request: fastapi.Request, selecionados_ids: str = 
     selecionados_ids = selecionados_ids.split(',')
     for id in selecionados_ids:
         try:
-            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_INGREDIENTE, filters={'insumo_id': id})
+            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_GASTO, filters={'insumo_id': id})
         except ValueError:
             pass
     return await delete_entity(

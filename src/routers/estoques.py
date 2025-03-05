@@ -38,11 +38,13 @@ async def post_estoques_index(request: fastapi.Request, payload: inputs.EstoqueC
     if descricao == 'uso em receita' and payload.receita_id:
         db_receita, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': payload.receita_id}, first=True)
         descricao = f'Uso em Receita ({db_receita.nome})'
-        for insumo_link in db_receita.insumo_links:
-            quantidade = -1 * insumo_link.quantidade * float(payload.quantidade_receita)
+
+        gastos_insumos = [gasto for gasto in db_receita.gastos if gasto.insumo_id]
+        for gasto in gastos_insumos:
+            quantidade = -1 * gasto.quantidade * float(payload.quantidade_receita)
             await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ESTOQUE, values={
                 'descricao': descricao,
-                'insumo_id': insumo_link.insumo_id,
+                'insumo_id': gasto.insumo_id,
                 'quantidade': quantidade,
                 'valor_pago': 0
             })

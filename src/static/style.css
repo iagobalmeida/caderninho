@@ -1,4 +1,4 @@
-[data-bs-theme=light] {
+:host, :root, [data-bs-theme="light"] {
     --tblr-primary: #38a1ff !important;
     --tblr-primary-rgb: 56,161,255 !important;
 }
@@ -102,9 +102,16 @@ a[target="_blank"]:has(.material-symbols-outlined) {
     }
 }
 
-body.index {
-    background: linear-gradient(white, #38a1ff);
+body {
+    background: linear-gradient(transparent, #38a1ff);
     background-size: 100vw 900vh;
+    &[data-bs-theme="dark"] {
+        background: linear-gradient(#151f2c, #38a1ff);
+        background-size: 100vw 900vh;
+    }
+}
+
+body.index {
     b {
         font-weight: 700;
     }
@@ -117,4 +124,8 @@ body.index {
 
 body.modal-open {
     overflow-y: scroll !important;
+    padding-right: 0px !important;
+}
+.modal.show[role="dialog"] {
+    padding-right: 0px !important;
 }

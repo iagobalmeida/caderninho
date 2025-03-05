@@ -2,13 +2,20 @@
 
 {% include 'receitas/modal_create.html' %}
 
-{% include 'receitas/modal_insumos_incluir.html' %}
-{% include 'receitas/modal_insumos_remover.html' %}
-{% include 'receitas/modal_insumos_atualizar.html' %}
+{% include 'receitas/modal_receita_gastos_incluir.html' %}
+{% include 'receitas/modal_receita_gastos_atualizar.html' %}
+{% include 'receitas/modal_receita_insumos_incluir.html' %}
+{% include 'receitas/modal_receita_insumos_atualizar.html' %}
 
 {% include 'insumos/modal_create.html' %}
 
 {% block content %}
+<style>
+  [data-receita-metrica] {
+    cursor: pointer;
+    transition: all ease-in-out 125ms;
+  }
+</style>
 <div class="col-12">
   <div class="card">
     <div class="card-header">
@@ -16,20 +23,16 @@
         {{ material_symbol('library_books') | safe }}
         {{receita.nome}}
       </h5>
-      <div class="dropdown ms-auto">
-        <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
-        <div class="dropdown-menu">
-          <!-- <a href="#" class="dropdown-item">Exportar CSV</a> -->
-          <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteReceita">
-            {{ material_symbol('delete') | safe }}
-            Excluír
-          </a>
-        </div>
+      <div class="ms-auto">
+        <button class="btn text-danger" data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"selecionados_ids":"{{receita.id}}", "action": "{{url_for('post_receita_excluir')}}", ".text-secondary": "Apagar esta receita?"}'>
+          {{ material_symbol('delete') | safe }}
+          Excluír
+        </button>
       </div>
     </div>
     <div class="card-body">
       <form class="datagrid" method="POST" action="{{ url_for('post_receita_atualizar') }}">
-        <div class="datagrid-item">
+        <div class="datagrid-item d-none">
           <div class="datagrid-title">Código Interno</div>
           <input required readonly type="text" class="form-control" name="id" value="{{receita.id}}" />
         </div>
@@ -65,89 +68,138 @@
     </div>
   </div>
 </div>
-<div class="col-12 col-md-6">
-  <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">
-        <span class="material-symbols-outlined"> sell </span>
-        Precificação
-      </h5>
-    </div>
+<!-- Custo -->
+<div data-receita-metrica="custo_base" data-receita-compoem="custo_total,custo_percentual" class="col-6 col-md-3 col-lg-2">
+  <div class="card bg-warning-lt border-warning">
     <div class="card-body">
-      <div class="datagrid">
-        <div class="datagrid-item">
-          <div class="datagrid-title">Rendimento</div>
-          <div class="datagrid-content">
-            <span class="badge bg-secondary-lt"> {{receita.rendimento}} g </span>
-          </div>
-        </div>
-        <div class="datagrid-item">
-          <div class="datagrid-title">Rendimento Unidades</div>
-          <div class="datagrid-content">
-            <span class="badge bg-secondary-lt"> {{receita.rendimento_unidades}} Un. </span>
-          </div>
-        </div>
-        <div class="datagrid-item">
-          <div class="datagrid-title">Custo unidade</div>
-          <div class="datagrid-content">
-            <span class="badge bg-danger-lt"> {{receita.custo_unidade | format_reais}} </span>
-          </div>
-        </div>
-        <div class="datagrid-item">
-          <div class="datagrid-title">Preço Sugerido</div>
-          <div class="datagrid-content">
-            <span class="badge bg-success-lt"> {{receita.preco_sugerido | format_reais}} </span>
-          </div>
-        </div>
-      </div>
+      <h5 class="mb-0">Custo Base</h5>
+      <h2>{{receita.custo_base | format_reais}}</h2>
     </div>
   </div>
 </div>
-<div class="col-12 col-md-6">
-  <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">
-        <span class="material-symbols-outlined"> currency_exchange </span>
-        Estimativas
-      </h5>
-    </div>
+<div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
+  {{ material_symbol('add') | safe }}
+</div>
+<div data-receita-metrica="custo_fixo" data-receita-compoem="custo_total,custo_percentual" class="col-6 col-md-3 col-lg-2">
+  <div class="card bg-warning-lt border-warning">
     <div class="card-body">
-      <div class="datagrid">
-        <div class="datagrid-item text-danger">
-          <div class="datagrid-title">Custo</div>
-          <div class="datagrid-content">
-            <span class="badge bg-danger-lt"> {{receita.custo | format_reais}} </span>
-          </div>
-        </div>
-        <div class="datagrid-item">
-          <div class="datagrid-title">Faturamento</div>
-          <div class="datagrid-content">
-            <span class="badge bg-primary-lt"> {{receita.faturamento | format_reais}} </span>
-          </div>
-        </div>
-        <div class="datagrid-item text-success">
-          <div class="datagrid-title">Lucro</div>
-          <div class="datagrid-content">
-            <span class="badge bg-success-lt"> {{receita.lucro | format_reais}} </span>
-          </div>
-        </div>
-      </div>
+      <h5 class="mb-0">Custo Fixo</h5>
+      <h2>{{receita.custo_fixo | format_reais}}</h2>
     </div>
   </div>
 </div>
+<div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
+  {{ material_symbol('add') | safe }}
+</div>
+<div data-receita-metrica="custo_percentual" data-receita-compoem="custo_total" class="col-6 col-md-3 col-lg-2">
+  <div class="card bg-warning-lt border-warning">
+    <div class="card-body">
+      <h5 class="mb-0">Custo Perc.</h5>
+      <h2>
+        {{receita.custo_percentual}}%
+        <small style="font-size: 14px;">
+          ({{(receita.custo_percentual * (receita.custo_base + receita.custo_fixo) / 100) | format_reais }})
+        </small>
+      </h2>
+    </div>
+  </div>
+</div>
+<div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
+  {{ material_symbol('equal') | safe }}
+</div>
+<div data-receita-metrica="custo_total" data-receita-compoem="custo_unidade,margem_total" class="col-6 col-md-3">
+  <div class="card bg-danger-lt border-danger">
+    <div class="card-body">
+      <h5 class="mb-0">Custo Total</h5>
+      <h2>{{receita.custo_total | format_reais}}</h2>
+    </div>
+  </div>
+</div>
+<!-- Rendimento -->
+<div data-receita-metrica="rendimento" data-receita-compoem="custo_unidade,rendimento_unidades" class="col-6 col-md-3 col-lg-2">
+  <div class="card bg-secondary-lt border-secondary">
+    <div class="card-body">
+      <h5 class="mb-0">Rendimento Total</h5>
+      <h2>{{receita.rendimento}} g</h2>
+    </div>
+  </div>
+</div>
+<div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
+  {{ material_symbol('percent') | safe }}
+</div>
+<div data-receita-metrica="peso_unitario" data-receita-compoem="custo_unidade,rendimento_unidades" class="col-6 col-md-3 col-lg-2">
+  <div class="card bg-secondary-lt border-secondary">
+    <div class="card-body">
+      <h5 class="mb-0">Peso Unitário</h5>
+      <h2>{{receita.peso_unitario}} g</h2>
+    </div>
+  </div>
+</div>
+<div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
+  {{ material_symbol('equal') | safe }}
+</div>
+<div data-receita-metrica="rendimento_unidades" data-receita-compoem="custo_unidade" class="col-6 col-md-3 col-lg-2">
+  <div class="card bg-secondary-lt border-secondary">
+    <div class="card-body">
+      <h5 class="mb-0">Rendimento Unidades</h5>
+      <h2>{{receita.rendimento_unidades}} un.</h2>
+    </div>
+  </div>
+</div>
+<div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
+  {{ material_symbol('arrow_right_alt') | safe }}
+</div>
+<div data-receita-metrica="custo_unidade" data-receita-compoem="preco_sugerido,margem_unitaria,margem_total" class="col-6 col-md-3">
+  <div class="card bg-danger-lt border-danger">
+    <div class="card-body">
+      <h5 class="mb-0">Custo Unidade</h5>
+      <h2>{{receita.custo_unidade | format_reais}}</h2>
+    </div>
+  </div>
+</div>
+<!-- Precificação -->
+<div data-receita-metrica="preco_sugerido" data-receita-compoem="margem_unitaria,margem_total" class="col-12 col-md-4">
+  <div class="card bg-primary-lt border-primary">
+    <div class="card-body">
+      <h5 class="mb-0">Preço Sugerido</h5>
+      <h2>{{receita.preco_sugerido | format_reais}}</h2>
+    </div>
+  </div>
+</div>
+<div data-receita-metrica="margem_unitaria" data-receita-compoem="margem_total" class="col-12 col-md-4">
+  <div class="card bg-purple-lt border-purple">
+    <div class="card-body">
+      <h5 class="mb-0">Margem Unitária</h5>
+      <h2>+ {{(receita.preco_sugerido - receita.custo_unidade) | format_reais}}</h2>
+    </div>
+  </div>
+</div>
+<div data-receita-metrica="margem_total" class="col-12 col-md-4">
+  <div class="card bg-purple-lt border-purple">
+    <div class="card-body">
+      <h5 class="mb-0">Margem Total</h5>
+      <h2>+ {{(receita.preco_sugerido * receita.rendimento_unidades) | format_reais}}</h2>
+    </div>
+  </div>
+</div>
+<!-- Gastos e Insumos -->
 <div class="col-12">
   <div class="card" id="cardInsumos">
     <div class="card-header">
       <h5 class="card-title">
-        {{ material_symbol('package_2') | safe }}
-        Insumos
+        {{ material_symbol('payments') | safe }}
+        Gastos
       </h5>
       <div class="ms-auto d-none d-md-flex btn-list">
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaGastoModal">
+          {{material_symbol('payments') | safe }}
+          Incluir Gasto
+        </button>
         <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
-          {{material_symbol('chevron_left') | safe }}
+          {{material_symbol('package_2') | safe }}
           Incluir Insumo
         </button>
-        <button class="btn" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_insumos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
+        <button class="btn" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_gastos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
           {{material_symbol('remove') | safe }}
           Remover Selecionados
         </button>
@@ -155,20 +207,67 @@
       <div class="dropdown ms-auto d-md-none">
         <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
+          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaGastoModal">
+            {{material_symbol('payments') | safe }}
+            Incluir Gasto
+          </button>
           <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
             {{material_symbol('chevron_left') | safe }}
             Incluir Insumo
           </button>
-          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_insumos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
+          <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"receita_id":{{receita.id}}, "action": "{{url_for('post_receita_gastos_remover')}}", ".text-secondary": "Remover insumos selecionados?"}'>
             {{material_symbol('remove') | safe }}
             Remover Selecionados
           </button>
         </div>
       </div>
     </div>
-
-    {% include 'components/table.html' %}
+    {% with table_data=custos_table_data, table_columns=custos_table_columns, table_data=custos_table_data, table_no_result=custos_table_no_result, table_modal=custos_table_modal %}
+      {% include 'components/table.html' %}
+    {% endwith %}
+  </div>
+</div>
+<div class="col-12">
+  <div class="card">
+      <div class="card-header">
+        <h5 class="card-title">
+          {{ material_symbol('package_2') | safe }}
+          Insumos
+        </h5>
+      </div>
+      {% with table_data=insumos_table_data, table_columns=insumos_table_columns, table_data=insumos_table_data, table_no_result=insumos_table_no_result, table_modal=insumos_table_modal %}
+        {% include 'components/table.html' %}
+      {% endwith %}
+    </div>
   </div>
 </div>
 {% endblock %} {% block script %}
+<script>
+  const apagarMetricas = (origem) => {
+    document.querySelectorAll('[data-receita-metrica]').forEach(el => {
+      if(el != origem) el.classList.add('opacity-25')
+    })
+  }
+  const acenderMetricas = (compoem=null) => {
+    if(compoem) {
+      document.querySelectorAll(`[data-receita-compoem*=${compoem}]`).forEach(el => {
+        el.classList.remove('opacity-25')
+      })
+    } else {
+      document.querySelectorAll('[data-receita-metrica]').forEach(el => {
+        el.classList.remove('opacity-25')
+      })
+    }
+  }
+  document.querySelectorAll('[data-receita-metrica]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      const metrica = el.getAttribute('data-receita-metrica')
+      apagarMetricas(el);
+      acenderMetricas(metrica);
+    });
+    el.addEventListener('mouseleave', () => {
+      acenderMetricas();
+    });
+  })
+</script>
 {% endblock %}

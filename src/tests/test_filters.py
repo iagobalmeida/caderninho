@@ -46,8 +46,9 @@ def test_filters_format_stock_movement():
 
 def test_filters_format_quantity():
     quantity_expected = '''
-        <div class="status status-primary">
-            1.0 Kg.
+         <divclass="status status-success">
+            <spanclass="material-symbols-outlined">arrow_upward</span>
+            1.0Kg.
         </div>
     '''
     result = filters.templates_filter_format_quantity(1000, converter_kg=True)

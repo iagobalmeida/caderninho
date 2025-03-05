@@ -26,8 +26,6 @@ async_session_maker = sessionmaker(
     expire_on_commit=False,
 )
 
-SessionLocal = Session(engine)
-
 
 @asynccontextmanager
 async def init_session():
@@ -60,7 +58,7 @@ async def __drop_tables(table_names: List[str], cascade: bool = True):
 async def reset():
     await __drop_tables(
         table_names=[
-            'receitainsumolink',
+            'receitagasto',
             'receita',
             'estoque',
             'venda',
