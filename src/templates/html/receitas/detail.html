@@ -23,15 +23,11 @@
         {{ material_symbol('library_books') | safe }}
         {{receita.nome}}
       </h5>
-      <div class="dropdown ms-auto">
-        <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
-        <div class="dropdown-menu">
-          <!-- <a href="#" class="dropdown-item">Exportar CSV</a> -->
-          <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteReceita">
-            {{ material_symbol('delete') | safe }}
-            Excluír
-          </a>
-        </div>
+      <div class="ms-auto">
+        <button class="btn text-danger" data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"selecionados_ids":"{{receita.id}}", "action": "{{url_for('post_receita_excluir')}}", ".text-secondary": "Apagar esta receita?"}'>
+          {{ material_symbol('delete') | safe }}
+          Excluír
+        </button>
       </div>
     </div>
     <div class="card-body">
@@ -73,7 +69,7 @@
   </div>
 </div>
 <!-- Custo -->
-<div data-receita-metrica="custo_base" data-receita-compoem="custo_total,custo_percentual" class="col-3 col-lg-2">
+<div data-receita-metrica="custo_base" data-receita-compoem="custo_total,custo_percentual" class="col-6 col-md-3 col-lg-2">
   <div class="card bg-warning-lt border-warning">
     <div class="card-body">
       <h5 class="mb-0">Custo Base</h5>
@@ -84,7 +80,7 @@
 <div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
   {{ material_symbol('add') | safe }}
 </div>
-<div data-receita-metrica="custo_fixo" data-receita-compoem="custo_total,custo_percentual" class="col-3 col-lg-2">
+<div data-receita-metrica="custo_fixo" data-receita-compoem="custo_total,custo_percentual" class="col-6 col-md-3 col-lg-2">
   <div class="card bg-warning-lt border-warning">
     <div class="card-body">
       <h5 class="mb-0">Custo Fixo</h5>
@@ -95,7 +91,7 @@
 <div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
   {{ material_symbol('add') | safe }}
 </div>
-<div data-receita-metrica="custo_percentual" data-receita-compoem="custo_total" class="col-3 col-lg-2">
+<div data-receita-metrica="custo_percentual" data-receita-compoem="custo_total" class="col-6 col-md-3 col-lg-2">
   <div class="card bg-warning-lt border-warning">
     <div class="card-body">
       <h5 class="mb-0">Custo Perc.</h5>
@@ -111,7 +107,7 @@
 <div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
   {{ material_symbol('equal') | safe }}
 </div>
-<div data-receita-metrica="custo_total" data-receita-compoem="custo_unidade,margem_total" class="col-3">
+<div data-receita-metrica="custo_total" data-receita-compoem="custo_unidade,margem_total" class="col-6 col-md-3">
   <div class="card bg-danger-lt border-danger">
     <div class="card-body">
       <h5 class="mb-0">Custo Total</h5>
@@ -120,7 +116,7 @@
   </div>
 </div>
 <!-- Rendimento -->
-<div data-receita-metrica="rendimento" data-receita-compoem="custo_unidade,rendimento_unidades" class="col-3 col-lg-2">
+<div data-receita-metrica="rendimento" data-receita-compoem="custo_unidade,rendimento_unidades" class="col-6 col-md-3 col-lg-2">
   <div class="card bg-secondary-lt border-secondary">
     <div class="card-body">
       <h5 class="mb-0">Rendimento Total</h5>
@@ -131,7 +127,7 @@
 <div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
   {{ material_symbol('percent') | safe }}
 </div>
-<div data-receita-metrica="peso_unitario" data-receita-compoem="custo_unidade,rendimento_unidades" class="col-3 col-lg-2">
+<div data-receita-metrica="peso_unitario" data-receita-compoem="custo_unidade,rendimento_unidades" class="col-6 col-md-3 col-lg-2">
   <div class="card bg-secondary-lt border-secondary">
     <div class="card-body">
       <h5 class="mb-0">Peso Unitário</h5>
@@ -142,7 +138,7 @@
 <div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
   {{ material_symbol('equal') | safe }}
 </div>
-<div data-receita-metrica="rendimento_unidades" data-receita-compoem="custo_unidade" class="col-3 col-lg-2">
+<div data-receita-metrica="rendimento_unidades" data-receita-compoem="custo_unidade" class="col-6 col-md-3 col-lg-2">
   <div class="card bg-secondary-lt border-secondary">
     <div class="card-body">
       <h5 class="mb-0">Rendimento Unidades</h5>
@@ -153,7 +149,7 @@
 <div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
   {{ material_symbol('arrow_right_alt') | safe }}
 </div>
-<div data-receita-metrica="custo_unidade" data-receita-compoem="preco_sugerido,margem_unitaria,margem_total" class="col-3">
+<div data-receita-metrica="custo_unidade" data-receita-compoem="preco_sugerido,margem_unitaria,margem_total" class="col-6 col-md-3">
   <div class="card bg-danger-lt border-danger">
     <div class="card-body">
       <h5 class="mb-0">Custo Unidade</h5>
@@ -162,7 +158,7 @@
   </div>
 </div>
 <!-- Precificação -->
-<div data-receita-metrica="preco_sugerido" data-receita-compoem="margem_unitaria,margem_total" class="col-4">
+<div data-receita-metrica="preco_sugerido" data-receita-compoem="margem_unitaria,margem_total" class="col-12 col-md-4">
   <div class="card bg-primary-lt border-primary">
     <div class="card-body">
       <h5 class="mb-0">Preço Sugerido</h5>
@@ -170,7 +166,7 @@
     </div>
   </div>
 </div>
-<div data-receita-metrica="margem_unitaria" data-receita-compoem="margem_total" class="col-4">
+<div data-receita-metrica="margem_unitaria" data-receita-compoem="margem_total" class="col-12 col-md-4">
   <div class="card bg-purple-lt border-purple">
     <div class="card-body">
       <h5 class="mb-0">Margem Unitária</h5>
@@ -178,7 +174,7 @@
     </div>
   </div>
 </div>
-<div data-receita-metrica="margem_total" class="col-4">
+<div data-receita-metrica="margem_total" class="col-12 col-md-4">
   <div class="card bg-purple-lt border-purple">
     <div class="card-body">
       <h5 class="mb-0">Margem Total</h5>
@@ -191,8 +187,8 @@
   <div class="card" id="cardInsumos">
     <div class="card-header">
       <h5 class="card-title">
-        {{ material_symbol('package_2') | safe }}
-        Gastos & Insumos
+        {{ material_symbol('payments') | safe }}
+        Gastos
       </h5>
       <div class="ms-auto d-none d-md-flex btn-list">
         <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaGastoModal">
@@ -229,10 +225,20 @@
     {% with table_data=custos_table_data, table_columns=custos_table_columns, table_data=custos_table_data, table_no_result=custos_table_no_result, table_modal=custos_table_modal %}
       {% include 'components/table.html' %}
     {% endwith %}
-    <hr class="my-2">
-    {% with table_data=insumos_table_data, table_columns=insumos_table_columns, table_data=insumos_table_data, table_no_result=insumos_table_no_result, table_modal=insumos_table_modal %}
-      {% include 'components/table.html' %}
-    {% endwith %}
+  </div>
+</div>
+<div class="col-12">
+  <div class="card">
+      <div class="card-header">
+        <h5 class="card-title">
+          {{ material_symbol('package_2') | safe }}
+          Insumos
+        </h5>
+      </div>
+      {% with table_data=insumos_table_data, table_columns=insumos_table_columns, table_data=insumos_table_data, table_no_result=insumos_table_no_result, table_modal=insumos_table_modal %}
+        {% include 'components/table.html' %}
+      {% endwith %}
+    </div>
   </div>
 </div>
 {% endblock %} {% block script %}

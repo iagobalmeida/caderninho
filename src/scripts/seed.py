@@ -32,6 +32,10 @@ async def try_add(session, obj):
 async def main():
     async with db.init_session() as session:
         organizacao = await try_add(session, mocks.MOCK_ORGANIZACAO)
+
+        mocks.MOCK_USUARIO_DONO.organizacao_id = organizacao.id
+        mocks.MOCK_USUARIO_SENHA_RECUPERADA.organizacao_id = organizacao.id
+
         await try_add(session, mocks.MOCK_USUARIO_DONO)
         await try_add(session, mocks.MOCK_USUARIO_SENHA_RECUPERADA)
         await try_add(session, mocks.MOCK_USUARIO_ADMIN)

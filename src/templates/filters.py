@@ -1,11 +1,9 @@
-import asyncio
 import json
 import re
 from datetime import datetime
 from typing import List, Tuple
 
 from fastapi.templating import Jinja2Templates
-from jinja2 import pass_context
 
 
 def __unit_converter(input: float, unity: str = 'g', converter_kg: bool = False, converter_kg_sempre: bool = False):
@@ -103,7 +101,12 @@ def templates_filter_format_log(input: str):
         return result
 
 
+def templates_filter_len(input: list):
+    return len(input)
+
+
 BASE_FILTERS = [
+    ('len', templates_filter_len),
     ('strftime', templates_filter_strftime),
     ('strftime_day', templates_filter_strftime_day),
     ('strftime_input', templates_filter_strftime_input),

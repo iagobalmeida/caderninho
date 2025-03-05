@@ -36,6 +36,7 @@ async def authenticate(session: Session, request: Request, email: str, senha: st
 
     sessao = AuthSession(
         **db_usuario.model_dump(),
+        organizacao_descricao=db_usuario.organizacao.descricao,
         valid=True
     )
 

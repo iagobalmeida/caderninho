@@ -91,8 +91,8 @@
               </a>
             </div>
             <!-- Micro Fluxo de Caixa -->
-            <div class="d-flex flex-column align-items-center justify-content-center order-3 order-md-auto">
-              <a class="row cursor-pointer rounded-pill border border-primary" href="{{url_for('get_home')}}">
+            <div class="d-flex flex-column align-items-center justify-content-center order-3 order-md-auto" id="miniFluxoCaixa">
+              <a class="row cursor-pointer rounded-pill border" href="{{url_for('get_home')}}">
                 <div class="col status status-success" style="border-top-right-radius: 0px;border-bottom-right-radius: 0px;">
                   {{ chart_resumo_caixa_total_entradas | format_reais }}
                 </div>

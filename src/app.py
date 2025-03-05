@@ -159,7 +159,12 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
 async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     logger.exception(ex)
     if not redirect_to:
-        redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
+        base_redirect = request.url_for('get_app_index')
+        if request.session.get('sessao_autenticada', False):
+            base_redirect = request.url_for('get_home')
+        redirect_to = str(request.headers.get('referer', base_redirect))
+
+        redirect_to = str(request.headers.get('referer', base_redirect))
 
     error = f'<span>Verifique os campos preenchidos'
     detalhe = re.search(r'\.(\w+)$', str(ex.orig))
@@ -176,7 +181,11 @@ async def value_error_exception_handler(request: fastapi.Request, ex, redirect_t
     if not isinstance(ex, HTTPException):
         logger.exception(ex)
     if not redirect_to:
-        redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
+        base_redirect = request.url_for('get_app_index')
+        if request.session.get('sessao_autenticada', False):
+            base_redirect = request.url_for('get_home')
+        redirect_to = str(request.headers.get('referer', base_redirect))
+
     redirect_to = url_incluir_query_params(redirect_to, error=str(ex))
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
 
@@ -189,13 +198,23 @@ async def http_error_exception_handler(request: fastapi.Request, ex: HTTPExcepti
         logger.warning('Não autorizado')
     else:
         logger.exception(ex)
-        redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
+
+        base_redirect = request.url_for('get_app_index')
+        if request.session.get('sessao_autenticada', False):
+            base_redirect = request.url_for('get_home')
+
+        redirect_to = str(request.headers.get('referer', base_redirect))
     return await value_error_exception_handler(request, ex, redirect_to=redirect_to)
 
 
 @app.exception_handler(RequestValidationError)  # pragma: nocover
 async def generic_exception_handler(request: fastapi.Request, ex: Exception):
     logger.exception(ex)
-    redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
+
+    base_redirect = request.url_for('get_app_index')
+    if request.session.sessao_autenticada:
+        base_redirect = request.url_for('get_home')
+
+    redirect_to = str(request.headers.get('referer', base_redirect))
     redirect_to = url_incluir_query_params(redirect_to, error=ex.errors()[0]["msg"])
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)

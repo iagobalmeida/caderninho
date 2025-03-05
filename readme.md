@@ -240,11 +240,8 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
   - [X] Botão "Baixe o App"
   - [X] Modal "Baixe o App"
 - [X] Campo `plano` em Organização
-  - [ ] Limitar número de registros por plano em `create`
   - [X] Exibir plano atual
   - [X] Botão para upgrade/extensão de plano
-  - [ ] Modal para upgrade/extensão de plano
-- [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`
 - [X] Campo `custo fixo` em receita
 - [X] Campo `porc. tributária` em receita
 - [X] Separar modal `Insumo` e `Gasto` em receita
@@ -258,10 +255,12 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
   - [X] Cacheamento de dados de fluxo de caixa
   - [X] Mini fluxo de caixa em cabeçalho
   - [X] Forçar limpeza de cache em organização
-- [ ] Exportacação de CSV
-- [ ] Autenticacao com OAuth2
 
 # v2.0
 - [ ] Filtro em tabelas
 - [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV
+- [ ] Autenticacao com OAuth2
+- [ ] Modal para upgrade/extensão de plano
+- [ ] Limitar número de registros por plano em `create`
+- [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`

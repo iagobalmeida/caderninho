@@ -25,7 +25,7 @@ class Entities(Enum):
 
 
 cache = Cache(Cache.MEMORY)
-CACHE_TTL = 1*60*5
+CACHE_TTL = 1*60*20
 
 
 async def set_cache(*args, value, duration: int = CACHE_TTL):

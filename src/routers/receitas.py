@@ -46,7 +46,7 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
     auth_session = getattr(request.state, 'auth', None)
     db_receita, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': id}, first=True)
     if not db_receita:
-        raise ValueError(f'Receita com id {id} não encontrada')
+        return redirect_url_for(request, 'get_receitas_index', error=f'Receita #{id} não encontrada')
     context_header = Context.Header(
         pretitle='Registros',
         title='Receitas',
@@ -116,12 +116,16 @@ async def post_receita_atualizar(request: fastapi.Request, payload: inputs.Recei
 
 @router.post('/excluir', include_in_schema=False)
 async def post_receita_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
-    return await delete_entity(
-        request=request,
-        db_session=session,
-        entity=repository.Entities.RECEITA,
-        ids=selecionados_ids.split(',')
-    )
+    try:
+        await delete_entity(
+            request=request,
+            db_session=session,
+            entity=repository.Entities.RECEITA,
+            ids=selecionados_ids.split(',')
+        )
+    except ValueError:
+        pass
+    return redirect_url_for(request, 'get_receitas_index', message='Receita excluída com sucesso!')
 
 
 @router.post('/gastos/incluir', include_in_schema=False)
