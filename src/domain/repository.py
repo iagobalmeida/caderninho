@@ -264,7 +264,7 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
         FROM gastorecorrente
         WHERE
             {filter_organizacao_id if auth_session.organizacao_id else ''}
-            data_inicio <= "{data_final.strftime('%Y-%m-%d')}"
+            data_inicio <= '{data_final.strftime('%Y-%m-%d')}'
     ''')
     result_recorrentes = (await db_session.exec(query_recorrentes)).all()
 
