@@ -270,7 +270,7 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
 
     for __row in result_recorrentes:
         __row_date = __row[0]
-        if not isinstance(__row_date):
+        if not isinstance(__row_date, datetime):
             __row_date = datetime.strptime(__row[0], '%Y-%m-%d')
 
         if str(__row[1]).title() == GastoRecorrencia.MENSAL.value:
