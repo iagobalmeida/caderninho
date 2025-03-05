@@ -99,7 +99,7 @@ async def post_organizacao_gastos_recorrentes_excluir(request: fastapi.Request, 
     auth_session = getattr(request.state, 'auth', None)
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.GASTO_RECORRENTE, filters={'id': id})
+            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.GASTO_RECORRENTE, filters={'id': int(id)})
     return redirect_back(request, message='Gasto Recorrente excluído com sucesso!')
 
 
@@ -148,7 +148,7 @@ async def post_organizacao_usuarios_excluir(request: fastapi.Request, selecionad
     auth_session = getattr(request.state, 'auth', None)
     if selecionados_ids:
         for id in selecionados_ids.split(','):
-            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'id': id})
+            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'id': int(id)})
     return redirect_back(request, message='Usuário excluído com sucesso!')
 
 

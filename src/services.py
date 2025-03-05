@@ -111,5 +111,5 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
 async def delete_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, ids: List[int]):
     auth_session = getattr(request.state, 'auth', None)
     for id in ids:
-        await repository.delete(auth_session=auth_session, db_session=db_session, entity=entity, filters={'id': id})
+        await repository.delete(auth_session=auth_session, db_session=db_session, entity=entity, filters={'id': int(id)})
     return redirect_back(request, message=f'{len(ids)} registros excluídos com sucesso!')
