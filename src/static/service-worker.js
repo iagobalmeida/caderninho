@@ -3,8 +3,15 @@ const urlsToCache = [
   "/",
   "/app",
   "/static/manifest.json",
+  "/static/style.css",
+  "/static/tabler.min.css",
+  "/static/logo.svg",
+  "/static/imgs/Phone-Customization--Streamline-Brooklyn.png",
+  "/static/imgs/Projection--Streamline-Brooklyn.png",
+  "/static/imgs/Too-Busy-2--Streamline-Brooklyn.png",
   "/static/favicon/android-chrome-192x192.png",
-  "/static/favicon/android-chrome-512x512.png"
+  "/static/favicon/android-chrome-512x512.png",
+  "/static/favicon/favicon.ico"
 ];
 
 self.addEventListener("install", event => {

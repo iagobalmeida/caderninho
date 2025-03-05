@@ -1,9 +1,10 @@
-import asyncio
 import json
+import re
 from typing import List
 
 import fastapi
 import fastapi.security
+from loguru import logger
 from sqlmodel import Session
 
 from src.domain import repository
@@ -13,13 +14,17 @@ from src.utils import redirect_back
 
 ENTITY_SYMBOLS = {
     'Estoque': 'inventory_2',
-    'Insumo': 'package_2'
+    'Insumo': 'package_2',
+    'Receita': 'library_books',
+    'CaixaMovimentacao': 'payments'
 }
 
 
 async def list_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, page: int = 1, filters: dict = {}, table_modal: bool = True):
     auth_session = getattr(request.state, 'auth', None)
-    title = entity.value.__name__.title()
+    title_parts = re.findall(r'[A-Z][a-z]*', entity.value.__name__)
+    page_title = ' '.join(title_parts)
+    title = '_'.join([p.lower() for p in title_parts])
 
     order_by = None
     desc = False
@@ -41,12 +46,14 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
     table_data = entities
     table_no_result = 'Nenhum registro encontrado'
 
-    delete_url = str(request.url_for(f'post_{title.lower()}_excluir'))
+    delete_url = str(request.url_for(f'post_{title}_excluir'))
+
+    logger.info(entity.value.__name__)
 
     context_header = Context.Header(
         pretitle='Registros',
-        title=title,
-        symbol=ENTITY_SYMBOLS.get(title, 'star'),
+        title=page_title,
+        symbol=ENTITY_SYMBOLS.get(entity.value.__name__, 'star'),
         buttons=[
             Button(
                 content='Excluír Selecionados',
@@ -59,24 +66,23 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
                     'data-bs-target': '#modalConfirm',
                     'data-bs-payload': json.dumps({
                         'action': delete_url,
-                        '.text-secondary': f'Excluir {title}(s) selecionadas?'
+                        '.text-secondary': f'Excluir {page_title}(s) selecionadas?'
                     })
                 }
             ),
             Button(
-                content=f'Criar {title}',
+                content=f'Criar {page_title}',
                 classname='btn btn-success',
                 symbol='add',
                 attributes={
                     'data-bs-toggle': 'modal',
-                    'data-bs-target': f'#modalCreate{title}'
+                    'data-bs-target': f'#modalCreate{entity.value.__name__}'
                 }
             )
         ]
     )
 
     db_insumos, _, _ = await repository.get(auth_session=auth_session, db_session=db_session, entity=repository.Entities.INSUMO)
-    entradas, saidas, caixa = await repository.get_fluxo_caixa(auth_session=auth_session, db_session=db_session)
 
     context = {
         'header': context_header,
@@ -86,16 +92,13 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
         'table_pages': pages,
         'table_count': count,
         'insumos': db_insumos,
-        'entradas': entradas,
-        'saidas': saidas,
-        'caixa': caixa,
         'filter_insumo_id': filters.get('insumo_id', None),
         'filter_data_inicio': filters.get('data_inicio', None),
         'filter_data_final': filters.get('data_final', None)
     }
 
     if table_modal:
-        context.update(table_modal=f'#modalEdit{title}')
+        context.update(table_modal=f'#modalEdit{entity.value.__name__}')
 
     return await render(
         session=db_session,

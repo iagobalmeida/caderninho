@@ -46,7 +46,7 @@ async def __assert_row_with_data_bs_payload(test_client, expected_values: dict):
 @pytest.mark.asyncio
 async def test_get_estoques_index(client):
     await autenticar(client)
-    await __assert_row_with_data_bs_payload(client, MOCK_ESTOQUE.dict())
+    await __assert_row_with_data_bs_payload(client, MOCK_ESTOQUE.data_bs_payload())
 
 
 @pytest.mark.asyncio

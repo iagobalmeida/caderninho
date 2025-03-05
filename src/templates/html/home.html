@@ -7,8 +7,8 @@
 {% if pix_qr_code or pix_mensagem %}
     <div class="col-12 col-lg-4">
         <div class="card">
-            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#card_pix">
-                <h5 class="card-title cursor-pointer">
+            <div class="card-header cursor-pointer" data-bs-toggle="collapse" data-bs-target="#card_pix">
+                <h5 class="card-title">
                     {{ material_symbol('qr_code') | safe }}
                     QR PIX da última venda
                     {% if pix_qr_code %}
@@ -16,7 +16,7 @@
                     {% endif %}
                 </h5>
             </div>
-            <form class="card-body" method="POST" action="{{request.url_for('post_vendas_marcar_recebido')}}">
+            <form class="card-body" method="POST" action="{{request.url_for('post_caixa_movimentacoes_marcar_recebido')}}">
                 <input type="hidden" name="selecionados_ids" value="{{pix_venda.id}}">
                 <p>{{pix_mensagem | safe}}</p>
                 {% if pix_qr_code and not pix_venda.recebido %}
@@ -40,8 +40,8 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
-                {{ material_symbol('shopping_cart') | safe }}
-                Vendas
+                {{ material_symbol('payments') | safe }}
+                Caixa
                 <small class="text-secondary ms-auto">{{vendas}} vendas cadastradas</small>
             </h3>
         </div>
@@ -50,7 +50,7 @@
                 Cadastre as <b>vendas</b> para formalizar as entradas do caixa.
             </p>
             <div class="ms-auto" style="width: fit-content;">
-                <a href="{{ url_for('get_vendas_index') }}" class="btn">Visualizar Vendas</a>
+                <a href="{{ url_for('get_caixa_movimentacoes_index') }}" class="btn">Visualizar Caixa</a>
             </div>
         </div>
     </div>
@@ -87,7 +87,7 @@
         </div>
         <div class="card-body">
             <p>
-                Cadastre <b>receitas</b> selecionando <code>Insumos</code> para determinar o preço de venda, lucro e faturamento previsto.
+                Cadastre <b>receitas</b> selecionando <code>Insumos</code> para determinar o preço de venda, margem e faturamento previsto.
             </p>
             <div class="ms-auto" style="width: fit-content;">
                 <a href="{{ url_for('get_receitas_index') }}" class="btn">Visualizar Receitas</a>

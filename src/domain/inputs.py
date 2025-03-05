@@ -1,6 +1,10 @@
-from typing import List, Optional, Union
+from datetime import datetime
+from typing import Optional, Union
 
 from pydantic import BaseModel
+
+from src.domain.schemas import (CaixMovimentacaoTipo, GastoRecorrencia,
+                                GastoTipo, Plano)
 
 
 class ReceitaAtualizar(BaseModel):
@@ -10,13 +14,16 @@ class ReceitaAtualizar(BaseModel):
     porcentagem_lucro: float
 
 
-class ReceitaInsumoAdicionar(BaseModel):
+class ReceitaGastosAdicionar(BaseModel):
     receita_id: int
-    insumo_id: int
-    quantidade: float
+    insumo_id: Optional[int] = None
+    descricao: Optional[str] = None
+    quantidade: Optional[float] = None
+    gasto_tipo: Optional[GastoTipo] = None  # TODO: Associar a ENUM
+    gasto_valor: Optional[float] = None
 
 
-class ReceitaInsumoAtualizar(BaseModel):
+class ReceitaGastosAtualizar(BaseModel):
     id: int
     receita_id: int
     insumo_id: int
@@ -26,7 +33,7 @@ class ReceitaInsumoAtualizar(BaseModel):
     quantidade: float
 
 
-class ReceitaInsumoRemover(BaseModel):
+class ReceitaGastosRemover(BaseModel):
     receita_id: int
     selecionados_ids: str
 
@@ -42,12 +49,13 @@ class InsumoAtualizar(InsumoCriar):
     id: int
 
 
-class VendaCriar(BaseModel):
+class CaixaMovimentacaoCriar(BaseModel):
     descricao: str
     valor: float
+    tipo: CaixMovimentacaoTipo
 
 
-class VendaAtualizar(VendaCriar):
+class CaixaMovimentacaoAtualizar(BaseModel):
     id: int
     descricao: str
     valor: float
@@ -83,7 +91,7 @@ class UsuarioCriar(BaseModel):
     nome: str
     email: str
     senha: str
-    plano: str
+    plano: Optional[Plano] = None
     senha_confirmar: str
     organizacao_id:  Optional[int] = False
     organizacao_descricao: Optional[str] = None
@@ -103,3 +111,12 @@ class AtualizarSenha(BaseModel):
     senha_atual: str
     senha: str
     senha_confirmar: str
+
+
+class GastoRecorrenteCriar(BaseModel):
+    organizacao_id: int
+    descricao: str
+    data_inicio: datetime
+    valor: float
+    tipo: GastoTipo
+    recorrencia: GastoRecorrencia

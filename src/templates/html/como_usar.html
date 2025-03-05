@@ -85,15 +85,15 @@
 
       <hr>
 
-      <h5 id="como_usar_4" class="card-title">4. Cadastrando uma Venda</h5>
+      <h5 id="como_usar_4" class="card-title">4. Cadastrando uma CaixaMovimentacao</h5>
       <p>Agora que você já criou a <code>Receita</code>, registrou as <code>Movimentações de Compra</code> de todos os <code>Insumos</code>, registrou a <code>Movimentação de Uso em Receita</code> identificando que houve uma produção, está na hora de registrar a venda dessa produção.</p>
-      <b id="como_usar_venda">4.1 O que é uma Venda</b>
+      <b id="como_usar_venda">4.1 O que é uma CaixaMovimentacao</b>
       <p class="mb-0">Apesar de ser intuitivo, é importante lembrar que uma venda pode ser imediata ou "prolongada". Uma venda prolongada é aquela onde o cliente solicita o produto, ele é produzido e enviado e o recebimento é feito mediante a entrega.</p>
-      <p class="mb-0">Em ambos os casos, o <i class="text-primary">KDerninho</i> considera como uma <code>Venda</code>, que pode ser "recebida" na hora ou não.</p>
+      <p class="mb-0">Em ambos os casos, o <i class="text-primary">KDerninho</i> considera como uma <code>CaixaMovimentacao</code>, que pode ser "recebida" na hora ou não.</p>
       <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_vendas.png')}}" style="max-width: 1080px;">
-      <p>Todas as <code>Vendas</code> possuem um marcador (<code>Pagamento Recebido</code>) que indica se ela já foi "recebida" (o cliente já pagou) ou não, e é possível alterar isso tanto no detalhamento da venda quanto de forma massiva pela tela de <a href="/app/vendas" target="_blank">{{material_symbol('shopping_cart') | safe }}Vendas</a></p>
-      <b id="como_usar_cadastrar_venda">4.2 Cadastrando uma Venda</b>
-      <p class="mb-0">Para cadastrar uma venda, acesse a página <a href="/app/vendas" target="_blank">{{material_symbol('shopping_cart') | safe }}Vendas</a>, clique em <span class="badge bg-green-lt">Criar Venda</span>, preencha com a <code>Descrição</code>, e o <code>Valor</code>.</p>
+      <p>Todas as <code>Caixa</code> possuem um marcador (<code>Pagamento Recebido</code>) que indica se ela já foi "recebida" (o cliente já pagou) ou não, e é possível alterar isso tanto no detalhamento da venda quanto de forma massiva pela tela de <a href="/app/vendas" target="_blank">{{material_symbol('payments') | safe }}Caixa</a></p>
+      <b id="como_usar_cadastrar_venda">4.2 Cadastrando uma CaixaMovimentacao</b>
+      <p class="mb-0">Para cadastrar uma venda, acesse a página <a href="/app/vendas" target="_blank">{{material_symbol('payments') | safe }}Caixa</a>, clique em <span class="badge bg-green-lt">Criar CaixaMovimentacao</span>, preencha com a <code>Descrição</code>, e o <code>Valor</code>.</p>
       <img class="border rounded mb-1" src="{{url_for('static', path='/docs/exemplo_nova_venda.png')}}" style="max-width: 480px;"><br>
       <b id="como_usar_qr_pix">4.3 Gerando um QR PIX</b>
       <p class="mb-0">Depois que uma venda foi cadastrada, você pode gerar o QRPix dessa venda acessando seu detalhamento (clicando na venda).</p>

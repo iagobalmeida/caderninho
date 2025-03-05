@@ -13,9 +13,19 @@ def url_incluir_query_params(url: str, **params):
     return urlunparse(parsed_url)
 
 
-def redirect_url_for(request: fastapi.Request, url_name: str, status_code: int = 302, **kwargs):
+def redirect_url_for(request: fastapi.Request, url_name: str, status_code: int = 302, message: str = None, error: str = None, **kwargs):
+    url = request.url_for(url_name, **kwargs)
+
+    query_params = {}
+    if message:
+        query_params.update(message=message)
+    if error:
+        query_params.update(error=error)
+    if query_params:
+        url = url_incluir_query_params(url, **query_params)
+
     return fastapi.responses.RedirectResponse(
-        url=request.url_for(url_name, **kwargs),
+        url=url,
         status_code=status_code
     )
 

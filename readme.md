@@ -16,7 +16,7 @@ Essa aplicação não seria possível sem a existência de:
 ### Funcionalidades
 
 No lugar de tabelas do excel, você pode usar o KDerninho para:
-- Estimar custo, faturamento e lucro de receitas de forma dinâmica
+- Estimar custo, faturamento e margem de receitas de forma dinâmica
 - Gerenciar o estoque de seus insumos e outros insumos
 - Gerenciar seu fluxo de caixa cadastrando compras, produção de receitas e outros gastos em geral
 - Compartilhar essas informações com outros usuários de sua organização
@@ -90,13 +90,13 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Remover tela `Insumos` (confusa)
 - [X] Usar clique em linha em vez de `editar/excluir`
 - [X] Adicionar checkbox com delete massivo em tabelas
-    - [X] Vendas
+    - [X] Caixa
     - [X] Estoques
     - [X] Receitas
         - [X] Listagem
         - [X] Insumos
 - [X] Adicionar opção excluir em modal de `editar`
-    - [X] Vendas
+    - [X] Caixa
     - [X] Estoque
     - [X] Receitas
         - [X] Listagem
@@ -213,7 +213,7 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Instalação de `loguru` para logs em arquivo rotativo e logs aprimorados
 - [X] Alerta "Sobre essa página" com link para documentação completa
   - [X] Home
-  - [X] Vendas
+  - [X] Caixa
   - [X] Estoque
   - [X] Receitas
   - [X] Detalhe de Receita
@@ -240,15 +240,27 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
   - [X] Botão "Baixe o App"
   - [X] Modal "Baixe o App"
 - [X] Campo `plano` em Organização
-  - [ ] Limitar número de registros por plano em `create`
   - [X] Exibir plano atual
   - [X] Botão para upgrade/extensão de plano
-  - [ ] Modal para upgrade/extensão de plano
-- [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`
-- [ ] Exportacação de CSV
-- [ ] Autenticacao com OAuth2
+- [X] Campo `custo fixo` em receita
+- [X] Campo `porc. tributária` em receita
+- [X] Separar modal `Insumo` e `Gasto` em receita
+- [X] Tabela `Caixa` vira `Fluxo de Caixa` e aceita `Entrada` e `Saída`
+  - [X] Campo `recebido`
+- [x] Gráfico de fluxo de caixa
+- [X] Cadastro de custo recorrente em `Organização`
+  - [X] Gráfico "fluxo de caixa"
+  - [X] Margem em fluxo de caixa
+  - [X] Margem final em fluxo de caixa
+  - [X] Cacheamento de dados de fluxo de caixa
+  - [X] Mini fluxo de caixa em cabeçalho
+  - [X] Forçar limpeza de cache em organização
 
 # v2.0
 - [ ] Filtro em tabelas
 - [ ] Geração de QR Code PIX com valor customizado
 - [ ] Upload e download de CSV
+- [ ] Autenticacao com OAuth2
+- [ ] Modal para upgrade/extensão de plano
+- [ ] Limitar número de registros por plano em `create`
+- [ ] Rota `/integration/payment` que recebe informações de pagamento e atualiza `plano` e `ultimo_pagamento_id`

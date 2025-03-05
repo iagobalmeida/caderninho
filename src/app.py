@@ -22,13 +22,14 @@ from src.domain import inputs, repository
 from src.modules import smpt
 from src.modules.logger import logger, setup_logger
 from src.routers.autenticacao import router as router_autenticacao
+from src.routers.caixa_movimentacoes import \
+    router as router_caixa_movimentacoes
 from src.routers.estoques import router as router_estoques
 from src.routers.insumos import router as router_insumos
 from src.routers.organizacao import router as router_organizacao
 from src.routers.paginas import router as router_paginas
 from src.routers.receitas import router as router_receitas
 from src.routers.scripts import router as router_scripts
-from src.routers.vendas import router as router_vendas
 from src.templates import render
 from src.utils import url_incluir_query_params
 
@@ -55,7 +56,7 @@ app.add_middleware(
 app.include_router(router_receitas)
 app.include_router(router_insumos)
 app.include_router(router_estoques)
-app.include_router(router_vendas)
+app.include_router(router_caixa_movimentacoes)
 app.include_router(router_organizacao)
 app.include_router(router_scripts)
 app.include_router(router_autenticacao)
@@ -158,7 +159,12 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
 async def integrity_error_exception_handler(request: fastapi.Request, ex, redirect_to: str = None):
     logger.exception(ex)
     if not redirect_to:
-        redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
+        base_redirect = request.url_for('get_app_index')
+        if request.session.get('sessao_autenticada', False):
+            base_redirect = request.url_for('get_home')
+        redirect_to = str(request.headers.get('referer', base_redirect))
+
+        redirect_to = str(request.headers.get('referer', base_redirect))
 
     error = f'<span>Verifique os campos preenchidos'
     detalhe = re.search(r'\.(\w+)$', str(ex.orig))
@@ -175,7 +181,11 @@ async def value_error_exception_handler(request: fastapi.Request, ex, redirect_t
     if not isinstance(ex, HTTPException):
         logger.exception(ex)
     if not redirect_to:
-        redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
+        base_redirect = request.url_for('get_app_index')
+        if request.session.get('sessao_autenticada', False):
+            base_redirect = request.url_for('get_home')
+        redirect_to = str(request.headers.get('referer', base_redirect))
+
     redirect_to = url_incluir_query_params(redirect_to, error=str(ex))
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)
 
@@ -188,13 +198,23 @@ async def http_error_exception_handler(request: fastapi.Request, ex: HTTPExcepti
         logger.warning('Não autorizado')
     else:
         logger.exception(ex)
-        redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
+
+        base_redirect = request.url_for('get_app_index')
+        if request.session.get('sessao_autenticada', False):
+            base_redirect = request.url_for('get_home')
+
+        redirect_to = str(request.headers.get('referer', base_redirect))
     return await value_error_exception_handler(request, ex, redirect_to=redirect_to)
 
 
 @app.exception_handler(RequestValidationError)  # pragma: nocover
 async def generic_exception_handler(request: fastapi.Request, ex: Exception):
     logger.exception(ex)
-    redirect_to = str(request.headers.get('referer', request.url_for('get_app_index')))
+
+    base_redirect = request.url_for('get_app_index')
+    if request.session.sessao_autenticada:
+        base_redirect = request.url_for('get_home')
+
+    redirect_to = str(request.headers.get('referer', base_redirect))
     redirect_to = url_incluir_query_params(redirect_to, error=ex.errors()[0]["msg"])
     return fastapi.responses.RedirectResponse(redirect_to, status_code=302)

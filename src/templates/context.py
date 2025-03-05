@@ -1,3 +1,5 @@
+import itertools
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional, TypedDict
 
 from fastapi import Request
@@ -6,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 from src.domain import repository
 from src.schemas.auth import AuthSession
 from src.schemas.docs import get_sobre_essa_pagina_html
+from src.templates.chartjs import chart_fluxo_caixa_config
 from src.templates.filters import \
     templates_global_material_symbol as material_symbol
 from src.utils import url_incluir_query_params
@@ -44,6 +47,7 @@ class Context(TypedDict):
     header: Header
     breadcrumbs: List[Breadcrumb]
     usuario: AuthSession = None
+    now: datetime
 
     @classmethod
     def factory_navbar_link(self, request: Request, title: str, symbol_name: str, url_name: str, query_params: dict = None):
@@ -82,7 +86,7 @@ class Context(TypedDict):
             current_path += f"{b}/"
             breadcrumbs.append(
                 Context.Breadcrumb(
-                    label=b,
+                    label=' '.join(b.split('_')),
                     url=f'{base_url}/{current_path}' if steps else None
                 )
             )
@@ -92,7 +96,7 @@ class Context(TypedDict):
 
 BASE_NAVBAR_LINKS = [
     ('Home', 'home', 'get_home'),
-    ('Vendas', 'shopping_cart', 'get_vendas_index', {'page': 1}),
+    ('Caixa', 'payments', 'get_caixa_movimentacoes_index', {'page': 1}),
     ('Estoque', 'inventory_2', 'get_estoques_index'),
     ('Receitas', 'library_books', 'get_receitas_index'),
     ('Insumos', 'package_2', 'get_insumos_index'),
@@ -104,6 +108,45 @@ ADMIN_NAVBAR_LINKS = [
 ]
 
 
+async def update_context_with_chart(auth_session: AuthSession, db_session, base_context: dict):
+    chart_data_inicial = datetime.now() - timedelta(days=30)
+    chart_data_final = datetime.now() + timedelta(days=30)
+
+    chart_datasets_cached = await repository.get_chart_fluxo_caixa_datasets(
+        auth_session=auth_session,
+        db_session=db_session,
+        data_inicial=chart_data_inicial,
+        data_final=chart_data_final
+    )
+    chart_datasets = chart_datasets_cached['value']
+    labels = [cd[0] for cd in chart_datasets]
+    entradas = [c[1] for c in chart_datasets]
+    saidas = [c[2] for c in chart_datasets]
+    margem = [c[3] for c in chart_datasets]
+    saidas_recorrentes = [c[4] for c in chart_datasets]
+    margem_final = list(map(int, itertools.accumulate(margem)))
+    datas = [datetime.strptime(cd[0], '%Y-%m-%d') for cd in chart_datasets]
+    chart_config = chart_fluxo_caixa_config(
+        data={
+            'Entradas': entradas[10:],
+            'Saídas': saidas[10:],
+            'Saídas Recorrentes': saidas_recorrentes[10:],
+            'Margem': margem[10:],
+            'Margem Final': margem_final[10:]
+        },
+        labels=labels[10:]
+    )
+    base_context.update(chart_resumo_caixa_data_atualizacao=chart_datasets_cached['created_at'])
+    base_context.update(chart_resumo_caixa_data_inicial=datas[10:][0])
+    base_context.update(chart_resumo_caixa_data_final=datas[-1])
+    base_context.update(chart_resumo_caixa_config=chart_config)
+    base_context.update(chart_resumo_caixa_total_entradas=sum(entradas))
+    base_context.update(chart_resumo_caixa_total_saidas=sum(saidas))
+    base_context.update(chart_resumo_caixa_total_saidas_recorrentes=sum(saidas_recorrentes))
+    base_context.update(chart_resumo_caixa_margem_final=margem_final[-1])
+    return base_context
+
+
 async def get_context(request: Request, session=None, context: dict = None, navbar_links: list = BASE_NAVBAR_LINKS):
     auth_session = getattr(request.state, 'auth', None)
     theme = request.session.get('theme', 'light')
@@ -112,6 +155,7 @@ async def get_context(request: Request, session=None, context: dict = None, navb
         navbar_links = [*navbar_links, *ADMIN_NAVBAR_LINKS]
 
     base_context = Context(
+        now=datetime.now(),
         title='Caderninho',
         navbar=Context.Navbar(
             links=[
@@ -133,13 +177,10 @@ async def get_context(request: Request, session=None, context: dict = None, navb
 
         db_insumos, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.INSUMO)
         db_receitas, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA)
-        entradas, saidas, caixa = await repository.get_fluxo_caixa(auth_session=auth_session, db_session=session)
 
         base_context.update(insumos=db_insumos)
         base_context.update(receitas=db_receitas)
-        base_context.update(entradas=entradas)
-        base_context.update(saidas=saidas)
-        base_context.update(caixa=caixa)
+        base_context = await update_context_with_chart(auth_session=auth_session, db_session=session, base_context=base_context)
 
     if context:
         base_context.update(**context)

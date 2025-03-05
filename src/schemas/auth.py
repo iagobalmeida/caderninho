@@ -21,5 +21,8 @@ class AuthSession(BaseModel):
         if request_session_sessao_autenticada:
             return cls(**request_session_sessao_autenticada)
 
-    def dict(self):
+    def data_bs_payload(self):
         return self.model_dump()
+
+    def __hash__(self):
+        return hash((self.organizacao_id, self.id))
