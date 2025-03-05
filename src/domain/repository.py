@@ -215,14 +215,14 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
     query_caixa_movimentacao = text(f'''
         SELECT
             date(data_criacao) AS dia,
-            sum(CASE WHEN (tipo = "ENTRADA") THEN valor ELSE 0 END) AS entradas,
-            sum(CASE WHEN (tipo = "SAIDA") THEN valor ELSE 0 END) AS saidas,
-            sum(CASE WHEN (tipo = "ENTRADA") THEN valor ELSE 0 END) - sum(CASE WHEN (tipo = "SAIDA") THEN valor ELSE 0 END) AS margem
+            sum(CASE WHEN (tipo = 'ENTRADA') THEN valor ELSE 0 END) AS entradas,
+            sum(CASE WHEN (tipo = 'SAIDA') THEN valor ELSE 0 END) AS saidas,
+            sum(CASE WHEN (tipo = 'ENTRADA') THEN valor ELSE 0 END) - sum(CASE WHEN (tipo = 'SAIDA') THEN valor ELSE 0 END) AS margem
         FROM caixamovimentacao
         WHERE
             {filter_organizacao_id if auth_session.organizacao_id else ''}
-            data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
-            AND data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
+            data_criacao >= '{data_inicial.strftime('%Y-%m-%d')}'
+            AND data_criacao <= '{data_final.strftime('%Y-%m-%d')}'
         GROUP BY date(data_criacao)
         ORDER BY dia ASC
 
