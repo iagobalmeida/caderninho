@@ -269,7 +269,10 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
     result_recorrentes = (await db_session.exec(query_recorrentes)).all()
 
     for __row in result_recorrentes:
-        __row_date = datetime.strptime(__row[0], '%Y-%m-%d')
+        __row_date = __row[0]
+        if not isinstance(__row_date):
+            __row_date = datetime.strptime(__row[0], '%Y-%m-%d')
+
         if str(__row[1]).title() == GastoRecorrencia.MENSAL.value:
             cobrancas_anteriores = int((datetime.now() - __row_date).days/30)
             results[0][3] -= cobrancas_anteriores * __row[3]
