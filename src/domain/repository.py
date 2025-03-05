@@ -243,8 +243,8 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
         FROM estoque
         WHERE
             {filter_organizacao_id if auth_session.organizacao_id else ''}
-            data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
-            AND data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
+            data_criacao >= '{data_inicial.strftime('%Y-%m-%d')}'
+            AND data_criacao <= '{data_final.strftime('%Y-%m-%d')}'
         GROUP BY date(data_criacao)
         ORDER BY dia ASC
     ''')
