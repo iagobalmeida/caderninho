@@ -8,7 +8,8 @@ from pixqrcode import PixQrCode
 from sqlalchemy.orm import validates
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
-from src.domain.schemas import CaixMovimentacaoTipo, GastoTipo, Plano
+from src.domain.schemas import (CaixMovimentacaoTipo, GastoRecorrencia,
+                                GastoTipo, Plano)
 from src.templates import filters
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -27,6 +28,7 @@ class Organizacao(SQLModel, table=True):
     plano: Optional[Plano] = Plano.TESTE
     plano_expiracao: Optional[datetime] = Field(default=datetime.now() + timedelta(days=7), nullable=False)
     pagamentos: List['Pagamento'] = Relationship(back_populates='organizacao')
+    gastos_recorrentes: List['GastoRecorrente'] = Relationship(back_populates='organizacao')
     # Configurações
     configuracoes: Dict = Field(default_factory=lambda: dict({
         'converter_kg': False,
@@ -62,10 +64,17 @@ class RegistroOrganizacao(SQLModel, table=False):
         return self.model_dump()
 
 
+class GastoRecorrente(RegistroOrganizacao, table=True):
+    organizacao: "Organizacao" = Relationship(back_populates="gastos_recorrentes", sa_relationship_kwargs={'lazy': 'selectin'})
+    descricao: str
+    data_inicio: datetime = Field(default=datetime.now(), nullable=False)
+    valor: float
+    tipo: GastoTipo = Field(default=GastoTipo.FIXO, nullable=False)
+    recorrencia: GastoRecorrencia = Field(default=GastoRecorrencia.MENSAL, nullable=False)
+
+
 class Pagamento(RegistroOrganizacao, table=True):
     organizacao: "Organizacao" = Relationship(back_populates="pagamentos", sa_relationship_kwargs={'lazy': 'selectin'})
-    id: Optional[int] = Field(default=None, primary_key=True)
-    organizacao_id: Optional[int] = Field(default=None, foreign_key="organizacao.id")
     data_criacao: datetime = Field(default=datetime.now(), nullable=False)
     valor: float
     plano: Plano

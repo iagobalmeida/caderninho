@@ -1,8 +1,10 @@
+from datetime import datetime
 from typing import Optional, Union
 
 from pydantic import BaseModel
 
-from src.domain.schemas import CaixMovimentacaoTipo, GastoTipo, Plano
+from src.domain.schemas import (CaixMovimentacaoTipo, GastoRecorrencia,
+                                GastoTipo, Plano)
 
 
 class ReceitaAtualizar(BaseModel):
@@ -109,3 +111,12 @@ class AtualizarSenha(BaseModel):
     senha_atual: str
     senha: str
     senha_confirmar: str
+
+
+class GastoRecorrenteCriar(BaseModel):
+    organizacao_id: int
+    descricao: str
+    data_inicio: datetime
+    valor: float
+    tipo: GastoTipo
+    recorrencia: GastoRecorrencia

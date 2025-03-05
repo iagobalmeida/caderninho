@@ -22,11 +22,15 @@ def templates_filter_markdown(input: str):
 
 
 def templates_filter_strftime(input: datetime):
-    return input.strftime('%d/%m/%Y ás %H:%M')
+    return input.strftime('%d/%m/%Y ás %H:%M:%S')
 
 
 def templates_filter_strftime_day(input: datetime):
     return input.strftime('%d/%m/%Y')
+
+
+def templates_filter_strftime_input(input: datetime):
+    return input.strftime('%Y-%m-%d')
 
 
 def templates_global_material_symbol(icon_name: str, classnames: str = None):
@@ -102,6 +106,7 @@ def templates_filter_format_log(input: str):
 BASE_FILTERS = [
     ('strftime', templates_filter_strftime),
     ('strftime_day', templates_filter_strftime_day),
+    ('strftime_input', templates_filter_strftime_input),
     ('format_stock', templates_filter_format_stock),
     ('format_stock_movement', templates_filter_format_stock_movement),
     ('format_quantity', templates_filter_format_quantity),

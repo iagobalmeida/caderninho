@@ -251,8 +251,13 @@ DATABASE_URL="sqlite:///test.db" coverage run -m pytest && coverage html && rm c
 - [X] Tabela `Caixa` vira `Fluxo de Caixa` e aceita `Entrada` e `Saída`
   - [X] Campo `recebido`
 - [x] Gráfico de fluxo de caixa
-- [ ] Cadastro de custo recorrente em `Organização`
-  - [ ] Gráfico "fluxo de caixa"
+- [X] Cadastro de custo recorrente em `Organização`
+  - [X] Gráfico "fluxo de caixa"
+  - [X] Margem em fluxo de caixa
+  - [X] Margem final em fluxo de caixa
+  - [X] Cacheamento de dados de fluxo de caixa
+  - [X] Mini fluxo de caixa em cabeçalho
+  - [X] Forçar limpeza de cache em organização
 - [ ] Exportacação de CSV
 - [ ] Autenticacao com OAuth2
 

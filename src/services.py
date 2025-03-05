@@ -83,7 +83,6 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
     )
 
     db_insumos, _, _ = await repository.get(auth_session=auth_session, db_session=db_session, entity=repository.Entities.INSUMO)
-    entradas, saidas, caixa = await repository.get_fluxo_caixa(auth_session=auth_session, db_session=db_session)
 
     context = {
         'header': context_header,
@@ -93,9 +92,6 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
         'table_pages': pages,
         'table_count': count,
         'insumos': db_insumos,
-        'entradas': entradas,
-        'saidas': saidas,
-        'caixa': caixa,
         'filter_insumo_id': filters.get('insumo_id', None),
         'filter_data_inicio': filters.get('data_inicio', None),
         'filter_data_final': filters.get('data_final', None)

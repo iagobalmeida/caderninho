@@ -23,8 +23,9 @@ async def get_organizacao_index(request: fastapi.Request, session: Session = DBS
     if auth_session.organizacao_descricao:
         context_header['title'] = auth_session.organizacao_descricao
 
-    db_usuarios, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO)
     db_organizacao, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
+    db_usuarios, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO)
+    db_gastos_fixos, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.GASTO_RECORRENTE)
 
     return await render(
         session=session,
@@ -32,8 +33,9 @@ async def get_organizacao_index(request: fastapi.Request, session: Session = DBS
         template_name='organizacao/detail.html',
         context={
             'header': context_header,
+            'organizacao': db_organizacao,
             'usuarios': db_usuarios,
-            'organizacao': db_organizacao
+            'gastos_fixos': db_gastos_fixos
         }
     )
 
@@ -76,6 +78,29 @@ async def post_organizacao_configuracoes(request: fastapi.Request, id: int = fas
         }
     )
     return redirect_back(request, message='Organização atualizada com sucesso!')
+
+
+@router.post('/gastos_recorrentes/criar', include_in_schema=False)
+async def post_organizacao_gastos_recorrentes_criar(request: fastapi.Request, payload: inputs.GastoRecorrenteCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
+    await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.GASTO_RECORRENTE, values={
+        'organizacao_id': payload.organizacao_id,
+        'descricao': payload.descricao,
+        'data_inicio': payload.data_inicio,
+        'valor': payload.valor,
+        'tipo': payload.tipo,
+        'recorrencia': payload.recorrencia
+    })
+    return redirect_back(request, message='Gasto Recorrente criado com sucesso!')
+
+
+@router.post('/gastos_recorrentes/excluir', include_in_schema=False)
+async def post_organizacao_gastos_recorrentes_excluir(request: fastapi.Request, selecionados_ids: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
+    if selecionados_ids:
+        for id in selecionados_ids.split(','):
+            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.GASTO_RECORRENTE, filters={'id': id})
+    return redirect_back(request, message='Gasto Recorrente excluído com sucesso!')
 
 
 @router.post('/usuarios/criar', include_in_schema=False)
@@ -125,3 +150,10 @@ async def post_organizacao_usuarios_excluir(request: fastapi.Request, selecionad
         for id in selecionados_ids.split(','):
             await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'id': id})
     return redirect_back(request, message='Usuário excluído com sucesso!')
+
+
+@router.get('/sistema/recarregar', include_in_schema=False)
+async def post_organizacao_sistema_recarregar(request: fastapi.Request, session: Session = DBSESSAO_DEP):
+    auth_session = getattr(request.state, 'auth', None)
+    await repository.recarregar_cache(auth_session=auth_session, db_session=session)
+    return redirect_back(request, message='Sistema recarregado com sucesso!')

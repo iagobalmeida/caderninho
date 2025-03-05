@@ -17,3 +17,8 @@ class GastoTipo(Enum):
 class CaixMovimentacaoTipo(Enum):
     ENTRADA = 'Entrada'
     SAIDA = 'Saida'
+
+
+class GastoRecorrencia(Enum):
+    MENSAL = 'Mensal'
+    SEMANAL = 'Semanal'

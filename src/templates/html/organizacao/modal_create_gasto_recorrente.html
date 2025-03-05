@@ -1,0 +1,43 @@
+<div class="modal fade" id="modalCreateGastoRecorrente" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_organizacao_gastos_recorrentes_criar') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ material_symbol('currency_exchange') | safe }} Criar Gasto Recorrente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="organizacao_id" value="{{usuario.organizacao_id}}" />
+          <div class="mb-3">
+            <label for="descricao" class="form-label required">Descricao</label>
+            <input required type="text" class="form-control" name="descricao" />
+          </div>
+          <div class="mb-3">
+            <label for="recorrencia" class="form-label required">Recorrência</label>
+            <select name="recorrencia" id="recorrencia" class="form-select">
+              <option value="Semanal">Semanal</option>
+              <option value="Mensal">Mensal</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="data_inicio" class="form-label required">Data Inicial</label>
+            <input required type="date" class="form-control" name="data_inicio" value="{{now | strftime_input}}"/>
+          </div>
+          <div class="mb-3">
+            <label for="tipo" class="form-label required">Tipo</label>
+            <select name="tipo" id="tipo" class="form-select">
+              <option value="Fixo">Fixo</option>
+              <option value="Percentual">Percentual</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="valor" class="form-label required">Valor</label>
+            <input required type="text" class="form-control" name="valor" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Criar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  

@@ -1,5 +1,4 @@
-import itertools
-from datetime import datetime, timedelta
+
 from pathlib import Path
 
 import fastapi
@@ -10,7 +9,6 @@ from src.db import DBSESSAO_DEP
 from src.domain import repository
 from src.schemas.docs import SOBRE_ESSA_PAGINA
 from src.templates import render
-from src.templates.chartjs import chart_fluxo_caixa_config
 from src.templates.context import Context
 
 router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
@@ -39,32 +37,6 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
             pix_qr_code = await repository.get_caixa_movimentacoes_qr_code(auth_session=auth_session, db_session=session, venda_id=db_ultima_venda.id)
             pix_mensagem = f'Use este QR Code para cobrar R$ {db_ultima_venda.valor} referente a <b>{db_ultima_venda.descricao}</b>.'
 
-    chart_data_inicial = datetime.now() - timedelta(days=30)
-    chart_data_final = datetime.now() + timedelta(days=30)
-    chart_datasets = await repository.get_chart_fluxo_caixa_datasets(
-        auth_session=auth_session,
-        db_session=session,
-        data_inicial=chart_data_inicial,
-        data_final=chart_data_final
-    )
-    labels = [cd[0] for cd in chart_datasets]
-    entradas = [c[1] for c in chart_datasets]
-    saidas = [c[2] for c in chart_datasets]
-    margem = [c[3] for c in chart_datasets]
-    saidas_recorrentes = [c[4] for c in chart_datasets]
-    margem_final = list(map(int, itertools.accumulate(margem)))
-    datas = [datetime.strptime(cd[0], '%Y-%m-%d') for cd in chart_datasets]
-
-    chart_config = chart_fluxo_caixa_config(
-        data={
-            'Entradas': entradas[10:],
-            'Saídas': saidas[10:],
-            'Saídas Recorrentes': saidas_recorrentes[10:],
-            'Margem': margem[10:],
-            'Margem Final': margem_final[10:]
-        },
-        labels=labels[10:]
-    )
 
     return await render(request, 'home.html', session, context={
         'len_receitas': db_receitas,
@@ -73,14 +45,7 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
         'vendas': db_vendas,
         'pix_qr_code': pix_qr_code,
         'pix_mensagem': pix_mensagem,
-        'pix_venda': pix_venda,
-        'chart_resumo_caixa_data_inicial': datas[10:][0],
-        'chart_resumo_caixa_data_final': datas[-1],
-        'chart_resumo_caixa_config': chart_config,
-        'chart_resumo_caixa_total_entradas': sum(entradas),
-        'chart_resumo_caixa_total_saidas': sum(saidas),
-        'chart_resumo_caixa_total_saidas_recorrentes': sum(saidas_recorrentes),
-        'chart_resumo_caixa_margem_final': margem_final[-1]
+        'pix_venda': pix_venda
     })
 
 

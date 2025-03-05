@@ -5,8 +5,8 @@ from random import choice, randint
 from loguru import logger
 
 from src import db
-from src.domain.entities import (CaixaMovimentacao, Estoque, Insumo, Receita,
-                                 ReceitaGasto)
+from src.domain.entities import (CaixaMovimentacao, Estoque, GastoRecorrente,
+                                 Insumo, Receita, ReceitaGasto)
 from src.tests import mocks
 
 
@@ -36,6 +36,9 @@ async def main():
         await try_add(session, mocks.MOCK_USUARIO_SENHA_RECUPERADA)
         await try_add(session, mocks.MOCK_USUARIO_ADMIN)
         await try_add(session, mocks.MOCK_ESTOQUE)
+        await try_add(session, mocks.MOCK_GASTO_RECORRENTE_SALARIO_MOTOBY)
+        await try_add(session, mocks.MOCK_GASTO_RECORRENTE_ALUGUEL)
+        await try_add(session, mocks.MOCK_GASTO_RECORRENTE_TRIBUTOS)
 
         acucar = await try_add(session, Insumo(organizacao_id=organizacao.id, nome='Açúcar', peso=1000, custo=14))
         manteiga = await try_add(session, Insumo(organizacao_id=organizacao.id, nome='Manteiga', peso=1000, custo=40))

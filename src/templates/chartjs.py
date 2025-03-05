@@ -19,7 +19,10 @@ BASE_OPTIONS = {
     'plugins': {
         'legend': {
             'display': False
-        }
+        },
+        # 'tooltip': {
+        #     'position': 'bottom'
+        # }
     }
 }
 

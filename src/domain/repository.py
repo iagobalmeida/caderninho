@@ -1,26 +1,52 @@
 from datetime import datetime, timedelta
 from enum import Enum
 from math import ceil
-from typing import Tuple
 
+from aiocache import Cache
 from loguru import logger
-from sqlmodel import and_, func, select, text
+from sqlmodel import func, select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.domain.entities import (CaixaMovimentacao, CaixMovimentacaoTipo,
-                                 Estoque, Insumo, Organizacao, Plano, Receita,
+from src.domain.entities import (CaixaMovimentacao, Estoque, GastoRecorrencia,
+                                 GastoRecorrente, Insumo, Organizacao, Receita,
                                  ReceitaGasto, Usuario)
 from src.schemas.auth import AuthSession
 
 
 class Entities(Enum):
     ORGANIZACAO = Organizacao
+    GASTO_RECORRENTE = GastoRecorrente
     USUARIO = Usuario
     RECEITA_GASTO = ReceitaGasto
     ESTOQUE = Estoque
     CAIXA_MOVIMENTACAO = CaixaMovimentacao
     INSUMO = Insumo
     RECEITA = Receita
+
+
+cache = Cache(Cache.MEMORY)
+CACHE_TTL = 1*60*5
+
+
+async def set_cache(*args, value, duration: int = CACHE_TTL):
+    key = '_'.join([str(a) for a in args])
+    __cache = {
+        'created_at': datetime.now(),
+        'expiration': datetime.now() + timedelta(seconds=duration),
+        'value': value
+    }
+    await cache.set(key, __cache, duration)
+    return __cache
+
+
+async def get_cache(*args):
+    key = '_'.join([str(a) for a in args])
+    return await cache.get(key)
+
+
+async def unset_cache(*args):
+    key = '_'.join([str(a) for a in args])
+    return await cache.delete(key)
 
 
 async def count_all(db_session: AsyncSession, entity: Entities, auth_session: AuthSession = None):
@@ -165,52 +191,39 @@ async def get_caixa_movimentacoes_qr_code(auth_session: AuthSession, db_session:
     )
 
 
-async def get_fluxo_caixa(auth_session: AuthSession, db_session: AsyncSession) -> Tuple[float, float, float]:
-    data_limite = datetime.now() - timedelta(days=30)
-
-    query_entradas = select(func.sum(CaixaMovimentacao.valor)).where(and_(CaixaMovimentacao.data_criacao >= data_limite, CaixaMovimentacao.tipo == CaixMovimentacaoTipo.ENTRADA))
-    if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
-        query_entradas = query_entradas.filter(CaixaMovimentacao.organizacao_id == auth_session.organizacao_id)
-    entradas = (await db_session.exec(query_entradas)).first()
-
-    query_saidas_caixa_movimentacao = select(func.sum(CaixaMovimentacao.valor)).where(and_(CaixaMovimentacao.data_criacao >= data_limite, CaixaMovimentacao.tipo == CaixMovimentacaoTipo.SAIDA))
-    if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
-        query_saidas_caixa_movimentacao = query_saidas_caixa_movimentacao.filter(CaixaMovimentacao.organizacao_id == auth_session.organizacao_id)
-    saidas_caixa_movimentacao = (await db_session.exec(query_saidas_caixa_movimentacao)).first()
-
-    query_saidas_estoques = select(func.sum(Estoque.valor_pago)).where(Estoque.data_criacao >= data_limite)
-    if getattr(db_session, 'sessao_autenticada', False) and not auth_session.administrador:
-        query_saidas_estoques = query_saidas_estoques.filter(Estoque.organizacao_id == auth_session.organizacao_id)
-    saidas_estoques = (await db_session.exec(query_saidas_estoques)).first()
-
-    logger.info(f'entradas: {entradas}')
-    logger.info(f'saidas_caixa_movimentacao: {saidas_caixa_movimentacao}')
-    logger.info(f'saidas_estoques: {saidas_estoques}')
-
-    saidas = (saidas_caixa_movimentacao if saidas_caixa_movimentacao else 0) + (saidas_estoques if saidas_estoques else 0)
-    caixa = (entradas if entradas else 0) - (saidas if saidas else 0)
-    return (entradas, saidas, caixa)
+async def recarregar_cache(auth_session: AuthSession, db_session: AsyncSession):
+    return await unset_cache('get_chart_fluxo_caixa_datasets', auth_session.id, auth_session.organizacao_id)
 
 
 async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: AsyncSession, data_inicial: datetime, data_final: datetime) -> dict:
+    cached = await get_cache('get_chart_fluxo_caixa_datasets', auth_session.id, auth_session.organizacao_id)
+    if not cached:
+        logger.info('✖ Cache not found!')
+        result = await __get_chart_fluxo_caixa_datasets(auth_session=auth_session, db_session=db_session, data_inicial=data_inicial, data_final=data_final)
+        return await set_cache('get_chart_fluxo_caixa_datasets', auth_session.id, auth_session.organizacao_id, value=result)
+    logger.info('✔ Cache found')
+    return cached
+
+
+async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: AsyncSession, data_inicial: datetime, data_final: datetime) -> dict:
     dates = [(data_inicial + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((data_final - data_inicial).days + 1)]
     results = [
         [data, 0, 0, 0, 0] for data in dates
     ]
 
-    filter_organizacao_id = f'caixamovimentacao.organizacao_id = {auth_session.organizacao_id} AND '
+    filter_organizacao_id = f'organizacao_id = {auth_session.organizacao_id} AND '
     query_caixa_movimentacao = text(f'''
         SELECT
-            date(caixamovimentacao.data_criacao) AS dia,
-            sum(CASE WHEN (caixamovimentacao.tipo = "ENTRADA") THEN caixamovimentacao.valor ELSE 0 END) AS entradas,
-            sum(CASE WHEN (caixamovimentacao.tipo = "SAIDA") THEN caixamovimentacao.valor ELSE 0 END) AS saidas,
-            sum(CASE WHEN (caixamovimentacao.tipo = "ENTRADA") THEN caixamovimentacao.valor ELSE 0 END) - sum(CASE WHEN (caixamovimentacao.tipo = "SAIDA") THEN caixamovimentacao.valor ELSE 0 END) AS margem
+            date(data_criacao) AS dia,
+            sum(CASE WHEN (tipo = "ENTRADA") THEN valor ELSE 0 END) AS entradas,
+            sum(CASE WHEN (tipo = "SAIDA") THEN valor ELSE 0 END) AS saidas,
+            sum(CASE WHEN (tipo = "ENTRADA") THEN valor ELSE 0 END) - sum(CASE WHEN (tipo = "SAIDA") THEN valor ELSE 0 END) AS margem
         FROM caixamovimentacao
         WHERE
             {filter_organizacao_id if auth_session.organizacao_id else ''}
-            caixamovimentacao.data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
-            AND caixamovimentacao.data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
-        GROUP BY date(caixamovimentacao.data_criacao)
+            data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
+            AND data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
+        GROUP BY date(data_criacao)
         ORDER BY dia ASC
 
     ''')
@@ -220,19 +233,19 @@ async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: 
         for __col in range(len(__row) - 1):
             results[__row_index][__col+1] += __row[__col+1]
 
-    filter_organizacao_id = f'estoque.organizacao_id = {auth_session.organizacao_id} AND '
+    filter_organizacao_id = f'organizacao_id = {auth_session.organizacao_id} AND '
     query_estoque = text(f'''
         SELECT
-            date(estoque.data_criacao) AS dia,
+            date(data_criacao) AS dia,
             sum(0) AS entradas,
-            sum(estoque.valor_pago) AS saidas,
-            -1 * sum(estoque.valor_pago) AS margem
+            sum(valor_pago) AS saidas,
+            -1 * sum(valor_pago) AS margem
         FROM estoque
         WHERE
             {filter_organizacao_id if auth_session.organizacao_id else ''}
-            estoque.data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
-            AND estoque.data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
-        GROUP BY date(estoque.data_criacao)
+            data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
+            AND data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
+        GROUP BY date(data_criacao)
         ORDER BY dia ASC
     ''')
     result_estoque = (await db_session.exec(query_estoque)).all()
@@ -241,23 +254,37 @@ async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: 
         for __col in range(len(__row) - 1):
             results[__row_index][__col+1] += __row[__col+1]
 
-    recorrentes = [
-        ('2025-01-01', 'mensal', 'fixo', 100),
-        ('2025-01-02', 'semanal', 'fixo', 50)
-    ]
+    filter_organizacao_id = f'organizacao_id = {auth_session.organizacao_id} AND '
+    query_recorrentes = text(f'''
+        SELECT
+            date(data_inicio) AS dia,
+            recorrencia AS recorrencia,
+            tipo AS tipo,
+            valor AS valor
+        FROM gastorecorrente
+        WHERE
+            {filter_organizacao_id if auth_session.organizacao_id else ''}
+            data_inicio <= "{data_final.strftime('%Y-%m-%d')}"
+    ''')
+    result_recorrentes = (await db_session.exec(query_recorrentes)).all()
 
-    for __row in recorrentes:
+    for __row in result_recorrentes:
         __row_date = datetime.strptime(__row[0], '%Y-%m-%d')
-        if __row[1] == 'mensal':
+        if str(__row[1]).title() == GastoRecorrencia.MENSAL.value:
             cobrancas_anteriores = int((datetime.now() - __row_date).days/30)
             results[0][3] -= cobrancas_anteriores * __row[3]
 
             dia_cobranca = __row_date.day
             for r in results:
                 if int(r[0].split('-')[-1]) == int(dia_cobranca):
-                    r[3] -= __row[3]
-                    r[4] += __row[3]
-        elif __row[1] == 'semanal':
+                    if __row[2] == 'FIXO':
+                        r[3] -= __row[3]
+                        r[4] += __row[3]
+                    else:
+                        __value = abs(r[3] * __row[3]/100)
+                        r[3] -= __value
+                        r[4] += __value
+        elif str(__row[1]).title() == GastoRecorrencia.SEMANAL.value:
             dia_cobranca = __row_date.weekday()
 
             cobrancas_anteriores = int((datetime.now() - __row_date).days/7)
@@ -265,7 +292,13 @@ async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: 
 
             for r in results:
                 if datetime.strptime(r[0], '%Y-%m-%d').weekday() == dia_cobranca:
-                    r[3] -= __row[3]
-                    r[4] += __row[3]
+                    if __row[2] == 'FIXO':
+                        r[3] -= __row[3]
+                        r[4] += __row[3]
+                    else:
+                        __value = abs(r[3] * __row[3]/100)
+                        r[3] -= __value
+                        r[4] += __value
+                        logger.info(r[4])
 
     return results

@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from src.domain import repository
+from src.domain.schemas import GastoRecorrencia, GastoTipo
 
 MOCK_ORGANIZACAO = repository.Entities.ORGANIZACAO.value(
     id=1,
@@ -57,6 +58,36 @@ MOCK_CAIXA_MOVIMENTACAO = repository.Entities.CAIXA_MOVIMENTACAO.value(
     organizacao_id=MOCK_ORGANIZACAO.id,
     descricao='CaixaMovimentacao teste',
     valor=100.0
+)
+
+MOCK_GASTO_RECORRENTE_SALARIO_MOTOBY = repository.Entities.GASTO_RECORRENTE.value(
+    id=1,
+    organizacao_id=MOCK_ORGANIZACAO.id,
+    data_inicio=datetime.now()-timedelta(days=45),
+    descricao='Salário Motoboy',
+    valor=25.0,
+    recorrencia=GastoRecorrencia.SEMANAL
+)
+
+
+MOCK_GASTO_RECORRENTE_ALUGUEL = repository.Entities.GASTO_RECORRENTE.value(
+    id=2,
+    organizacao_id=MOCK_ORGANIZACAO.id,
+    data_inicio=datetime.now()-timedelta(days=45),
+    descricao='Aluguel',
+    valor=100.0,
+    recorrencia=GastoRecorrencia.MENSAL
+)
+
+
+MOCK_GASTO_RECORRENTE_TRIBUTOS = repository.Entities.GASTO_RECORRENTE.value(
+    id=2,
+    organizacao_id=MOCK_ORGANIZACAO.id,
+    data_inicio=datetime.now()-timedelta(days=45),
+    descricao='Imposto',
+    tipo=GastoTipo.PERCENTUAL,
+    valor=2,
+    recorrencia=GastoRecorrencia.SEMANAL
 )
 
 

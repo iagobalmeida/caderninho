@@ -1,6 +1,6 @@
 
 <div class="col-sm-12 col-lg-3">
-    <div class="cursor-pointer card bg-success-lt border-success" data-chartjs-toggle-dataset="4">
+    <div class="cursor-pointer card bg-success-lt border-success" data-chartjs-toggle-dataset="0">
         <div class="card-body">
             <h5 class="card-title mb-0">Entradas</h5>
             <div class="d-flex align-items-center">
@@ -21,7 +21,7 @@
 </div>
 
 <div class="col-sm-12 col-lg-3">
-    <div class="cursor-pointer card bg-danger-lt border-danger" data-chartjs-toggle-dataset="3">
+    <div class="cursor-pointer card bg-danger-lt border-danger" data-chartjs-toggle-dataset="1">
         <div class="card-body">
             <h5 class="card-title mb-0">Saídas</h5>
             <div class="d-flex align-items-center">
@@ -29,7 +29,7 @@
                     {{ chart_resumo_caixa_total_saidas | format_reais }}
                 </div>
                 <div class="me-auto">
-                    <div class="text-red d-inline-flex align-items-center lh-1">
+                    <div class="text-danger d-inline-flex align-items-center lh-1">
                         {{ material_symbol('arrow_upward') | safe }}
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                     {{ chart_resumo_caixa_total_saidas_recorrentes | format_reais }}
                 </div>
                 <div class="me-auto">
-                    <div class="text-red d-inline-flex align-items-center lh-1">
+                    <div class="text-warning d-inline-flex align-items-center lh-1">
                         {{ material_symbol('currency_exchange') | safe }}
                     </div>
                 </div>
@@ -63,7 +63,7 @@
 </div>
 
 <div class="col-sm-12 col-lg-3">
-    <div class="cursor-pointer card bg-purple-lt border-purple" data-chartjs-toggle-dataset="0,1">
+    <div class="cursor-pointer card bg-purple-lt border-purple" data-chartjs-toggle-dataset="3,4">
         <div class="card-body">
             <h5 class="card-title mb-0">Margem</h5>
 
@@ -89,13 +89,13 @@
         <div class="card-header cursor-pointer d-flex align-items-center justify-content-between flex-wrap" data-bs-toggle="collapse" data-bs-target="#collapseChartResumoCaixa">
             <h5 class="card-title">
                 {{ material_symbol('monitoring') | safe }}
-                Gráfico Fluxo de Caixa
+                Fluxo de Caixa
             </h5>
             <small class="text-muted">Clique para expandir/fechar</small>
         </div>
         <div class="card-body collapse show" id="collapseChartResumoCaixa">
             <p>
-                Dados de <b>{{chart_resumo_caixa_data_inicial | strftime_day}}</b> á <b>{{chart_resumo_caixa_data_final | strftime_day}}</b>
+                Dados de <b>{{chart_resumo_caixa_data_inicial | strftime_day}}</b> á <b>{{chart_resumo_caixa_data_final | strftime_day}}</b>. (Última atualização em <b>{{chart_resumo_caixa_data_atualizacao | strftime }}</b>)
             </p>
             <canvas id="chartResumoCaixa" width="400" height="300" style="max-height: 300px;"></canvas>
         </div>
