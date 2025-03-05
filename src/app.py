@@ -212,7 +212,7 @@ async def generic_exception_handler(request: fastapi.Request, ex: Exception):
     logger.exception(ex)
 
     base_redirect = request.url_for('get_app_index')
-    if request.session.sessao_autenticada:
+    if request.session.get('sessao_autenticada', False):
         base_redirect = request.url_for('get_home')
 
     redirect_to = str(request.headers.get('referer', base_redirect))
