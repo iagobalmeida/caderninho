@@ -41,6 +41,7 @@ async def test_post_caixa_movimentacoes_index(client):
     await autenticar(client)
     response = await client.post('/app/caixa_movimentacoes', data={
         'descricao': 'CaixaMovimentacao teste',
+        'tipo': 'Entrada',
         'valor': 100.00
     })
     assert response.status_code == 200
@@ -87,6 +88,7 @@ async def test_post_caixa_movimentacoes_atualizar(client):
     response = await client.post('/app/caixa_movimentacoes/atualizar', data={
         'id': 2,
         'descricao': 'CaixaMovimentacao Atualizada',
+        'tipo': 'Entrada',
         'valor': 100,
         'recebido': True
     })

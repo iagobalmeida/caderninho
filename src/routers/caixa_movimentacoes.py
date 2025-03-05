@@ -26,7 +26,7 @@ async def post_caixa_movimentacoes_index(request: fastapi.Request, payload: inpu
     auth_session = getattr(request.state, 'auth', None)
     await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.CAIXA_MOVIMENTACAO, values={
         'descricao': payload.descricao,
-        'tipo': payload.tipo.upper(),
+        'tipo': payload.tipo,
         'valor': payload.valor
     })
     return redirect_back(request, message='Movimentação de caixa criada com sucesso!')

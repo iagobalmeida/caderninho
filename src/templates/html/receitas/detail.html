@@ -2,6 +2,8 @@
 
 {% include 'receitas/modal_create.html' %}
 
+{% include 'receitas/modal_receita_gastos_incluir.html' %}
+{% include 'receitas/modal_receita_gastos_atualizar.html' %}
 {% include 'receitas/modal_receita_insumos_incluir.html' %}
 {% include 'receitas/modal_receita_insumos_atualizar.html' %}
 
@@ -109,7 +111,7 @@
 <div class="col-1 d-none d-lg-flex align-items-center justify-content-center opacity-50">
   {{ material_symbol('equal') | safe }}
 </div>
-<div data-receita-metrica="custo_total" data-receita-compoem="custo_unidade" class="col-3">
+<div data-receita-metrica="custo_total" data-receita-compoem="custo_unidade,margem_total" class="col-3">
   <div class="card bg-danger-lt border-danger">
     <div class="card-body">
       <h5 class="mb-0">Custo Total</h5>
@@ -119,7 +121,7 @@
 </div>
 <!-- Rendimento -->
 <div data-receita-metrica="rendimento" data-receita-compoem="custo_unidade,rendimento_unidades" class="col-3 col-lg-2">
-  <div class="card bg-teal-lt border-teal">
+  <div class="card bg-secondary-lt border-secondary">
     <div class="card-body">
       <h5 class="mb-0">Rendimento Total</h5>
       <h2>{{receita.rendimento}} g</h2>
@@ -141,7 +143,7 @@
   {{ material_symbol('equal') | safe }}
 </div>
 <div data-receita-metrica="rendimento_unidades" data-receita-compoem="custo_unidade" class="col-3 col-lg-2">
-  <div class="card bg-teal-lt border-teal">
+  <div class="card bg-secondary-lt border-secondary">
     <div class="card-body">
       <h5 class="mb-0">Rendimento Unidades</h5>
       <h2>{{receita.rendimento_unidades}} un.</h2>
@@ -161,7 +163,7 @@
 </div>
 <!-- Precificação -->
 <div data-receita-metrica="preco_sugerido" data-receita-compoem="margem_unitaria,margem_total" class="col-4">
-  <div class="card bg-purple-lt border-purple">
+  <div class="card bg-primary-lt border-primary">
     <div class="card-body">
       <h5 class="mb-0">Preço Sugerido</h5>
       <h2>{{receita.preco_sugerido | format_reais}}</h2>
@@ -169,7 +171,7 @@
   </div>
 </div>
 <div data-receita-metrica="margem_unitaria" data-receita-compoem="margem_total" class="col-4">
-  <div class="card bg-success-lt border-success">
+  <div class="card bg-purple-lt border-purple">
     <div class="card-body">
       <h5 class="mb-0">Margem Unitária</h5>
       <h2>+ {{(receita.preco_sugerido - receita.custo_unidade) | format_reais}}</h2>
@@ -177,13 +179,14 @@
   </div>
 </div>
 <div data-receita-metrica="margem_total" class="col-4">
-  <div class="card bg-success-lt border-success">
+  <div class="card bg-purple-lt border-purple">
     <div class="card-body">
       <h5 class="mb-0">Margem Total</h5>
       <h2>+ {{(receita.preco_sugerido * receita.rendimento_unidades) | format_reais}}</h2>
     </div>
   </div>
 </div>
+<!-- Gastos e Insumos -->
 <div class="col-12">
   <div class="card" id="cardInsumos">
     <div class="card-header">
@@ -192,7 +195,7 @@
         Gastos & Insumos
       </h5>
       <div class="ms-auto d-none d-md-flex btn-list">
-        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#inserirReceitaGastoModal">
           {{material_symbol('payments') | safe }}
           Incluir Gasto
         </button>
@@ -208,7 +211,7 @@
       <div class="dropdown ms-auto d-md-none">
         <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
         <div class="dropdown-menu">
-          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaInsumoModal">
+          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#inserirReceitaGastoModal">
             {{material_symbol('payments') | safe }}
             Incluir Gasto
           </button>
@@ -226,7 +229,7 @@
     {% with table_data=custos_table_data, table_columns=custos_table_columns, table_data=custos_table_data, table_no_result=custos_table_no_result, table_modal=custos_table_modal %}
       {% include 'components/table.html' %}
     {% endwith %}
-    <hr>
+    <hr class="my-2">
     {% with table_data=insumos_table_data, table_columns=insumos_table_columns, table_data=insumos_table_data, table_no_result=insumos_table_no_result, table_modal=insumos_table_modal %}
       {% include 'components/table.html' %}
     {% endwith %}

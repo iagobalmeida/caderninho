@@ -65,7 +65,7 @@ async def get_receita(request: fastapi.Request, id: int, session: Session = DBSE
     ]
     insumos_table_data = [gasto for gasto in gastos if gasto.insumo_id]
     insumos_table_no_result = 'Nenhum registro encontrado'
-    insumos_table_modal = '#atualizarReceitaGastoModal'
+    insumos_table_modal = '#atualizarReceitaInsumoModal'
 
     custos_table_columns = [
         'Descrição',

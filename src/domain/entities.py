@@ -1,6 +1,5 @@
 import math
 from datetime import datetime, timedelta
-from enum import Enum
 from typing import Dict, List, Optional
 
 from loguru import logger
@@ -9,29 +8,12 @@ from pixqrcode import PixQrCode
 from sqlalchemy.orm import validates
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
+from src.domain.schemas import CaixMovimentacaoTipo, GastoTipo, Plano
 from src.templates import filters
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 STRFTIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-
-
-class Plano(Enum):
-    BLOQUEADO = 'Bloqueado'
-    TESTE = 'Teste'
-    PEQUENO = 'Pequeno'
-    INTERMEDIARIO = 'Intermediário'
-    AVANCADO = 'Avançado'
-
-
-class GastoTipo(Enum):
-    PERCENTUAL = 'Percentual'
-    FIXO = 'Fixo'
-
-
-class CaixMovimentacaoTipo(Enum):
-    ENTRADA = 'Entrada'
-    SAIDA = 'Saida'
 
 
 class Organizacao(SQLModel, table=True):
@@ -184,6 +166,7 @@ class ReceitaGasto(RegistroOrganizacao, table=True):
         base_dict = self.model_dump()
         if self.gasto_tipo:
             base_dict['gasto_tipo'] = self.gasto_tipo.value
+            base_dict['#input_gasto_valor_unidade'] = 'R$' if self.gasto_tipo == GastoTipo.FIXO else '%'
         elif self.insumo:
             base_dict['insumo_nome'] = self.insumo.nome
             base_dict['insumo_custo'] = self.insumo.custo

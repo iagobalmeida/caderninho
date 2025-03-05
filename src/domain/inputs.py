@@ -1,6 +1,8 @@
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from pydantic import BaseModel
+
+from src.domain.schemas import CaixMovimentacaoTipo, GastoTipo, Plano
 
 
 class ReceitaAtualizar(BaseModel):
@@ -15,7 +17,7 @@ class ReceitaGastosAdicionar(BaseModel):
     insumo_id: Optional[int] = None
     descricao: Optional[str] = None
     quantidade: Optional[float] = None
-    gasto_tipo: Optional[str] = None  # TODO: Associar a ENUM
+    gasto_tipo: Optional[GastoTipo] = None  # TODO: Associar a ENUM
     gasto_valor: Optional[float] = None
 
 
@@ -48,10 +50,10 @@ class InsumoAtualizar(InsumoCriar):
 class CaixaMovimentacaoCriar(BaseModel):
     descricao: str
     valor: float
-    tipo: str
+    tipo: CaixMovimentacaoTipo
 
 
-class CaixaMovimentacaoAtualizar(CaixaMovimentacaoCriar):
+class CaixaMovimentacaoAtualizar(BaseModel):
     id: int
     descricao: str
     valor: float
@@ -87,7 +89,7 @@ class UsuarioCriar(BaseModel):
     nome: str
     email: str
     senha: str
-    plano: Optional[str] = None
+    plano: Optional[Plano] = None
     senha_confirmar: str
     organizacao_id:  Optional[int] = False
     organizacao_descricao: Optional[str] = None

@@ -4,7 +4,7 @@ from math import ceil
 from typing import Tuple
 
 from loguru import logger
-from sqlmodel import and_, case, func, select, text
+from sqlmodel import and_, func, select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.domain.entities import (CaixaMovimentacao, CaixMovimentacaoTipo,
@@ -195,9 +195,10 @@ async def get_fluxo_caixa(auth_session: AuthSession, db_session: AsyncSession) -
 async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: AsyncSession, data_inicial: datetime, data_final: datetime) -> dict:
     dates = [(data_inicial + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((data_final - data_inicial).days + 1)]
     results = [
-        [data, 0, 0, 0] for data in dates
+        [data, 0, 0, 0, 0] for data in dates
     ]
 
+    filter_organizacao_id = f'caixamovimentacao.organizacao_id = {auth_session.organizacao_id} AND '
     query_caixa_movimentacao = text(f'''
         SELECT
             date(caixamovimentacao.data_criacao) AS dia,
@@ -206,8 +207,8 @@ async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: 
             sum(CASE WHEN (caixamovimentacao.tipo = "ENTRADA") THEN caixamovimentacao.valor ELSE 0 END) - sum(CASE WHEN (caixamovimentacao.tipo = "SAIDA") THEN caixamovimentacao.valor ELSE 0 END) AS margem
         FROM caixamovimentacao
         WHERE
-            caixamovimentacao.organizacao_id = {auth_session.organizacao_id}
-            AND caixamovimentacao.data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
+            {filter_organizacao_id if auth_session.organizacao_id else ''}
+            caixamovimentacao.data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
             AND caixamovimentacao.data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
         GROUP BY date(caixamovimentacao.data_criacao)
         ORDER BY dia ASC
@@ -219,6 +220,7 @@ async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: 
         for __col in range(len(__row) - 1):
             results[__row_index][__col+1] += __row[__col+1]
 
+    filter_organizacao_id = f'estoque.organizacao_id = {auth_session.organizacao_id} AND '
     query_estoque = text(f'''
         SELECT
             date(estoque.data_criacao) AS dia,
@@ -227,8 +229,8 @@ async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: 
             -1 * sum(estoque.valor_pago) AS margem
         FROM estoque
         WHERE
-            estoque.organizacao_id = {auth_session.organizacao_id}
-            AND estoque.data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
+            {filter_organizacao_id if auth_session.organizacao_id else ''}
+            estoque.data_criacao >= "{data_inicial.strftime('%Y-%m-%d')}"
             AND estoque.data_criacao <= "{data_final.strftime('%Y-%m-%d')}"
         GROUP BY date(estoque.data_criacao)
         ORDER BY dia ASC
@@ -238,5 +240,32 @@ async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: 
         __row_index = dates.index(__row[0])
         for __col in range(len(__row) - 1):
             results[__row_index][__col+1] += __row[__col+1]
+
+    recorrentes = [
+        ('2025-01-01', 'mensal', 'fixo', 100),
+        ('2025-01-02', 'semanal', 'fixo', 50)
+    ]
+
+    for __row in recorrentes:
+        __row_date = datetime.strptime(__row[0], '%Y-%m-%d')
+        if __row[1] == 'mensal':
+            cobrancas_anteriores = int((datetime.now() - __row_date).days/30)
+            results[0][3] -= cobrancas_anteriores * __row[3]
+
+            dia_cobranca = __row_date.day
+            for r in results:
+                if int(r[0].split('-')[-1]) == int(dia_cobranca):
+                    r[3] -= __row[3]
+                    r[4] += __row[3]
+        elif __row[1] == 'semanal':
+            dia_cobranca = __row_date.weekday()
+
+            cobrancas_anteriores = int((datetime.now() - __row_date).days/7)
+            results[0][3] -= cobrancas_anteriores * __row[3]
+
+            for r in results:
+                if datetime.strptime(r[0], '%Y-%m-%d').weekday() == dia_cobranca:
+                    r[3] -= __row[3]
+                    r[4] += __row[3]
 
     return results

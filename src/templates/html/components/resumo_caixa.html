@@ -1,52 +1,8 @@
 
-<div class="col-12">
-    <div class="card">
-        <div class="card-header cursor-pointer bg-primary text-white  d-flex align-items-center justify-content-between flex-wrap" data-bs-toggle="collapse" data-bs-target="#collapseChartResumoCaixa">
-            <h5 class="card-title">
-                {{ material_symbol('monitoring') | safe }}
-                Gráfico Fluxo de Caixa
-            </h5>
-            <small class="text-white opacity-75">Clique para expandir/fechar</small>
-        </div>
-        <div class="card-body collapse show" id="collapseChartResumoCaixa">
-            <p>
-                Dados de <b>{{chart_resumo_caixa_data_inicial | strftime_day}}</b> á <b>{{chart_resumo_caixa_data_final | strftime_day}}</b>
-            </p>
-            <canvas id="myChart" width="400" height="300" style="max-height: 300px;"></canvas>
-        </div>
-    </div>
-</div>
-
-<script>
-    const ctx = document.getElementById('myChart').getContext('2d');
-
-    const config = {{chart_resumo_caixa_config | json | safe}}
-
-    if(!config['options']['scales']) config['options']['scales'] = {'y': {}}
-    config['options']['scales']['y']['ticks'] = {
-        callback: function(value, index, ticks) {
-            return 'R$ ' + value;
-        }
-    }
-    new Chart(ctx, config);
-</script>
-
-<div class="col-sm-12 col-lg-4">
-    <div class="card bg-success-lt border-success">
-        <div class="card-header d-flex align-items-center justify-content-between flex-wrap">
-            <h5 class="card-title">Entradas</h5>
-            <small class="opacity-75">
-                Dados de <b>{{chart_resumo_caixa_data_inicial | strftime_day}}</b> á <b>{{chart_resumo_caixa_data_final | strftime_day}}</b>
-            </small>
-        </div>
+<div class="col-sm-12 col-lg-3">
+    <div class="cursor-pointer card bg-success-lt border-success" data-chartjs-toggle-dataset="4">
         <div class="card-body">
-            <div class="ms-auto lh-1 position-absolute" style="right: 16px">
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateCaixaMovimentacao">
-                    {{ material_symbol('add') | safe }}
-                    Nova Movimentação
-                    &nbsp;
-                </button>
-            </div>
+            <h5 class="card-title mb-0">Entradas</h5>
             <div class="d-flex align-items-center">
                 <div class="h1 mb-0 me-2 text-success">
                     {{ chart_resumo_caixa_total_entradas | format_reais }}
@@ -57,26 +13,17 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<div class="col-sm-12 col-lg-4">
-    <div class="card bg-danger-lt border-danger">
-        <div class="card-header d-flex align-items-center justify-content-between flex-wrap">
-            <h5 class="card-title">Saídas</h5>
             <small class="opacity-75">
                 Dados de <b>{{chart_resumo_caixa_data_inicial | strftime_day}}</b> á <b>{{chart_resumo_caixa_data_final | strftime_day}}</b>
             </small>
         </div>
-        <div class="card-body position-relative">
-            <div class="ms-auto lh-1 position-absolute" style="right: 16px">
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateEstoque">
-                    {{ material_symbol('add') | safe }}
-                    Nova Movimentação
-                    &nbsp;
-                </button>
-            </div>
+    </div>
+</div>
+
+<div class="col-sm-12 col-lg-3">
+    <div class="cursor-pointer card bg-danger-lt border-danger" data-chartjs-toggle-dataset="3">
+        <div class="card-body">
+            <h5 class="card-title mb-0">Saídas</h5>
             <div class="d-flex align-items-center">
                 <div class="h1 mb-0 me-2 text-danger">
                     {{ chart_resumo_caixa_total_saidas | format_reais }}
@@ -87,29 +34,100 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<div class="col-sm-12 col-lg-4">
-    <div class="card bg-purple-lt border-purple">
-        <div class="card-header d-flex align-items-center justify-content-between flex-wrap">
-            <h5 class="card-title">Margem</h5>
             <small class="opacity-75">
                 Dados de <b>{{chart_resumo_caixa_data_inicial | strftime_day}}</b> á <b>{{chart_resumo_caixa_data_final | strftime_day}}</b>
             </small>
         </div>
+    </div>
+</div>
+
+<div class="col-sm-12 col-lg-3">
+    <div class="cursor-pointer card bg-warning-lt border-warning" data-chartjs-toggle-dataset="2">
         <div class="card-body">
+            <h5 class="card-title mb-0">Recorrentes</h5>
+            <div class="d-flex align-items-center">
+                <div class="h1 mb-0 me-2 text-warning">
+                    {{ chart_resumo_caixa_total_saidas_recorrentes | format_reais }}
+                </div>
+                <div class="me-auto">
+                    <div class="text-red d-inline-flex align-items-center lh-1">
+                        {{ material_symbol('currency_exchange') | safe }}
+                    </div>
+                </div>
+            </div>
+            <small class="opacity-75">
+                Dados de <b>{{chart_resumo_caixa_data_inicial | strftime_day}}</b> á <b>{{chart_resumo_caixa_data_final | strftime_day}}</b>
+            </small>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-12 col-lg-3">
+    <div class="cursor-pointer card bg-purple-lt border-purple" data-chartjs-toggle-dataset="0,1">
+        <div class="card-body">
+            <h5 class="card-title mb-0">Margem</h5>
+
             <div class="d-flex align-items-center">
                 <div class="h1 mb-0 me-2 text-purple">
                     {{ chart_resumo_caixa_margem_final | format_reais }}
                 </div>
                 <div class="me-auto">
                     <div class="text-purple d-inline-flex align-items-center lh-1">
-                        {{ material_symbol('sync') | safe }}
+                        {{ material_symbol('water') | safe }}
                     </div>
                 </div>
             </div>
+            <small class="opacity-75">
+                Dados de <b>{{chart_resumo_caixa_data_inicial | strftime_day}}</b> á <b>{{chart_resumo_caixa_data_final | strftime_day}}</b>
+            </small>
         </div>
     </div>
 </div>
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-header cursor-pointer d-flex align-items-center justify-content-between flex-wrap" data-bs-toggle="collapse" data-bs-target="#collapseChartResumoCaixa">
+            <h5 class="card-title">
+                {{ material_symbol('monitoring') | safe }}
+                Gráfico Fluxo de Caixa
+            </h5>
+            <small class="text-muted">Clique para expandir/fechar</small>
+        </div>
+        <div class="card-body collapse show" id="collapseChartResumoCaixa">
+            <p>
+                Dados de <b>{{chart_resumo_caixa_data_inicial | strftime_day}}</b> á <b>{{chart_resumo_caixa_data_final | strftime_day}}</b>
+            </p>
+            <canvas id="chartResumoCaixa" width="400" height="300" style="max-height: 300px;"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctxChartFluxoCaixa = document.getElementById('chartResumoCaixa').getContext('2d');
+
+    const configChartFluxoCaixa = {{chart_resumo_caixa_config | json | safe}}
+
+    if(!configChartFluxoCaixa['options']['scales']) configChartFluxoCaixa['options']['scales'] = {'y': {}}
+    configChartFluxoCaixa['options']['scales']['y']['ticks'] = {
+        callback: function(value, index, ticks) {
+            return 'R$ ' + value;
+        }
+    }
+    const chartFluxoCaixa = new Chart(ctxChartFluxoCaixa, configChartFluxoCaixa);
+
+    document.querySelectorAll('[data-chartjs-toggle-dataset]').forEach(el => {
+        el.addEventListener('click', (ev) => {
+            const dataChartJSToggleIds = (el.getAttribute('data-chartjs-toggle-dataset') || '').split(',');
+            const visibles = chartFluxoCaixa.getVisibleDatasetCount();
+            const willHide = !el.classList.contains('opacity-50');
+            if(willHide && visibles <= dataChartJSToggleIds.length) return;
+
+            el.classList.toggle('opacity-50');
+            dataChartJSToggleIds.forEach(datasetId => {
+                const meta = chartFluxoCaixa.getDatasetMeta(datasetId)
+                chartFluxoCaixa.setDatasetVisibility(parseInt(datasetId), !meta.visible);
+                chartFluxoCaixa.update();
+            })
+        })
+    })
+</script>

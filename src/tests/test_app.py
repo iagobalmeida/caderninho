@@ -34,7 +34,7 @@ async def test_post_registrar(client):
         'senha': 'novo',
         'senha_confirmar': 'novo',
         'organizacao_descricao': 'Nova Organização Teste',
-        'plano': 'TESTE',
+        'plano': 'Teste',
         'dono': True,
     })
 
@@ -52,7 +52,7 @@ async def test_post_registrar_senhas_nao_batem(client):
         'senha': 'novo',
         'senha_confirmar': 'senha_incorreta',
         'organizacao_descricao': 'Nova Organização Teste',
-        'plano': 'TESTE',
+        'plano': 'Teste',
         'dono': True,
     })
 

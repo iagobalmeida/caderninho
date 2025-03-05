@@ -51,13 +51,15 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
     entradas = [c[1] for c in chart_datasets]
     saidas = [c[2] for c in chart_datasets]
     margem = [c[3] for c in chart_datasets]
-    margem_final = list(map(abs, itertools.accumulate(margem)))
+    saidas_recorrentes = [c[4] for c in chart_datasets]
+    margem_final = list(map(int, itertools.accumulate(margem)))
     datas = [datetime.strptime(cd[0], '%Y-%m-%d') for cd in chart_datasets]
 
     chart_config = chart_fluxo_caixa_config(
         data={
             'Entradas': entradas[10:],
             'Saídas': saidas[10:],
+            'Saídas Recorrentes': saidas_recorrentes[10:],
             'Margem': margem[10:],
             'Margem Final': margem_final[10:]
         },
@@ -77,6 +79,7 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
         'chart_resumo_caixa_config': chart_config,
         'chart_resumo_caixa_total_entradas': sum(entradas),
         'chart_resumo_caixa_total_saidas': sum(saidas),
+        'chart_resumo_caixa_total_saidas_recorrentes': sum(saidas_recorrentes),
         'chart_resumo_caixa_margem_final': margem_final[-1]
     })
 
