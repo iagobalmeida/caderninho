@@ -262,7 +262,7 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
     for __row in result_estoque:
         __row_date = str(__row[0])
         try:
-            __row_index = dates.index(__row[0])
+            __row_index = dates.index(__row_date)
             for __col in range(len(__row) - 1):
                 results[__row_index][__col+1] += __row[__col+1]
         except ValueError:
