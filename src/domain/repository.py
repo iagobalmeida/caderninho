@@ -229,9 +229,19 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
     ''')
     result_caixa_movimentacao = (await db_session.exec(query_caixa_movimentacao)).all()
     for __row in result_caixa_movimentacao:
-        __row_index = dates.index(__row[0])
-        for __col in range(len(__row) - 1):
-            results[__row_index][__col+1] += __row[__col+1]
+        __row_date = str(__row[0])
+        try:
+            __row_index = dates.index(__row_date)
+            for __col in range(len(__row) - 1):
+                results[__row_index][__col+1] += __row[__col+1]
+        except ValueError:
+            results[__row_date] = [
+                __row_date,
+                __row[1],
+                __row[2],
+                __row[3],
+                0
+            ]
 
     filter_organizacao_id = f'organizacao_id = {auth_session.organizacao_id} AND '
     query_estoque = text(f'''
@@ -250,9 +260,19 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
     ''')
     result_estoque = (await db_session.exec(query_estoque)).all()
     for __row in result_estoque:
-        __row_index = dates.index(__row[0])
-        for __col in range(len(__row) - 1):
-            results[__row_index][__col+1] += __row[__col+1]
+        __row_date = str(__row[0])
+        try:
+            __row_index = dates.index(__row[0])
+            for __col in range(len(__row) - 1):
+                results[__row_index][__col+1] += __row[__col+1]
+        except ValueError:
+            results[__row_date] = [
+                __row_date,
+                __row[1],
+                __row[2],
+                __row[3],
+                0
+            ]
 
     filter_organizacao_id = f'organizacao_id = {auth_session.organizacao_id} AND '
     query_recorrentes = text(f'''
