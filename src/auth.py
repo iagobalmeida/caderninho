@@ -5,9 +5,9 @@ from fastapi.responses import RedirectResponse
 from loguru import logger
 from sqlmodel import Session
 
-from src.domain import repository
-from src.schemas.auth import AuthSession
-from src.utils import redirect_url_for
+from domain import repository
+from schemas.auth import AuthSession
+from utils import redirect_url_for
 
 
 async def authenticate(session: Session, request: Request, email: str, senha: str, lembrar_de_mim: bool = False) -> bool:
@@ -34,10 +34,21 @@ async def authenticate(session: Session, request: Request, email: str, senha: st
     if not senha_valida:
         return False
 
+    organizacao_id = None
+    organizacao_descricao = '-'
+    if db_usuario.organizacao:
+        organizacao_descricao = db_usuario.organizacao.descricao
+        organizacao_id = db_usuario.organizacao.id
+
     sessao = AuthSession(
-        **db_usuario.model_dump(),
-        organizacao_descricao=db_usuario.organizacao.descricao,
-        valid=True
+        id=db_usuario.id,
+        nome=db_usuario.nome,
+        email=db_usuario.email,
+        administrador=db_usuario.administrador,
+        dono=db_usuario.dono,
+        valid=True,
+        organizacao_id=organizacao_id,
+        organizacao_descricao=organizacao_descricao,
     )
 
     if not lembrar_de_mim:

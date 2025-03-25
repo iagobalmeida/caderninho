@@ -42,28 +42,25 @@
             <div class="mb-3">
               <label class="form-label">Escolha seu Plano</label>
               <select name="plano" id="plano" class="form-select">
-                <option value="Teste">Testar por 7 dias grátis</option>
-                <option value="Pequeno">Pequeno</option>
-                <option value="Intermediário" selected>Intermediário (Recomendado)</option>
-                <option value="Avançado">Avançado</option>
+                <option value="" selected disabled>Selecionar</option>
+                {% for plano_chave in planos %}
+                  {% if planos[plano_chave].assinatura_exibir %}
+                    <option value="{{plano_chave}}">{{planos[plano_chave].nome}}</option>
+                  {% endif %}
+                {% endfor %}
               </select>
             </div>
-            <div class="mb-3 d-none" id="wrapper-pagamento-TESTE">
-                <p class="mb-0">Grátis por <b>7 dias</b>.</p>
-                <small class="text-danger">Sua conta fica bloqueada após o período de teste</small>
-            </div>
-            <div class="mb-3 d-none" id="wrapper-pagamento-PEQUENO">
-                <!-- <p>Pagamento único: R$ 100 á vista (você paga 5/mês)</p> -->
-                <p>Você irá pagar <b>R$ 10/mês</b>.</p>
-            </div>
-            <div class="mb-3" id="wrapper-pagamento-INTERMEDIARIO">
-                <!-- <p>Pagamento único: R$ 200 á vista (você paga 15/mês)</p> -->
-                <p>Você irá pagar <b>R$ 20/mês</b>.</p>
-            </div>
-            <div class="mb-3 d-none" id="wrapper-pagamento-AVANCADO">
-                <!-- <p>Pagamento único: R$ 300 á vista (você paga 20/mês)</p> -->
-                <p>Você irá pagar <b>R$ 30/mês</b>.</p>
-            </div>
+            {% for plano_chave in planos %}
+                {% with plano=planos[plano_chave] %}
+                  <div class="mb-3 d-none" id="wrapper-pagamento-{{plano_chave}}">
+                      {% if plano.assinatura_descricao %}
+                        {{plano.assinatura_descricao | safe}}
+                      {% else %}
+                        <p>Você irá pagar <b>R$ {{plano.valor}}/mês</b>.</p>
+                      {% endif %}
+                  </div>
+                {% endwith %}
+            {% endfor %}
             <hr>
             <div class="mb-2">
               <label class="form-label">

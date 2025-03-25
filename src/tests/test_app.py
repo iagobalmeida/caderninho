@@ -4,8 +4,8 @@ from unittest.mock import patch
 import pytest
 from bs4 import BeautifulSoup
 
-from src.tests.mocks import MockSMTPServer
-from src.tests.utils import autenticar_admin
+from tests.mocks import MockSMTPServer
+from tests.utils import autenticar, autenticar_admin
 
 
 @pytest.mark.asyncio
@@ -97,3 +97,21 @@ async def test_app_get_admin_logs(client):
     await autenticar_admin(client)
     response = await client.get('/app/admin/logs')
     assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_get_app_home(client):
+    await autenticar(client)
+    response = await client.get('/app/home')
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.content, 'html.parser')
+    assert 'Home' in soup.text
+
+
+@pytest.mark.asyncio
+async def test_get_app_como_usar(client):
+    await autenticar(client)
+    response = await client.get('/app/como_usar')
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.content, 'html.parser')
+    assert 'Como Usar' in soup.text

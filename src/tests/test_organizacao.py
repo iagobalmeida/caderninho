@@ -4,8 +4,8 @@ from unittest.mock import patch
 import pytest
 from bs4 import BeautifulSoup
 
-from src.tests.mocks import MOCK_ORGANIZACAO
-from src.tests.utils import autenticar
+from tests.mocks import MOCK_ORGANIZACAO
+from tests.utils import autenticar
 
 
 async def __get_organizacao(test_client):
@@ -37,7 +37,7 @@ async def test_get_organizacao_index(client):
 async def test_post_organizacao_index(client):
     await autenticar(client)
     response = await client.post('/app/organizacao', data={
-        'id': MOCK_ORGANIZACAO.id,
+        'id': str(MOCK_ORGANIZACAO.id),
         'descricao': 'teste',
         'cidade': MOCK_ORGANIZACAO.cidade,
         'chave_pix': MOCK_ORGANIZACAO.chave_pix
@@ -55,16 +55,16 @@ async def test_post_organizacao_index(client):
 async def test_post_organizacao_configuracoes(client):
     await autenticar(client)
     response = await client.post('/app/organizacao/configuracoes', data={
-        'id': MOCK_ORGANIZACAO.id,
+        'id': str(MOCK_ORGANIZACAO.id),
         'converter_kg': True
     })
     assert response.status_code == 200
 
     soup = await __get_organizacao(client)
     main_form = soup.find('form', {'id': 'form-configuracoes'})
-    dom_input_descricao = main_form.find('input', {'name': 'converter_kg'})
-    assert dom_input_descricao
-    assert dom_input_descricao.get('checked', False) != False
+    dom_input_converter_kg = main_form.find('input', {'name': 'converter_kg'})
+    assert dom_input_converter_kg
+    assert dom_input_converter_kg.get('checked', False) != False
 
 
 @pytest.mark.asyncio
@@ -75,7 +75,7 @@ async def test_post_organizacao_usuarios_criar(client):
         'email': 'outro@email.com',
         'senha': 'teste',
         'senha_confirmar': 'teste',
-        'organizacao_id': MOCK_ORGANIZACAO.id,
+        'organizacao_id': str(MOCK_ORGANIZACAO.id),
     })
     assert response.status_code == 200
 
@@ -98,7 +98,7 @@ async def test_post_organizacao_usuarios_criar_senhas_nao_batem(client):
         'email': 'outro@email.com',
         'senha': 'foo',
         'senha_confirmar': 'bar',
-        'organizacao_id': MOCK_ORGANIZACAO.id,
+        'organizacao_id': str(MOCK_ORGANIZACAO.id),
     })
     assert response.status_code == 200
     soup = await __get_organizacao(client)

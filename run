@@ -6,16 +6,17 @@ if [ "$1" == "install" ] ; then
   cp src/.env.example src/.env
   exit 0
 elif [ "$1" == "server" ] ; then
-  source .venv/bin/acivate
+  source .venv/bin/activate
   uvicorn src.app:app --reload
   exit 0
 elif [ "$1" == "coverage" ] ; then
-  source .venv/bin/acivate
+  source .venv/bin/activate
   DATABASE_URL="sqlite+aiosqlite:///test.db" coverage run -m pytest && coverage html && rm coverage.svg && coverage-badge -o coverage.svg
+  coverage report
   exit 0
 elif [ "$1" == "tests" ]; then
   source .venv/bin/activate
-  DATABASE_URL="sqlite+aiosqlite:///test.db" python -m pytest -s -x
+  DATABASE_URL="sqlite+aiosqlite:///test.db" python -m pytest -v -s -x 
   exit 0
 else
     if [ "$1" != "" ]; then

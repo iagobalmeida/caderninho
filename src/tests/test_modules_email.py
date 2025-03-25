@@ -2,7 +2,7 @@ import smtplib
 from unittest.mock import patch
 
 from modules import smpt
-from src.tests.mocks import MockSMTPServer, MockSMTPServerException
+from tests.mocks import MockSMTPServer, MockSMTPServerException
 
 
 def test_send_email_enviar():

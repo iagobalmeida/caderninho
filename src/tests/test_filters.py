@@ -3,7 +3,7 @@ from datetime import datetime
 
 import bs4
 
-from src.templates import filters
+from templates import filters
 
 
 def __remover_espacos(texto: str):
@@ -16,7 +16,7 @@ def test_filters_markdown():
 
 
 def test_filters_strftime():
-    strftime_expected = '01/01/2025 ás 10:10'
+    strftime_expected = '01/01/2025 ás 10:10:00'
     assert filters.templates_filter_strftime(datetime(2025, 1, 1, 10, 10)) == strftime_expected
 
 

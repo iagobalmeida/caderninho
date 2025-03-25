@@ -2,11 +2,11 @@
 import fastapi
 from sqlmodel import Session
 
-from src import auth
-from src.db import DBSESSAO_DEP
-from src.domain import inputs, repository
-from src.services import delete_entity, list_entity
-from src.utils import redirect_back
+import auth
+from db import DBSESSAO_DEP
+from domain import inputs, repository
+from services import delete_entity, list_entity
+from utils import redirect_back
 
 router = fastapi.APIRouter(prefix='/app/insumos', dependencies=[auth.HEADER_AUTH])
 

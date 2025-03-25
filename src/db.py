@@ -6,12 +6,17 @@ from loguru import logger
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import Session, SQLModel
+from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.env import getenv
+from env import getenv
 
-database_url = getenv('DATABASE_URL', "sqlite+aiosqlite:///database.db")
+database_url = getenv(
+    key='DATABASE_URL',
+    test_key='TEST_DATABASE_URL',
+    default="sqlite+aiosqlite:///database.db"
+)
+
 engine = create_async_engine(
     database_url,
     # pool_size=10,

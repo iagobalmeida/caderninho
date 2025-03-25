@@ -1,4 +1,5 @@
 import math
+import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
@@ -8,9 +9,9 @@ from pixqrcode import PixQrCode
 from sqlalchemy.orm import validates
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
-from src.domain.schemas import (CaixMovimentacaoTipo, GastoRecorrencia,
-                                GastoTipo, Plano)
-from src.templates import filters
+from domain.schemas import (PLANOS_DATA, CaixMovimentacaoTipo,
+                            GastoRecorrencia, GastoTipo, Planos)
+from templates import filters
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -18,16 +19,15 @@ STRFTIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 class Organizacao(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
     # Dados
     descricao: str
     cidade: Optional[str] = None
     chave_pix: Optional[str] = None
     usuarios: List['Usuario'] = Relationship(back_populates='organizacao')
     # Plano & pagamento
-    plano: Optional[Plano] = Plano.TESTE
+    plano: Optional[Planos] = Planos.TESTE
     plano_expiracao: Optional[datetime] = Field(default=datetime.now() + timedelta(days=7), nullable=False)
-    pagamentos: List['Pagamento'] = Relationship(back_populates='organizacao')
     gastos_recorrentes: List['GastoRecorrente'] = Relationship(back_populates='organizacao')
     # Configurações
     configuracoes: Dict = Field(default_factory=lambda: dict({
@@ -35,17 +35,17 @@ class Organizacao(SQLModel, table=True):
         'converter_kg_sempre': False,
         'usar_custo_med': False
     }), sa_column=Column(JSON))
+    # Asaas
+    asaas_customer_id: Optional[str] = None
 
     class Config:
         arbitrary_types_allowed = True
 
     @property
     def plano_descricao(self):
-        if self.plano == Plano.BLOQUEADO:
-            return 'Sua conta está <b>bloqueada</b>, você precisa atualizar seu plano ou extender a validade do plano atual.'
-        elif self.plano == Plano.TESTE:
-            return 'Sua conta está em <b>modo de teste</b>, você pode atualizar seu plano a qualquer momento.'
-        return self.plano.value
+        plano_data = getattr(PLANOS_DATA, self.plano.value)
+        data_expiracao = self.plano_exiracao.strftime('%d/%m/%y')
+        return f'{plano_data.app_descricao} (Expira em {data_expiracao})'
 
     @property
     def chave_pix_valida(self):
@@ -57,11 +57,15 @@ class Organizacao(SQLModel, table=True):
 
 
 class RegistroOrganizacao(SQLModel, table=False):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    organizacao_id: Optional[int] = Field(default=None, foreign_key="organizacao.id")
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
+    organizacao_id: Optional[uuid.UUID] = Field(default=None, foreign_key="organizacao.id")
 
     def data_bs_payload(self):
-        return self.model_dump()
+        base_dict = self.model_dump()
+        for key, value in base_dict.items():
+            if isinstance(value, uuid.UUID):
+                base_dict[key] = str(value)
+        return base_dict
 
 
 class GastoRecorrente(RegistroOrganizacao, table=True):
@@ -71,13 +75,6 @@ class GastoRecorrente(RegistroOrganizacao, table=True):
     valor: float
     tipo: GastoTipo = Field(default=GastoTipo.FIXO, nullable=False)
     recorrencia: GastoRecorrencia = Field(default=GastoRecorrencia.MENSAL, nullable=False)
-
-
-class Pagamento(RegistroOrganizacao, table=True):
-    organizacao: "Organizacao" = Relationship(back_populates="pagamentos", sa_relationship_kwargs={'lazy': 'selectin'})
-    data_criacao: datetime = Field(default=datetime.now(), nullable=False)
-    valor: float
-    plano: Plano
 
 
 class Usuario(RegistroOrganizacao, table=True):
@@ -104,6 +101,8 @@ class Usuario(RegistroOrganizacao, table=True):
         base_dict.update(
             organizacao_descricao=self.organizacao.descricao if self.organizacao else '-'
         )
+        base_dict['id'] = str(self.id)
+        base_dict['organizacao_id'] = str(self.organizacao_id)
         return base_dict
 
 
@@ -111,8 +110,8 @@ class ReceitaGasto(RegistroOrganizacao, table=True):
     gasto_tipo: Optional[GastoTipo] = Field(None)
     gasto_valor: Optional[float] = Field(None)
     quantidade: Optional[float] = Field(default=None)
-    receita_id: Optional[int] = Field(default=None, foreign_key="receita.id")
-    insumo_id: Optional[int] = Field(default=None, foreign_key="insumo.id")
+    receita_id: Optional[uuid.UUID] = Field(default=None, foreign_key="receita.id")
+    insumo_id: Optional[uuid.UUID] = Field(default=None, foreign_key="insumo.id")
     receita: "Receita" = Relationship(back_populates="gastos")
     insumo: "Insumo" = Relationship(back_populates="receita_links")
     organizacao: "Organizacao" = Relationship(sa_relationship_kwargs={'lazy': 'selectin'})
@@ -177,17 +176,21 @@ class ReceitaGasto(RegistroOrganizacao, table=True):
             base_dict['gasto_tipo'] = self.gasto_tipo.value
             base_dict['#input_gasto_valor_unidade'] = 'R$' if self.gasto_tipo == GastoTipo.FIXO else '%'
         elif self.insumo:
+            base_dict['insumo_id'] = str(self.insumo.id)
             base_dict['insumo_nome'] = self.insumo.nome
             base_dict['insumo_custo'] = self.insumo.custo
             base_dict['insumo_peso'] = self.insumo.peso
             base_dict['#input_quantidade_unidade'] = self.insumo.unidade
+        base_dict['id'] = str(self.id)
+        base_dict['organizacao_id'] = str(self.organizacao_id)
+        base_dict['receita_id'] = str(self.receita_id)
         return base_dict
 
 
 class Estoque(RegistroOrganizacao, table=True):
     descricao: Optional[str] = Field(default=None)
     data_criacao: datetime = Field(default=datetime.now(), nullable=False)
-    insumo_id: Optional[int] = Field(default=None, foreign_key="insumo.id")
+    insumo_id: Optional[uuid.UUID] = Field(default=None, foreign_key="insumo.id")
     insumo: "Insumo" = Relationship(back_populates="estoque_links")
     quantidade: Optional[float] = Field(default=0)
     valor_pago: Optional[float] = Field(default=0)
@@ -231,6 +234,9 @@ class Estoque(RegistroOrganizacao, table=True):
     def data_bs_payload(self):
         base_dict = self.model_dump()
         base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
+        base_dict['id'] = str(self.id)
+        base_dict['organizacao_id'] = str(self.organizacao_id)
+        base_dict['insumo_id'] = str(self.insumo_id)
         return base_dict
 
 
@@ -285,6 +291,8 @@ class CaixaMovimentacao(RegistroOrganizacao, table=True):
         base_dict['data_criacao'] = self.data_criacao.strftime(STRFTIME_FORMAT)
         base_dict['#img_qr_code'] = self.gerar_qr_code()
         base_dict['tipo'] = self.tipo.value.title()
+        base_dict['id'] = str(self.id)
+        base_dict['organizacao_id'] = str(self.id)
         return base_dict
 
     def gerar_qr_code(self, pix_nome=None, pix_cidade=None, pix_chave=None) -> str:
@@ -299,7 +307,7 @@ class CaixaMovimentacao(RegistroOrganizacao, table=True):
             pix_qr_code = PixQrCode(pix_nome, pix_chave, pix_cidade, f'{self.valor:.2f}')
             return pix_qr_code.export_base64()
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
             return None
 
 
@@ -368,6 +376,8 @@ class Insumo(RegistroOrganizacao, table=True):
             for r in receitas_associadas
         ]
         base_dict['estoque_atual'] = self.estoque_atual
+        base_dict['id'] = str(self.id)
+        base_dict['organizacao_id'] = str(self.organizacao_id)
         return base_dict
 
     @property
@@ -393,6 +403,12 @@ class Receita(RegistroOrganizacao, table=True):
     organizacao: "Organizacao" = Relationship()
 
     gastos: List['ReceitaGasto'] = Relationship(back_populates='receita', sa_relationship_kwargs={'lazy': 'selectin'})
+
+    def data_bs_payload(self):
+        base_dict = self.model_dump()
+        base_dict['id'] = str(self.id)
+        base_dict['organizacao_id'] = str(self.id)
+        return base_dict
 
     @classmethod
     def columns(self):

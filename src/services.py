@@ -1,5 +1,6 @@
 import json
 import re
+from datetime import datetime, timedelta
 from typing import List
 
 import fastapi
@@ -7,10 +8,11 @@ import fastapi.security
 from loguru import logger
 from sqlmodel import Session
 
-from src.domain import repository
-from src.templates import render
-from src.templates.context import Button, Context
-from src.utils import redirect_back
+from domain import repository, schemas
+from modules import asaas
+from templates import render
+from templates.context import Button, Context
+from utils import redirect_back
 
 ENTITY_SYMBOLS = {
     'Estoque': 'inventory_2',
@@ -20,7 +22,7 @@ ENTITY_SYMBOLS = {
 }
 
 
-async def list_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, page: int = 1, filters: dict = {}, table_modal: bool = True):
+async def list_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, page: int = 1, per_page: int = 30, filters: dict = {}, table_modal: bool = True):
     auth_session = getattr(request.state, 'auth', None)
     title_parts = re.findall(r'[A-Z][a-z]*', entity.value.__name__)
     page_title = ' '.join(title_parts)
@@ -39,6 +41,7 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
         filters=filters,
         order_by=order_by,
         page=page,
+        per_page=per_page,
         desc=desc
     )
 
@@ -48,7 +51,7 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
 
     delete_url = str(request.url_for(f'post_{title}_excluir'))
 
-    logger.info(entity.value.__name__)
+    logger.debug(entity.value.__name__)
 
     context_header = Context.Header(
         pretitle='Registros',
@@ -111,5 +114,43 @@ async def list_entity(request: fastapi.Request, db_session: Session, entity: rep
 async def delete_entity(request: fastapi.Request, db_session: Session, entity: repository.Entities, ids: List[int]):
     auth_session = getattr(request.state, 'auth', None)
     for id in ids:
-        await repository.delete(auth_session=auth_session, db_session=db_session, entity=entity, filters={'id': int(id)})
+        try:
+            await repository.delete(auth_session=auth_session, db_session=db_session, entity=entity, filters={'id': int(id)})
+        except ValueError as ex:
+            logger.error(ex)
+            continue
     return redirect_back(request, message=f'{len(ids)} registros excluídos com sucesso!')
+
+
+async def generate_payment_link(request: fastapi.Request, organizacao_id: str, plano: schemas.Planos):
+    external_reference = f'{organizacao_id}::{plano.value}'
+    plano_data = schemas.PLANOS_DATA.get(plano.value, 'Pequeno')
+    api_response = await asaas.api_create_payment_link(
+        externalReference=external_reference,
+        name=f'Assinatura "{plano.value.title()}"',
+        value=plano_data.valor,
+        description=plano_data.card_descricao,
+        callback_url=str(request.url_for('post_asaas_webhook'))
+    )
+    return api_response.url
+
+
+async def handle_payment_webhook(request: fastapi.Request, db_session: Session):
+    request_json = await request.json()
+    webhook_data = asaas.WebhookData(**request_json)
+
+    organizacao_id, plano = webhook_data.payment.externalReference.split('::')
+    await repository.update(
+        db_session=db_session,
+        entity=repository.Entities.ORGANIZACAO,
+        filters={
+            'id': organizacao_id
+        },
+        values={
+            'plano': plano,
+            'plano_expiracao': datetime.now() + timedelta(years=365),
+            'asaas_customer_id': webhook_data.payment.customer
+        }
+    )
+
+    return True

@@ -1,12 +1,12 @@
 import fastapi
 from sqlmodel import Session
 
-from src import auth
-from src.db import DBSESSAO_DEP
-from src.domain import inputs, repository
-from src.templates import render
-from src.templates.context import Context
-from src.utils import redirect_back
+import auth
+from db import DBSESSAO_DEP
+from domain import inputs, repository
+from templates import render
+from templates.context import Context
+from utils import redirect_back
 
 router = fastapi.APIRouter(prefix='/app/organizacao', dependencies=[auth.HEADER_AUTH])
 context_header = Context.Header(
@@ -41,7 +41,7 @@ async def get_organizacao_index(request: fastapi.Request, session: Session = DBS
 
 
 @router.post('/', include_in_schema=False)
-async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.Form(), descricao: str = fastapi.Form(), cidade: str = fastapi.Form(), chave_pix: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
+async def post_organizacao_index(request: fastapi.Request, id: str = fastapi.Form(), descricao: str = fastapi.Form(), cidade: str = fastapi.Form(), chave_pix: str = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
     await repository.update(
         auth_session=auth_session,
@@ -60,7 +60,7 @@ async def post_organizacao_index(request: fastapi.Request, id: int = fastapi.For
 
 
 @router.post('/configuracoes', include_in_schema=False)
-async def post_organizacao_configuracoes(request: fastapi.Request, id: int = fastapi.Form(), converter_kg: bool = fastapi.Form(False), converter_kg_sempre: bool = fastapi.Form(False), usar_custo_med: bool = fastapi.Form(False), session: Session = DBSESSAO_DEP):
+async def post_organizacao_configuracoes(request: fastapi.Request, id: str = fastapi.Form(), converter_kg: bool = fastapi.Form(False), converter_kg_sempre: bool = fastapi.Form(False), usar_custo_med: bool = fastapi.Form(False), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
     await repository.update(
         auth_session=auth_session,
@@ -107,7 +107,7 @@ async def post_organizacao_gastos_recorrentes_excluir(request: fastapi.Request, 
 async def post_organizacao_usuarios_criar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
     if payload.senha != payload.senha_confirmar:
-        raise ValueError('As senhas não batem')
+        return redirect_back(request, error='As senhas não batem')
 
     # if not payload.organizacao_id:
     #     db_organizacao = await repository.create(session, repository.Entities.ORGANIZACAO, {'descricao': payload.organizacao_descricao})

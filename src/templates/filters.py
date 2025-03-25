@@ -82,9 +82,12 @@ def templates_filter_format_reais(input: float):
 
 
 def templates_filter_json(input: str):
-    if not input:
-        return None
-    return json.dumps(input)
+    try:
+        if not input:
+            return None
+        return json.dumps(input)
+    except:
+        breakpoint()
 
 
 def templates_filter_format_log(input: str):

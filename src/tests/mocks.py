@@ -1,17 +1,20 @@
+import uuid
 from datetime import datetime, timedelta
 
-from src.domain import repository
-from src.domain.schemas import GastoRecorrencia, GastoTipo
+from domain import repository
+from domain.schemas import GastoRecorrencia, GastoTipo
+from schemas.auth import AuthSession
 
 MOCK_ORGANIZACAO = repository.Entities.ORGANIZACAO.value(
-    id=1,
+    id=uuid.uuid4(),
     descricao='Organização Teste',
     cidade='Piracicaba',
     chave_pix='12312312323'
 )
 
+USUARIO_DONO_ID = uuid.uuid4()
 MOCK_USUARIO_DONO = repository.Entities.USUARIO.value(
-    id=1,
+    id=USUARIO_DONO_ID,
     organizacao_id=MOCK_ORGANIZACAO.id,
     nome='Zé do teste (Dono)',
     email='teste@email.com',
@@ -21,7 +24,7 @@ MOCK_USUARIO_DONO = repository.Entities.USUARIO.value(
 MOCK_USUARIO_DONO.hash_senha()
 
 MOCK_USUARIO_ADMIN = repository.Entities.USUARIO.value(
-    id=2,
+    id=uuid.uuid4(),
     nome='Administrador',
     email='admin@email.com',
     senha='admin',
@@ -30,7 +33,7 @@ MOCK_USUARIO_ADMIN = repository.Entities.USUARIO.value(
 MOCK_USUARIO_ADMIN.hash_senha()
 
 MOCK_USUARIO_SENHA_RECUPERADA = repository.Entities.USUARIO.value(
-    id=3,
+    id=uuid.uuid4(),
     nome='Zé do teste (Senha recuperada)',
     email='teste_2@email.com',
     senha='teste',
@@ -38,30 +41,42 @@ MOCK_USUARIO_SENHA_RECUPERADA = repository.Entities.USUARIO.value(
 )
 MOCK_USUARIO_ADMIN.hash_senha()
 
+INSUMO_ID = uuid.uuid4()
+MOCK_INSUMO = repository.Entities.INSUMO.value(
+    id=INSUMO_ID,
+    organizacao_id=MOCK_ORGANIZACAO.id,
+    nome='Insumo teste',
+    peso=1.0,
+    custo=1.0
+)
+
+ESTOQUE_ID = uuid.uuid4()
 MOCK_ESTOQUE = repository.Entities.ESTOQUE.value(
-    id=1,
+    id=ESTOQUE_ID,
     organizacao_id=MOCK_ORGANIZACAO.id,
     descricao='Movimentação teste',
     data_criacao=datetime.now(),
-    insumo_id=1
+    insumo_id=INSUMO_ID
 )
 
+RECEITA_ID = uuid.uuid4()
 MOCK_RECEITA = repository.Entities.RECEITA.value(
-    id=1,
+    id=RECEITA_ID,
     organizacao_id=MOCK_ORGANIZACAO.id,
     nome='Receita Teste',
     peso_unitario=100.0,
 )
 
+CAIXA_MOVIMENTACAO_ID = uuid.uuid4()
 MOCK_CAIXA_MOVIMENTACAO = repository.Entities.CAIXA_MOVIMENTACAO.value(
-    id=1,
+    id=CAIXA_MOVIMENTACAO_ID,
     organizacao_id=MOCK_ORGANIZACAO.id,
     descricao='CaixaMovimentacao teste',
     valor=100.0
 )
 
 MOCK_GASTO_RECORRENTE_SALARIO_MOTOBY = repository.Entities.GASTO_RECORRENTE.value(
-    id=1,
+    id=uuid.uuid4(),
     organizacao_id=MOCK_ORGANIZACAO.id,
     data_inicio=datetime.now()-timedelta(days=45),
     descricao='Salário Motoboy',
@@ -71,7 +86,7 @@ MOCK_GASTO_RECORRENTE_SALARIO_MOTOBY = repository.Entities.GASTO_RECORRENTE.valu
 
 
 MOCK_GASTO_RECORRENTE_ALUGUEL = repository.Entities.GASTO_RECORRENTE.value(
-    id=2,
+    id=uuid.uuid4(),
     organizacao_id=MOCK_ORGANIZACAO.id,
     data_inicio=datetime.now()-timedelta(days=45),
     descricao='Aluguel',
@@ -81,13 +96,24 @@ MOCK_GASTO_RECORRENTE_ALUGUEL = repository.Entities.GASTO_RECORRENTE.value(
 
 
 MOCK_GASTO_RECORRENTE_TRIBUTOS = repository.Entities.GASTO_RECORRENTE.value(
-    id=2,
+    id=uuid.uuid4(),
     organizacao_id=MOCK_ORGANIZACAO.id,
     data_inicio=datetime.now()-timedelta(days=45),
     descricao='Imposto',
     tipo=GastoTipo.PERCENTUAL,
     valor=2,
     recorrencia=GastoRecorrencia.SEMANAL
+)
+
+MOCK_AUTH_SESSION = AuthSession(
+    valid=True,
+    id=MOCK_USUARIO_DONO.id,
+    nome=MOCK_USUARIO_DONO.nome,
+    email=MOCK_USUARIO_DONO.email,
+    dono=False,
+    administrador=False,
+    organizacao_id=MOCK_ORGANIZACAO.id,
+    organizacao_descricao=MOCK_ORGANIZACAO.descricao
 )
 
 

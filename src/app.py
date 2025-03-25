@@ -17,21 +17,22 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from src import db
-from src.domain import inputs, repository
-from src.modules import smpt
-from src.modules.logger import logger, setup_logger
-from src.routers.autenticacao import router as router_autenticacao
-from src.routers.caixa_movimentacoes import \
-    router as router_caixa_movimentacoes
-from src.routers.estoques import router as router_estoques
-from src.routers.insumos import router as router_insumos
-from src.routers.organizacao import router as router_organizacao
-from src.routers.paginas import router as router_paginas
-from src.routers.receitas import router as router_receitas
-from src.routers.scripts import router as router_scripts
-from src.templates import render
-from src.utils import url_incluir_query_params
+import db
+from domain import inputs, repository
+from domain.schemas import PLANOS_DATA
+from modules import smpt
+from modules.logger import logger, setup_logger
+from routers.autenticacao import router as router_autenticacao
+from routers.caixa_movimentacoes import router as router_caixa_movimentacoes
+from routers.estoques import router as router_estoques
+from routers.insumos import router as router_insumos
+from routers.organizacao import router as router_organizacao
+from routers.paginas import router as router_paginas
+from routers.receitas import router as router_receitas
+from routers.scripts import router as router_scripts
+from services import generate_payment_link, handle_payment_webhook
+from templates import render
+from utils import redirect_url, redirect_url_for, url_incluir_query_params
 
 setup_logger()
 
@@ -84,50 +85,63 @@ async def android_chrome_192x192_png(request: fastapi.Request):
 @app.get('/', include_in_schema=False)
 async def get_index(request: fastapi.Request):
     return await render(request, 'index.html', context={
-        'body_class': 'index'
+        'planos': PLANOS_DATA,
+        'body_class': 'index',
+        'data_bs_theme': 'auto'
     })
 
 
 @app.get('/app', include_in_schema=False)
 async def get_app_index(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
-    return await render(request, 'autenticacao/login.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
+    return await render(request, 'autenticacao/login.html', context={
+        'message': message,
+        'error': error,
+        'data_bs_theme': 'auto'
+    })
 
 
 @app.get('/app/registrar', include_in_schema=False)
 async def get_registrar(request: fastapi.Request, message: str = fastapi.Query(None),  error: str = fastapi.Query(None)):
-    return await render(request, 'autenticacao/criar_conta.html', context={'message': message, 'error': error, 'data_bs_theme': 'auto'})
+    return await render(request, 'autenticacao/criar_conta.html', context={
+        'planos': PLANOS_DATA,
+        'message': message,
+        'error': error,
+        'data_bs_theme': 'auto'
+    })
 
 
 @app.post('/app/registrar', include_in_schema=False)
-async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.Session = db.DBSESSAO_DEP):
+async def post_registrar(request: fastapi.Request, payload: inputs.UsuarioCriar = fastapi.Form(), error: str = fastapi.Query(None), session: db.AsyncSession = db.DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
-    template_name = 'autenticacao/login.html'
-    message = None
+    if payload.senha != payload.senha_confirmar:
+        return redirect_url_for(request, 'get_registrar', error='As senhas não batem')
+
+    db_organizacao = await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, values={
+        'descricao': payload.organizacao_descricao,
+        'plano': payload.plano,
+        'plano_expiracao': datetime.now() + timedelta(days=1)
+    })
+    organizacao_id = db_organizacao.id
+
+    await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, values={
+        'nome': payload.nome,
+        'email': payload.email,
+        'senha': payload.senha,
+        'organizacao_id': organizacao_id,
+        'dono': True
+    })
+
     try:
-        if payload.senha != payload.senha_confirmar:
-            raise ValueError('As senhas não batem')
-
-        db_organizacao = await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.ORGANIZACAO, values={
-            'descricao': payload.organizacao_descricao,
-            'plano': payload.plano,
-            'plano_expiracao': datetime.now() + timedelta(days=1)
-        })
-        organizacao_id = db_organizacao.id
-
-        await repository.create(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, values={
-            'nome': payload.nome,
-            'email': payload.email,
-            'senha': payload.senha,
-            'organizacao_id': organizacao_id,
-            'dono': True
-        })
-        message = 'Conta criada com sucesso'
+        redirect_to = await generate_payment_link(
+            request=request,
+            organizacao_id=organizacao_id,
+            plano=payload.plano
+        )
+        return redirect_url(redirect_to)
     except Exception as ex:
-        logger.exception(ex)
-        template_name = 'autenticacao/criar_conta.html'
-        error = str(ex)
+        logger.error(ex)
 
-    return await render(request, template_name, context={'error': error, 'message': message, 'data_bs_theme': 'auto'})
+    return redirect_url_for(request, 'get_app_index', message='Conta criada com sucesso!')
 
 
 @app.get('/app/recuperar_senha', include_in_schema=False)
@@ -140,7 +154,7 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
     auth_session = getattr(request.state, 'auth', None)
     db_usuario, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.USUARIO, filters={'email': email}, first=True)
     if not db_usuario:
-        raise ValueError('Não foi encontrado usuário com esse email')
+        return redirect_url_for(request, 'get_recuperar_senha', error='Não foi encontrado usuário com esse email')
 
     nova_senha = str(random.randint(int('1'*9), int('9'*9)))
     db_usuario.senha = nova_senha
@@ -153,6 +167,14 @@ async def post_recuperar_senha(request: fastapi.Request, email: str = fastapi.Fo
         para=[db_usuario.email]
     )
     return await render(request, 'autenticacao/login.html', context={'message': f'Senha enviada para: {db_usuario.email}', 'error': error, 'data_bs_theme': 'auto'})
+
+
+@app.post('/asaas/webhook', include_in_schema=False)
+async def post_asaas_webhook(request: fastapi.Request, db_session: db.AsyncSession = db.DBSESSAO_DEP):
+    return await handle_payment_webhook(
+        request=request,
+        db_session=db_session
+    )
 
 
 @app.exception_handler(IntegrityError)  # pragma: nocover
@@ -209,7 +231,7 @@ async def http_error_exception_handler(request: fastapi.Request, ex: HTTPExcepti
 
 @app.exception_handler(RequestValidationError)  # pragma: nocover
 async def generic_exception_handler(request: fastapi.Request, ex: Exception):
-    logger.exception(ex)
+    logger.error(str(ex))
 
     base_redirect = request.url_for('get_app_index')
     if request.session.get('sessao_autenticada', False):

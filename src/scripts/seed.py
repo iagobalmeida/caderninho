@@ -3,29 +3,30 @@ from datetime import datetime, timedelta
 from random import choice, randint
 
 from loguru import logger
+from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src import db
-from src.domain.entities import (CaixaMovimentacao, Estoque, GastoRecorrente,
-                                 Insumo, Receita, ReceitaGasto)
-from src.tests import mocks
+import db
+from domain.entities import (CaixaMovimentacao, Estoque, GastoRecorrente,
+                             Insumo, Receita, ReceitaGasto)
+from tests import mocks
 
 
 def __random_date(starting_off: datetime = datetime.now(), range: int = 30):
     return starting_off + timedelta(days=randint(range*-1, range))
 
 
-async def try_add(session, obj):
+async def try_add(session: AsyncSession, obj):
     try:
-        obj.id = None
+        # obj.id = None
         session.add(obj)
         await session.commit()
         await session.refresh(obj)
         if type(obj).__name__ == 'Usuario':
             logger.info(obj)
-        logger.info(f'{type(obj).__name__} #{obj.id} inserido')
         return obj
     except Exception as ex:
-        logger.exception(ex)
+        logger.error(str(ex))
+        await session.rollback()
         return obj
 
 
@@ -39,6 +40,10 @@ async def main():
         await try_add(session, mocks.MOCK_USUARIO_DONO)
         await try_add(session, mocks.MOCK_USUARIO_SENHA_RECUPERADA)
         await try_add(session, mocks.MOCK_USUARIO_ADMIN)
+
+        insumo_mock = await try_add(session, mocks.MOCK_INSUMO)
+        cookies = await try_add(session, mocks.MOCK_RECEITA)
+
         await try_add(session, mocks.MOCK_ESTOQUE)
         await try_add(session, mocks.MOCK_GASTO_RECORRENTE_SALARIO_MOTOBY)
         await try_add(session, mocks.MOCK_GASTO_RECORRENTE_ALUGUEL)
@@ -48,9 +53,8 @@ async def main():
         manteiga = await try_add(session, Insumo(organizacao_id=organizacao.id, nome='Manteiga', peso=1000, custo=40))
         chocolate = await try_add(session, Insumo(organizacao_id=organizacao.id, nome='Chocolate', peso=1000, custo=57))
         farinha = await try_add(session, Insumo(organizacao_id=organizacao.id, nome='Farinha', peso=1000, custo=4))
-        cookies = await try_add(session, Receita(organizacao_id=organizacao.id, nome='Cookies', peso_unitario=100))
 
-        insumos = [acucar, manteiga, chocolate, farinha]
+        insumos = [acucar, manteiga, chocolate, farinha, insumo_mock]
 
         for __insumo in insumos:
             await try_add(session, ReceitaGasto(organizacao_id=organizacao.id, quantidade=100, receita_id=cookies.id, insumo_id=__insumo.id))

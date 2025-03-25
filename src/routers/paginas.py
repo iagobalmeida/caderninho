@@ -4,12 +4,12 @@ from pathlib import Path
 import fastapi
 from sqlmodel import Session
 
-from src import auth
-from src.db import DBSESSAO_DEP
-from src.domain import repository
-from src.schemas.docs import SOBRE_ESSA_PAGINA
-from src.templates import render
-from src.templates.context import Context
+import auth
+from db import DBSESSAO_DEP
+from domain import repository
+from schemas.docs import SOBRE_ESSA_PAGINA
+from templates import render
+from templates.context import Context
 
 router = fastapi.APIRouter(prefix='/app', dependencies=[auth.HEADER_AUTH])
 
@@ -36,7 +36,6 @@ async def get_home(request: fastapi.Request, session: Session = DBSESSAO_DEP):
         else:
             pix_qr_code = await repository.get_caixa_movimentacoes_qr_code(auth_session=auth_session, db_session=session, venda_id=db_ultima_venda.id)
             pix_mensagem = f'Use este QR Code para cobrar R$ {db_ultima_venda.valor} referente a <b>{db_ultima_venda.descricao}</b>.'
-
 
     return await render(request, 'home.html', session, context={
         'len_receitas': db_receitas,

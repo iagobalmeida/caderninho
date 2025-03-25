@@ -1,7 +1,8 @@
 import pytest
 from bs4 import BeautifulSoup
 
-from src.tests.utils import autenticar
+from tests import mocks
+from tests.utils import autenticar
 
 
 @pytest.mark.asyncio
@@ -50,21 +51,22 @@ async def test_post_authenticate(client):
 async def test_post_perfil(client):
     await autenticar(client)
     response = await client.post('/app/auth/perfil', data={
-        'id': 1,
+        'id': mocks.USUARIO_DONO_ID,
         'nome': 'Usuário Atualizado',
         'email': 'teste@email.com',
         'dono': True,
     })
     soup = BeautifulSoup(response.content, 'html.parser')
     dom_alert = soup.find('div', {'role': 'alert'})
-    assert dom_alert and 'Perfil atualizado com sucesso!' in dom_alert.text
+    assert dom_alert
+    assert 'Perfil atualizado com sucesso!' in dom_alert.text
 
 
 @pytest.mark.asyncio
 async def test_post_atualizar_senha(client):
     await autenticar(client)
     response = await client.post('/app/auth/atualizar_senha', data={
-        'id': 1,
+        'id': mocks.USUARIO_DONO_ID,
         'senha_atual': 'teste',
         'senha': 'teste',
         'senha_confirmar': 'teste',
@@ -78,13 +80,13 @@ async def test_post_atualizar_senha(client):
 async def test_post_atualizar_senha_senhas_nao_batem(client):
     await autenticar(client)
     response = await client.post('/app/auth/atualizar_senha', data={
-        'id': 1,
+        'id': mocks.USUARIO_DONO_ID,
         'senha_atual': 'teste',
         'senha': 'foo',
         'senha_confirmar': 'bar',
     })
     soup = BeautifulSoup(response.content, 'html.parser')
-    dom_alert = soup.find('h4', {'role': 'alert'})
+    dom_alert = soup.find('div', {'role': 'alert'})
     assert dom_alert and 'As senhas não batem' in dom_alert.text
 
 

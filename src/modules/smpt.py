@@ -3,7 +3,7 @@ import smtplib
 from email.mime.text import MIMEText
 from typing import Any, List, Tuple, Union
 
-from src.env import getenv
+from env import getenv
 
 SMTP_LOGIN = getenv('SMTP_LOGIN', None)
 SMTP_PASSWORD = getenv('SMTP_PASSWORD', None)

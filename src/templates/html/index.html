@@ -114,111 +114,35 @@
         <div class="container">
             <h2 class="fw-bold">Qual o tamanho do seu <b class="text-primary">KDerninho</b>?</h2>
             <div class="row mt-4">
-                <div class="col-md-4">
-                    <div class="card border">
-                        <div class="card-body">
-                            <h5 class="card-title">Pequeno</h5>
-                            <p class="card-text">Para quem está começando do zero</p>
-                            <ul class="list-group mb-3">
-                                <li class="list-group-item"><b>1</b> Conta de Dono</li>
-                                <li class="list-group-item bg-danger text-danger" style="--tblr-bg-opacity: .07;">Nenhuma Conta de Usuário</li>
-                                <li class="list-group-item"><b>5</b> Receitas</li>
-                                <li class="list-group-item"><b>40</b> Insumos</li>
-                                <li class="list-group-item">
-                                    Até <b>1.000</b> Caixa/mês
-                                    <i class="text-danger">*</i>
-                                </li>
-                                <li class="list-group-item">
-                                    Até <b>1.000</b> Movimentações/mês
-                                    <i class="text-danger">*</i>
-                                </li>
-                                <li class="list-group-item bg-danger text-danger" style="--tblr-bg-opacity: .07;">Sem exportação</li>
-                            </ul>
-                            <p class="card-text text-muted">
-                                <i>* São mantidos por <b>2 meses</b>.</i>
-                            </p>
-                            <!-- <h5 class="fw-bold text-muted mb-0">Por R$180, você paga</h5> -->
-                            <h2 class="fw-bold text-primary mb-1">R$15/mês</h2>
-                            <!-- <h5 class="fw-bold text-muted">(Ou R$ 22.50/mês)</h5> -->
-                            <a href="/app/registrar" class="btn btn-primary">
-                                {{ material_symbol('shopping_bag') | safe }}
-                                Assinar Plano
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card border-primary">
-                        <div class="card-body">
-                            <div class="badge bg-primary-lt position-absolute border border-primary" style="top: -8px; right: -8px; font-size: 14px;">
-                                Mais popular
+                {% for plano_chave in planos %}
+                    {% with plano=planos[plano_chave] %}
+                        {% if plano.card_exibir %}
+                            <div class="col-md-4">
+                                <div class="card border border-primary">
+                                    <div class="card-body">
+                                        <h5 class="card-title flex-column text-primary">
+                                            {{material_symbol(plano.symbol) | safe}}
+                                            {{plano.nome}}
+                                        </h5>
+                                        <p class="card-text">{{plano.card_descricao}}</p>
+                                        <ul class="list-group mb-3">
+                                            {% for beneficio in plano.card_beneficios %}
+                                                {{ beneficio | safe }}
+                                            {% endfor %}
+                                        </ul>
+                                        <!-- <h5 class="fw-bold text-muted mb-0">Por R$180, você paga</h5> -->
+                                        <h2 class="fw-bold text-primary mb-1">R${{plano.valor}}/mês</h2>
+                                        <!-- <h5 class="fw-bold text-muted">(Ou R$ 22.50/mês)</h5> -->
+                                        <a href="/app/registrar" class="btn btn-primary">
+                                            {{ material_symbol('shopping_bag') | safe }}
+                                            Assinar Plano
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                            <h5 class="card-title">Intermediário</h5>
-                            <p class="card-text">Para quem já tem um negócio</p>
-                            <ul class="list-group mb-3">
-                                <li class="list-group-item bg-primary text-primary" style="--tblr-bg-opacity: .07;"><b>2</b> Contas de Dono</li>
-                                <li class="list-group-item bg-primary text-primary" style="--tblr-bg-opacity: .07;"><b>10</b> Contas de Usuário</li>
-                                <li class="list-group-item"><b>50</b> Receitas</li>
-                                <li class="list-group-item"><b>400</b> Insumos</li>
-                                <li class="list-group-item">
-                                    Até <b>20.000</b> Caixa/mês
-                                    <i class="text-danger">*</i>
-                                </li>
-                                <li class="list-group-item">
-                                    Até <b>20.000</b> Movimentações/mês
-                                    <i class="text-danger">*</i>
-                                </li>
-                                <li class="list-group-item bg-primary text-primary" style="--tblr-bg-opacity: .07;">Exportação de <b>Caixa</b> e <b>Movimentações</b></li>
-                            </ul>
-                            <p class="card-text text-muted">
-                                <i>* São mantidos por <b>4 meses</b>.</i>
-                            </p>
-                            <!-- <h5 class="fw-bold text-muted mb-0">Por R$588, você paga</h5> -->
-                            <h2 class="fw-bold text-primary mb-1">R$49/mês</h2>
-                            <!-- <h5 class="fw-bold text-muted">(Ou R$ 73.50/mês)</h5> -->
-                            <a href="#" class="btn btn-primary">
-                                {{ material_symbol('shopping_bag') | safe }}
-                                Assinar Plano
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card border">
-                        <div class="card-body">
-                            <div class="badge bg-green-lt position-absolute border border-success" style="top: -8px; right: -8px; font-size: 14px;">
-                                Melhor custo benefício
-                            </div>
-                            <h5 class="card-title">Avançado</h5>
-                            <p class="card-text">Para largar de vez as tabelas</p>
-                            <ul class="list-group mb-3">
-                                <li class="list-group-item bg-success text-success" style="--tblr-bg-opacity: .07;"><b>5</b> Contas de Dono</li>
-                                <li class="list-group-item bg-success text-success" style="--tblr-bg-opacity: .07;"><b>30</b> Contas de Usuário</li>
-                                <li class="list-group-item bg-success text-success" style="--tblr-bg-opacity: .07;">Receitas <b>Ilimitadas</b></li>
-                                <li class="list-group-item bg-success text-success" style="--tblr-bg-opacity: .07;">Insumos <b>Ilimitados</b></li>
-                                <li class="list-group-item">
-                                    Até <b>150.000</b> Caixa/mês
-                                    <i class="text-danger">*</i>
-                                </li>
-                                <li class="list-group-item">
-                                    Até <b>150.000</b> Movimentações/mês
-                                    <i class="text-danger">*</i>
-                                </li>
-                                <li class="list-group-item bg-success text-success" style="--tblr-bg-opacity: .07;">Exportação de <b>Todos os Registros</b></li>
-                            </ul>
-                            <p class="card-text text-muted">
-                                <i>* São mantidos por <b>6 meses</b>.</i>
-                            </p>
-                            <!-- <h5 class="fw-bold text-muted mb-0">Por R$1.188, você paga</h5> -->
-                            <h2 class="fw-bold text-primary mb-1">R$99/mês</h2>
-                            <!-- <h5 class="fw-bold text-muted">(Ou R$ 148.50/mês)</h5> -->
-                            <a href="#" class="btn btn-primary">
-                                {{ material_symbol('shopping_bag') | safe }}
-                                Assinar Plano
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
             </div>
         </div>
     </section>

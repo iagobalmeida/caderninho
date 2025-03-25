@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from enum import Enum
+from logging import getLogger
 from math import ceil
 
 from aiocache import Cache
@@ -7,10 +8,10 @@ from loguru import logger
 from sqlmodel import func, select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.domain.entities import (CaixaMovimentacao, Estoque, GastoRecorrencia,
-                                 GastoRecorrente, Insumo, Organizacao, Receita,
-                                 ReceitaGasto, Usuario)
-from src.schemas.auth import AuthSession
+from domain.entities import (CaixaMovimentacao, Estoque, GastoRecorrencia,
+                             GastoRecorrente, Insumo, Organizacao, Receita,
+                             ReceitaGasto, Usuario)
+from schemas.auth import AuthSession
 
 
 class Entities(Enum):
@@ -63,7 +64,7 @@ async def get(
         first: bool = False,
         order_by: str = None,
         desc: bool = False,
-        per_page: int = 10,
+        per_page: int = 30,
         page: int = 1,
         auth_session: AuthSession = None,
         ignore_validations: bool = False
@@ -79,7 +80,7 @@ async def get(
             elif key == 'data_final':
                 query = query.filter(entity.value.data_criacao <= value)
             else:
-                query = query.filter(entity.value.__dict__[key] == value)
+                query = query.filter(getattr(entity.value, key) == value)
 
     if auth_session and not ignore_validations:
         if not auth_session.administrador and entity != Entities.ORGANIZACAO:
@@ -127,9 +128,7 @@ async def update(db_session: AsyncSession, entity: Entities, filters: dict = {},
             if entity == Entities.ORGANIZACAO:
                 raise ValueError('Sem permissão para alterar as informações da organização!')
 
-    for key, value in values.items():
-        if value == None:
-            continue
+    for key, value in [(key, value) for key, value in values.items() if value != None]:
         db_entity.__setattr__(key, value)
 
     if entity == Entities.USUARIO:
@@ -179,10 +178,8 @@ async def create(db_session: AsyncSession, entity: Entities, values: dict = {}, 
 
 # Funções otimizadas
 
-async def get_caixa_movimentacoes_qr_code(auth_session: AuthSession, db_session: AsyncSession, venda_id: int) -> str:
+async def get_caixa_movimentacoes_qr_code(auth_session: AuthSession, db_session: AsyncSession, venda_id: str) -> str:
     organizacao, _, _ = await get(auth_session=auth_session, db_session=db_session, entity=Entities.ORGANIZACAO, filters={'id': auth_session.organizacao_id}, first=True)
-    if not organizacao:  # pragma: nocover
-        return None
     venda, _, _ = await get(auth_session=auth_session, db_session=db_session, entity=Entities.CAIXA_MOVIMENTACAO, filters={'id': venda_id}, first=True)
     return venda.gerar_qr_code(
         pix_nome=organizacao.descricao,
@@ -198,10 +195,10 @@ async def recarregar_cache(auth_session: AuthSession, db_session: AsyncSession):
 async def get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session: AsyncSession, data_inicial: datetime, data_final: datetime) -> dict:
     cached = await get_cache('get_chart_fluxo_caixa_datasets', auth_session.id, auth_session.organizacao_id)
     if not cached:
-        logger.info('✖ Cache not found!')
+        logger.debug('✖ Cache not found!')
         result = await __get_chart_fluxo_caixa_datasets(auth_session=auth_session, db_session=db_session, data_inicial=data_inicial, data_final=data_final)
         return await set_cache('get_chart_fluxo_caixa_datasets', auth_session.id, auth_session.organizacao_id, value=result)
-    logger.info('✔ Cache found')
+    logger.debug('✔ Cache found')
     return cached
 
 
@@ -211,7 +208,7 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
         [data, 0, 0, 0, 0] for data in dates
     ]
 
-    filter_organizacao_id = f'organizacao_id = {auth_session.organizacao_id} AND '
+    filter_organizacao_id = f"organizacao_id = '{auth_session.organizacao_id}' AND "
     query_caixa_movimentacao = text(f'''
         SELECT
             date(data_criacao) AS dia,
@@ -243,7 +240,6 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
                 0
             ]
 
-    filter_organizacao_id = f'organizacao_id = {auth_session.organizacao_id} AND '
     query_estoque = text(f'''
         SELECT
             date(data_criacao) AS dia,
@@ -274,7 +270,6 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
                 0
             ]
 
-    filter_organizacao_id = f'organizacao_id = {auth_session.organizacao_id} AND '
     query_recorrentes = text(f'''
         SELECT
             date(data_inicio) AS dia,
@@ -320,6 +315,6 @@ async def __get_chart_fluxo_caixa_datasets(auth_session: AuthSession, db_session
                         __value = abs(r[3] * __row[3]/100)
                         r[3] -= __value
                         r[4] += __value
-                        logger.info(r[4])
+                        # logger.info(r[4])
 
     return results

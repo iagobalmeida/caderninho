@@ -4,8 +4,8 @@ from unittest.mock import patch
 import pytest
 from bs4 import BeautifulSoup
 
-from src.tests.mocks import MOCK_CAIXA_MOVIMENTACAO
-from src.tests.utils import autenticar
+from tests.mocks import CAIXA_MOVIMENTACAO_ID, MOCK_CAIXA_MOVIMENTACAO
+from tests.utils import autenticar
 
 
 async def __get_receitas_rows(test_client):
@@ -53,7 +53,7 @@ async def test_post_caixa_movimentacoes_index(client):
 async def test_post_caixa_movimentacoes_excluir(client):
     await autenticar(client)
     response = await client.post('/app/caixa_movimentacoes/excluir', data={
-        'selecionados_ids': '1'
+        'selecionados_ids': CAIXA_MOVIMENTACAO_ID
     })
     assert response.status_code == 200
     dom_rows = await __get_receitas_rows(client)
@@ -64,7 +64,7 @@ async def test_post_caixa_movimentacoes_excluir(client):
 async def test_post_caixa_movimentacoes_marcar_recebido(client):
     await autenticar(client)
     response = await client.post('/app/caixa_movimentacoes/marcar/recebido', data={
-        'selecionados_ids': '2'
+        'selecionados_ids': CAIXA_MOVIMENTACAO_ID
     })
     assert response.status_code == 200
     dom_rows = await __get_receitas_rows(client)
@@ -75,7 +75,7 @@ async def test_post_caixa_movimentacoes_marcar_recebido(client):
 async def test_post_caixa_movimentacoes_marcar_pendente(client):
     await autenticar(client)
     response = await client.post('/app/caixa_movimentacoes/marcar/pendente', data={
-        'selecionados_ids': '2'
+        'selecionados_ids': CAIXA_MOVIMENTACAO_ID
     })
     assert response.status_code == 200
     dom_rows = await __get_receitas_rows(client)
@@ -86,7 +86,7 @@ async def test_post_caixa_movimentacoes_marcar_pendente(client):
 async def test_post_caixa_movimentacoes_atualizar(client):
     await autenticar(client)
     response = await client.post('/app/caixa_movimentacoes/atualizar', data={
-        'id': 2,
+        'id': CAIXA_MOVIMENTACAO_ID,
         'descricao': 'CaixaMovimentacao Atualizada',
         'tipo': 'Entrada',
         'valor': 100,

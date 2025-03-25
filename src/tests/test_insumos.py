@@ -3,7 +3,8 @@ import json
 import pytest
 from bs4 import BeautifulSoup
 
-from src.tests.utils import autenticar
+from tests.mocks import INSUMO_ID
+from tests.utils import autenticar
 
 
 async def __get_insumos_rows(test_client):
@@ -67,7 +68,7 @@ async def test_post_insumos_atualizar(client):
 async def test_post_insumos_excluir(client):
     await autenticar(client)
     response = await client.post('/app/insumos/excluir', data={
-        'selecionados_ids': '1,999'
+        'selecionados_ids': f'{INSUMO_ID}'
     })
     assert response.status_code == 200
     dom_rows = await __get_insumos_rows(client)

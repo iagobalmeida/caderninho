@@ -3,8 +3,8 @@ import json
 import pytest
 from bs4 import BeautifulSoup
 
-from src.tests.mocks import MOCK_RECEITA
-from src.tests.utils import autenticar
+from tests.mocks import MOCK_RECEITA, RECEITA_ID
+from tests.utils import autenticar
 
 
 async def __get_receitas_rows(test_client):
@@ -40,7 +40,7 @@ async def test_get_receitas_index(client):
 @pytest.mark.asyncio
 async def test_get_receita(client):
     await autenticar(client)
-    response = await client.get('/app/receitas/1')
+    response = await client.get(f'/app/receitas/{RECEITA_ID}')
     soup = BeautifulSoup(response.content, 'html.parser')
 
     expected_inputs = ['id', 'nome', 'peso_unitario', 'porcentagem_lucro']
@@ -114,7 +114,7 @@ async def test_post_receitas_gastos_incluir_custo_percentual(client):
     response = await client.post('/app/receitas/gastos/incluir', data={
         'receita_id': 1,
         'descricao': 'Taxa fixa de Imposto',
-        'gasto_tipo': 'PERCENTUAL',
+        'gasto_tipo': 'Percentual',
         'gasto_valor': 3
     })
     assert response.status_code == 200
@@ -126,9 +126,9 @@ async def test_post_receitas_gastos_incluir_custo_percentual(client):
 async def test_post_receitas_gastos_incluir_custo_fixo(client):
     await autenticar(client)
     response = await client.post('/app/receitas/gastos/incluir', data={
-        'receita_id': 1,
+        'receita_id': str(RECEITA_ID),
         'descricao': 'Taxa fixa de Imposto',
-        'gasto_tipo': 'FIXO',
+        'gasto_tipo': 'Fixo',
         'gasto_valor': 10
     })
     assert response.status_code == 200
@@ -140,7 +140,7 @@ async def test_post_receitas_gastos_incluir_custo_fixo(client):
 async def test_post_receitas_deletar(client):
     await autenticar(client)
     response = await client.post('/app/receitas/excluir', data={
-        'selecionados_ids': '1'
+        'selecionados_ids': str(RECEITA_ID)
     })
     assert response.status_code == 200
     dom_rows = await __get_receitas_rows(client)

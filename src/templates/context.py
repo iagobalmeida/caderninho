@@ -5,13 +5,13 @@ from typing import Dict, List, Optional, TypedDict
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from src.domain import repository
-from src.schemas.auth import AuthSession
-from src.schemas.docs import get_sobre_essa_pagina_html
-from src.templates.chartjs import chart_fluxo_caixa_config
-from src.templates.filters import \
+from domain import repository
+from schemas.auth import AuthSession
+from schemas.docs import get_sobre_essa_pagina_html
+from templates.chartjs import chart_fluxo_caixa_config
+from templates.filters import \
     templates_global_material_symbol as material_symbol
-from src.utils import url_incluir_query_params
+from utils import url_incluir_query_params
 
 
 class Button(TypedDict):

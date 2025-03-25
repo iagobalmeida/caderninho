@@ -1,15 +1,16 @@
-import json
+import uuid
 
 import fastapi
+from loguru import logger
 from sqlmodel import Session
 
-from src import auth
-from src.db import DBSESSAO_DEP
-from src.domain import inputs, repository
-from src.services import delete_entity, list_entity
-from src.templates import render
-from src.templates.context import Context
-from src.utils import redirect_back, redirect_url_for
+import auth
+from db import DBSESSAO_DEP
+from domain import inputs, repository
+from services import delete_entity, list_entity
+from templates import render
+from templates.context import Context
+from utils import redirect_back, redirect_url_for
 
 router = fastapi.APIRouter(prefix='/app/receitas', dependencies=[auth.HEADER_AUTH])
 
@@ -42,7 +43,7 @@ async def post_receitas_index(request: fastapi.Request, nome: str = fastapi.Form
 
 
 @router.get('/{id}', include_in_schema=False)
-async def get_receita(request: fastapi.Request, id: int, session: Session = DBSESSAO_DEP):
+async def get_receita(request: fastapi.Request, id: uuid.UUID, session: Session = DBSESSAO_DEP):
     auth_session = getattr(request.state, 'auth', None)
     db_receita, _, _ = await repository.get(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA, filters={'id': id}, first=True)
     if not db_receita:
@@ -178,5 +179,9 @@ async def post_receita_gastos_remover(request: fastapi.Request, payload: inputs.
     auth_session = getattr(request.state, 'auth', None)
     if payload.selecionados_ids:
         for id in payload.selecionados_ids.split(','):
-            await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_GASTO, filters={'id': id})
+            try:
+                await repository.delete(auth_session=auth_session, db_session=session, entity=repository.Entities.RECEITA_GASTO, filters={'id': id})
+            except ValueError as ex:
+                logger.error(ex)
+                continue
     return redirect_url_for(request, 'get_receita', id=payload.receita_id)

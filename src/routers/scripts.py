@@ -1,9 +1,9 @@
 # pragma: nocover
 import fastapi
 
-from src import db
-from src.env import getenv
-from src.scripts import seed
+import db
+from env import getenv
+from scripts import seed
 
 router = fastapi.APIRouter(prefix='/scripts')
 
