@@ -27,4 +27,4 @@ RUN poetry config virtualenvs.create false \
 COPY . .
 
 # Comando de execução: usa a variável $PORT do Railway ou 8000 como padrão
-CMD ["sh", "-c", "uvicorn caderninho.src.app:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["poetry", "run", "uvicorn", "caderninho.src.app:app", "--host 0.0.0.0", "--port ${PORT:-8000}"]
