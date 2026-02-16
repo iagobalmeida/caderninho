@@ -6,11 +6,16 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
+# Instala dependências de sistema (gcc, etc) necessárias para compilar pacotes
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 # Instala o poetry
 RUN pip install --no-cache-dir poetry
 
-# Copia os arquivos de definição de dependências
-COPY pyproject.toml poetry.lock ./
+# Copia arquivos de dependências e o readme (necessário se citado no pyproject.toml)
+COPY pyproject.toml poetry.lock readme.md ./
 
 # Instala as dependências do projeto
 # --without dev: Não instala dependências de teste/dev para produção
