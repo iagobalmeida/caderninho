@@ -1,0 +1,79 @@
+
+
+<div class="modal fade" id="atualizarReceitaInsumoModal" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST" action="{{ url_for('post_receita_gastos_atualizar') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <span class="material-symbols-outlined"> package_2 </span>
+            Editar Uso de Insumo
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" tabindex="-1" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input required type="hidden" class="form-control pe-0" value="{{receita.id}}" name="receita_id" />
+          <input required type="hidden" class="form-control pe-0"  name="id" />
+          <div class="mb-3">
+            <label class="form-label required">Insumo</label>
+            {% if insumos %}
+            <select required readonly class="form-select" name="insumo_id">
+              <option selected value="-1">Selecionar</option>
+              {% for insumo in insumos %}
+              <option value="{{insumo.id}}" data-custo_p_grama="{{insumo.custo_p_grama}}">{{insumo.nome | title}}</option>
+              {% endfor %}
+            </select>
+            {% else %}
+              <p class="text-muted">Sem insumos cadastrados</p>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label required">Quantidade Utilizada</label>
+            <div class="input-group input-group-flat">
+              <input required type="number" step="any" class="form-control pe-0" value="0" min="1" name="quantidade" />
+              <span class="input-group-text" id="input_quantidade_unidade"> g </span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-header cursor-pointer d-flex flex-column align-items-start" data-bs-toggle="collapse" data-bs-target="#collapseEditarInsumo">
+          <h5 class="modal-title no-space">
+            {{ material_symbol('edit') | safe }}
+            Editar Insumo
+          </h5>
+          <span class="text-muted text-sm">Clique para expandir</span>
+        </div>
+        <div class="modal-body collapse" id="collapseEditarInsumo">
+          <div class="mb-3">
+            <label for="insumo_nome" class="form-label required">
+              Nome
+            </label>
+            <input type="text" class="form-control" name="insumo_nome" placeholder="Preencha para atualizar o nome desse insumo">
+          </div>
+          <div class="mb-3">
+            <label for="insumo_custo" class="form-label required">
+              Custo
+            </label>
+            <div class="input-group input-group-flat">
+              <span class="input-group-text"> R$ </span>
+              <input name="insumo_custo" required type="number" step="any" class="form-control text-end" min="1" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="insumo_peso" class="form-label required">
+              Peso / Unidades (por pacote)
+            </label>
+            <input required type="number" step="any" class="form-control text-end" name="insumo_peso">
+          </div>
+          <div class="mb-3">
+            <label for="unidade" class="form-label required">Unidade de Medida</label>
+            <select class="form-select" name="unidade">
+              <option value="g">Gramas (g)</option>
+              <option value="un">Unidades (un)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn">Atualizar</button>
+        </div>
+      </div>
+    </form>
+  </div>

@@ -1,0 +1,41 @@
+{% with page = request.query_params.get('page', 1) %}
+  {% set query_params = [] %}
+  {% for key, value in request.query_params.items() %}
+    {% if key != 'page' %}
+      {% set _ = query_params.append(key ~ '=' ~ value) %}
+    {% endif %}
+  {% endfor %}
+  {% set extra_params = '&' ~ query_params | join('&') if query_params else '' %}
+  <div class="col-12 pagination mb-5">
+      <div class="btn-list">
+        {% if page | int >= 4 %}
+          <a href="?page=1{{extra_params}}" class="btn {{'btn-primary' if page|int == 1 else ''}}">
+            1
+          </a>
+          {% if page | int > 4 %}
+            <span>
+              {{material_symbol('more_horiz') | safe}}
+            </span>
+          {% endif %}
+        {% endif %}
+        {% if table_pages %}
+          {% for i in range(table_pages) %}
+            {% if i - 2 < page | int and i + 4 > page | int %}
+              <a href="?page={{i+1}}{{extra_params}}" class="btn {{'btn-primary' if page|int == i+1 else ''}}">{{i+1}}</a>
+            {% endif %}
+          {% endfor %}
+          {% if page | int <= table_pages - 3 %}
+            {% if page | int < table_pages - 3 %}
+              <span>
+                {{material_symbol('more_horiz') | safe}}
+              </span>
+            {% endif %}
+            <a href="?page={{table_pages}}{{extra_params}}" class="btn {{'btn-primary' if page|int == table_pages else ''}}">
+              {{table_pages}}
+            </a>
+          {% endif %}
+        {% endif %}
+      </div>
+      <span class="text-secondary">Visualizando 10 de {{table_count}} registros</span>
+  </div>
+{% endwith %}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caderninho</title>
+
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="{{ url_for('static', path='/tabler.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="{{ url_for('static', path='/style.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="{{ url_for('static', path='/tabler.min.js') }}" as="script">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', path='favicon/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', path='favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', path='favicon/favicon-16x16.png') }}">
+    
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+      <link rel="preload" href="{{ url_for('static', path='/tabler.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+      <link href="{{ url_for('static', path='/style.css') }}" rel="stylesheet">
+    </noscript>
+  
+    <link rel="preload" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js?v=1.0" as="script">
+    <link rel="manifest" href="{{ url_for('static', path='/manifest.json') }}">
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("{{ url_for('static', path='/service-worker.js') }}")
+            .then(() => console.log("Service Worker registrado!"))
+            .catch(err => console.error("Erro ao registrar Service Worker:", err));
+    }
+    </script>
+    <style>
+      /* @import url('https://rsms.me/inter/inter.css');
+      :root {
+      	--tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+      } */
+      /* body {
+      	font-feature-settings: "cv03", "cv04", "cv11";
+      } */
+    </style>
+</head>
+<body data-bs-theme="{{data_bs_theme}}" class="{{body_class}}">
+    {% block layout %}
+    {% endblock %}
+    <script src="{{ url_for('static', path='/scripts.js') }}" defer></script>
+    <div class="modal fade" id="modalBaixarApp" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-primary border-white">
+                <div class="modal-header text-white">
+                    <h5 class="modal-title ">
+                        <span class="material-symbols-outlined">
+                            celebration
+                        </span>
+                        Seu dispositivo é compatível com o App!
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" tabindex="-1" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-white">
+                    <p>Seu dispositivo é compátivel com o App do KDerninho, basta clicar no botão abaixo para instalar</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal" tabindex="-1">Outra hora</button>
+                    <button id="installPWA" type="submit" class="btn btn-primary">
+                        <span class="material-symbols-outlined me-2">
+                            download
+                        </span>
+                        Instalar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+      let deferredPrompt;
+      window.addEventListener("beforeinstallprompt", (event) => {
+          let installModalIgnorado = parseInt(localStorage.getItem('installModalIgnorado')) || 0;
+          event.preventDefault();
+          deferredPrompt = event;
+          const modalDom = document.getElementById('modalBaixarApp')
+          modalDom.addEventListener('hidden.bs.modal', function () {
+              localStorage.setItem('installModalIgnorado', installModalIgnorado+1);
+          });
+          const modal = new bootstrap.Modal(modalDom);
+          if(installModalIgnorado < 3) {
+              modal.show();
+          }
+          document.querySelectorAll('[data-bs-intall-app]').forEach((el) => {
+              el.addEventListener('click', async () => {
+                  if (deferredPrompt) {
+                      deferredPrompt.prompt(); // Mostra o prompt de instalação
+                      const { outcome } = await deferredPrompt.userChoice;
+                      deferredPrompt = null; // Reseta o evento
+                  }
+              });
+          });
+      });
+    </script>
+    {% block script %}
+    {% endblock %}
+  </div>
+</div>
+<script src="{{ url_for('static', path='/tabler.min.js') }}" defer></script>
+</body></html>

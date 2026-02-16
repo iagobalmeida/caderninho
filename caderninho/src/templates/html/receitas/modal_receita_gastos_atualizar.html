@@ -1,0 +1,46 @@
+
+<div class="modal fade" id="atualizarReceitaGastoModal" tabindex="-1">
+    <form class="modal-dialog" method="POST" action="{{ url_for('post_receita_gastos_incluir') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <span class="material-symbols-outlined"> payments </span>
+            Atualizar Gasto
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" tabindex="-1" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="receita_id" value="{{receita.id}}">
+            <div class="mb-3">
+              <label class="form-label required">Descrição</label>
+              <input required type="text" class="form-control" name="descricao" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label required" for="tipo">Tipo</label>
+                <select required class="form-select" name="gasto_tipo">
+                    <option value="Percentual">Percentual</option>
+                    <option value="Fixo">Fixo</option>
+                    <option value="Por Unidade">Por Unidade</option>
+                </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required">Valor</label>
+              <div class="input-group input-group-flat">
+                <span class="input-group-text" id="input_gasto_valor_unidade"> % </span>
+                <input required type="number" step="any" class="form-control" min="0" name="gasto_valor" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success">Incluir</button>
+          </div>
+      </div>
+    </form>
+    <script>
+      document.querySelector('#atualizarReceitaGastoModal select').addEventListener('change', (e) => {
+        document.querySelector('#atualizarReceitaGastoModal #input_gasto_valor_unidade').innerHTML = ''
+        if(e.target.value == 'Fixo' || e.target.value == 'Por Unidade') document.querySelector('#atualizarReceitaGastoModal #input_gasto_valor_unidade').innerHTML = 'R$'
+        if(e.target.value == 'Percentual') document.querySelector('#atualizarReceitaGastoModal #input_gasto_valor_unidade').innerHTML = '%'
+      });
+    </script>
+  </div>

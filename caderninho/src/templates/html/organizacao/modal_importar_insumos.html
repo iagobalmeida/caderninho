@@ -1,0 +1,32 @@
+<div class="modal fade" id="modalImportarInsumos" tabindex="-1">
+    <form class="modal-dialog" role="document" method="POST"
+        action="{{ url_for('post_organizacao_importar_dados', entity='insumo') }}" enctype="multipart/form-data">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ material_symbol('upload') | safe }} Importar Insumos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" tabindex="-1"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h5>Como Importar</h5>
+                <p>Baixe o modelo e importe o modelo na sua ferramenta de preferência.</p>
+                <p>Ao terminar de preencher com os dados, exporte para o formato <kbd>CSV</kbd>.</p>
+                <p>Seleciona o arquivo em formato <kbd>CSV</kbd> clicando no botão abaixo e clique em Importar.</p>
+                <a class="btn" href="{{url_for('get_post_organizacao_importar_dados_modelo', entity='insumo')}}" download="kderninho_insumos.csv">
+                    {{ material_symbol('download') | safe }}
+                    Baixar Modelo
+                </a>
+                <hr>
+                <input type="hidden" name="organizacao_id" value="{{usuario.organizacao_id}}" />
+                <div class="mb-3">
+                    <label for="descricao" class="form-label required">Arquivo CSV</label>
+                    <input required type="file" class="form-control" name="arquivo_csv" />
+                </div>
+                <p class="text-danger">Limitado a 100 registros por importação</p>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Importar</button>
+            </div>
+        </div>
+    </form>
+</div>

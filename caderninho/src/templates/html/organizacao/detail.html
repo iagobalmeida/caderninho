@@ -1,0 +1,295 @@
+{% extends '/layout/app.html' %}
+{% include '/organizacao/modal_create_gasto_recorrente.html' %}
+
+{% block content %}
+<div class="col-12">
+    <form action="{{url_for('post_organizacao_index')}}" method="POST" id="form-organizacao" class="card">
+        <div class="card-header">
+            <h5 class="card-title">
+              {{ material_symbol('info') | safe }}
+              Informações
+            </h5>
+            <div class="ms-auto">
+                <button type="submit" class="btn">Aplicar Alterações</button>
+            </div>
+        </div>
+        {% if usuario.dono %}
+            <div class="card-body">
+                <div class="datagrid">
+                    <input type="hidden" name="id" value="{{organizacao.id}}">
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">Descrição</div>
+                        <input class="form-control" type="text" name="descricao" required value="{{organizacao.descricao}}">
+                    </div>
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">CNPJ</div>
+                        <input class="form-control" type="text" name="cnpj" required value="{{organizacao.cnpj}}">
+                    </div>
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">Cidade</div>
+                        <input class="form-control" type="text" name="cidade" required value="{{organizacao.cidade}}">
+                    </div>
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">Chave PIX</div>
+                        {% if organizacao.chave_pix_valida %}
+                            <input class="form-control is-valid" type="text" name="chave_pix" required value="{{organizacao.chave_pix}}">
+                            <div class="valid-feedback">Chave PIX válida</div>
+                        {% else %}
+                            <input class="form-control is-invalid" type="text" name="chave_pix" required value="{{organizacao.chave_pix}}">
+                            <div class="invalid-feedback">Essa Chave PIX é inválida</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="card-body">
+                <div class="datagrid" method="POST">
+                    <input type="hidden" name="id" value="{{organizacao.id}}">
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">Descrição</div>
+                        <input disabled class="form-control" type="text" name="descricao" required value="{{organizacao.descricao}}">
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </form>
+</div>
+    
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">
+                {{ material_symbol('currency_exchange') | safe }}
+                Gastos Recorrentes
+            </h5>
+            <div class="dropdown ms-auto">
+                <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalCreateGastoRecorrente">
+                    {{material_symbol('chevron_left') | safe }}
+                    Adicionar Gasto
+                    </button>
+                    <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"action": "{{url_for('post_organizacao_gastos_recorrentes_excluir')}}", ".text-secondary": "Excluir gastos selecionados?"}'>
+                    {{material_symbol('remove') | safe }}
+                    Remover Selecionados
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body collapse show">
+            <p>As <b>Gastos Recorrentes</b> irão ser contabilizadas no seu fluxo de caixa.</p>
+        </div>
+        <div class="table-responsive border-top">
+            <table class="table table-vcenter table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th class="w-1"></th>
+                        <th>Descrição</th>
+                        <th>Recorrência</th>
+                        <th>Data Início</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for gasto_fixo in gastos_fixos %}
+                        <tr class="cursor-pointer">
+                            <td class="w-1">
+                            <input type="checkbox" name="checkbox_{{gasto_fixo.id}}" id="checkbox_{{gasto_fixo.id}}" data-id="{{gasto_fixo.id}}">
+                            </td>
+                            <td>{{gasto_fixo.descricao}}</td>
+                            <td>{{gasto_fixo.recorrencia.value | title}}</td>
+                            <td>{{gasto_fixo.data_inicio | strftime_day }}</td>
+                            <td>{{gasto_fixo.tipo.value | title}}</td>
+                            {% if gasto_fixo.tipo.value == 'Fixo' %}
+                                <td>{{gasto_fixo.valor | format_reais}}</td>
+                            {% else %}
+                                <td>{{gasto_fixo.valor}} %</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">
+                {{ material_symbol('groups') | safe }}
+                Usuários
+            </h5>
+            {% if usuario.dono %}
+            <div class="dropdown ms-auto">
+                <a class="btn dropdown-toggle" data-bs-toggle="dropdown">Ações</a>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalCreateUsuario">
+                    {{material_symbol('chevron_left') | safe }}
+                    Adicionar Usuário
+                    </button>
+                    <button class="dropdown-item" id="btn-excluir-selecionados" disabled data-bs-toggle="modal" data-bs-target="#modalConfirm" data-bs-payload='{"action": "{{url_for('post_organizacao_usuarios_excluir')}}", ".text-secondary": "Excluir usuários selecionados?"}'>
+                    {{material_symbol('remove') | safe }}
+                    Remover Selecionados
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table table-vcenter table-striped table-hover" id="table_usuarios">
+                <thead class="sticky-top">
+                    <tr>
+                        {% if usuario.dono %}
+                            <th class="w-1"></th>
+                        {% endif %}
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Dono</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% with main_usuario = usuario %}
+                        {% for usuario in usuarios %}
+                                {% if main_usuario.dono %}
+                                    {% if main_usuario.id == usuario.id %}
+                                        <tr class="cursor-pointer">
+                                            <td class="w-1"></td>
+                                            <td>{{usuario.nome}} (você)</td>
+                                            <td>{{usuario.email}}</td>
+                                            <td>{{'✔' if usuario.dono else '✖'}}</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr class="cursor-pointer" data-bs-payload="{{usuario.data_bs_payload() | json}}">
+                                            <td class="w-1">
+                                                <input type="checkbox" name="checkbox_{{usuario.id}}" id="checkbox_{{usuario.id}}" data-id="{{usuario.id}}">
+                                            </td>
+                                            <td data-bs-toggle="modal" data-bs-target="#modalEditUsuario">{{usuario.nome}}</td>
+                                            <td data-bs-toggle="modal" data-bs-target="#modalEditUsuario">{{usuario.email}}</td>
+                                            <td data-bs-toggle="modal" data-bs-target="#modalEditUsuario">
+                                                {{'✔' if usuario.dono else '✖'}}
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% else %}
+                                    <tr class="cursor-pointer">
+                                        <td>{{usuario.nome}}</td>
+                                        <td>{{usuario.email}}</td>
+                                        <td>{{'✔' if usuario.dono else '✖'}}</td>
+                                    </tr>
+                                {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-header d-flex flex-column align-items-start cursor-pointer" data-bs-toggle="collapse" data-bs-target="#collapse_plano_pagamentos">
+            <h5 class="card-title">
+                {{ material_symbol('payments') | safe }}
+                Plano & Pagamentos
+            </h5>
+            <span class="text-muted text-sm">Clique para expandir/fechar</span>
+        </div>
+        <div class="card-body collapse" id="collapse_plano_pagamentos">
+            <p>{{organizacao.plano_descricao | safe}}<p>
+            <button class="btn btn-success">Atualizar plano</button>
+            <button class="btn btn-outline-success">Aumentar validade do plano</button>
+        </div>
+    </div>
+</div>
+
+{% if usuario.dono and organizacao %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    {{ material_symbol('list') | safe }}
+                    Dados
+                </h5>
+            </div>
+            <div class="card-body row">
+                <div class="col-6 d-flex flex-column align-items-stretch gap-2">
+                    <h5>{{ material_symbol('upload') | safe }} Importar</h5>
+                    {% for entity, title, symbol in import_export_entities %}
+                        <button class="btn me-2" data-bs-toggle="modal" data-bs-target="#modalImportarInsumos">
+                            {{ material_symbol(symbol) | safe }}
+                            Importar {{title}}
+                        </button>
+                    {% endfor %}
+                </div>
+                <div class="col-6  d-flex flex-column align-items-stretch gap-2">
+                    <h5>{{ material_symbol('download') | safe }} Exportar</h5>
+                    {% for entity, title, symbol in import_export_entities %}
+                        <a class="btn" href="{{url_for('get_organizacao_exportar_dados', entity=entity)}}" download>
+                            {{ material_symbol(symbol) | safe }}
+                            Exportar {{title}}
+                        </a>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <form class="card" method="POST" action="{{url_for('post_organizacao_configuracoes')}}" id="form-configuracoes">
+            <div class="card-header cursor-pointer" data-bs-toggle="collapse" data-bs-target="#collapse_configuracoes">
+                <div class="d-flex flex-column align-items-start">
+                    <h5 class="card-title mb-1">
+                        {{ material_symbol('settings') | safe }}
+                        Configurações
+                    </h5>
+                    <span class="text-muted text-sm">Clique para expandir/fechar</span>
+                </div>
+                <div class="ms-auto">
+                    <button class="btn">Aplicar Alterações</button>
+                </div>
+            </div>
+            <div class="card-body collapse show" id="collapse_configuracoes">
+                <input type="hidden" name="id" value="{{organizacao.id}}">
+                <div class="mb-3">
+                <div class="form-label">Unidades de Medida</div>
+                <label class="form-check form-switch">
+                    <input name="converter_kg" class="form-check-input" type="checkbox" {{ 'checked' if organizacao.configuracoes.converter_kg else ''}}>
+                    <span class="form-check-label">Converter valores maiores que <b>1000g</b> para <b>Kg</b></span>
+                </label>
+                <label class="form-check form-switch">
+                    <input name="converter_kg_sempre" class="form-check-input" type="checkbox" {{ 'checked' if organizacao.configuracoes.converter_kg_sempre else ''}}>
+                    <span class="form-check-label">
+                        Converter todos os valores para <b>Kg</b>
+                        <br>
+                        <small class="text-danger">* Essa opção sobrepõe a anterior</small>
+                    </span>
+                </label>
+                </div>
+                <div class="mb-3">
+                <div class="form-label">Cálculos</div>
+                <label class="form-check form-switch">
+                    <input name="usar_custo_med" class="form-check-input" type="checkbox" {{ 'checked' if organizacao.configuracoes.usar_custo_med else ''}}>
+                    <span class="form-check-label">
+                        Utilizar <b>Custo/grama médio (R$)</b> em vez de <b>Custo/grama (R$)</b>
+                        <br>
+                        <small class="text-muted">O campo <b>Custo/grama médio</b> é calculado a partir dos cadastros de <b>Movimentações de Compra</b> de um insumo</small>
+                        <br>
+                        <small class="text-danger">* Insumos sem nenhum registro de Movimentação de compra não são afetados por essa configuração</small>
+                        <br>
+                        <small class="text-danger">* Essa opção afeta a precificação das receitas</small>
+                    </span>
+                </label>
+                </div>
+                <div class="mb-3">
+                    <div class="form-label">Sistema</div>
+                    <p>Existe um sistema de cacheamento com duração de 20 minutos das métricas mais robustas do sistema, afim de otimizar sua experiência. Você pode forçar o recarregamento dessas métricas utilizando o botão abaixo</p>
+                    <a href="{{url_for('post_organizacao_sistema_recarregar')}}" class="btn">Forçar Recarregamento</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endif %}
+{% endblock %}
+

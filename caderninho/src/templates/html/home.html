@@ -1,0 +1,118 @@
+{% extends '/layout/app.html' %}
+
+{% block content %}
+
+{% include 'components/resumo_caixa.html' %}
+
+{% if pix_qr_code or pix_mensagem %}
+    <div class="col-12 col-lg-4">
+        <div class="card">
+            <div class="card-header cursor-pointer" data-bs-toggle="collapse" data-bs-target="#card_pix">
+                <h5 class="card-title">
+                    {{ material_symbol('qr_code') | safe }}
+                    QR PIX da última venda
+                    {% if pix_qr_code %}
+                        <small class="text-secondary ms-auto">Clique para exibir</small>
+                    {% endif %}
+                </h5>
+            </div>
+            <form class="card-body" method="POST" action="{{request.url_for('post_caixa_movimentacoes_marcar_recebido')}}">
+                <input type="hidden" name="selecionados_ids" value="{{pix_venda.id}}">
+                <p>{{pix_mensagem | safe}}</p>
+                {% if pix_qr_code and not pix_venda.recebido %}
+                    <button class="btn btn-success">
+                        {{material_symbol('done_all') | safe}}
+                        Marcar como Recebido
+                    </button>
+                    <div class="collapse" id="card_pix">
+                        <img src="{{pix_qr_code}}" alt="QR Code" style="max-height: 300px" class="mt-3 rounded">
+                    </div>
+                {% endif %}
+                {% if pix_mensagem and not pix_qr_code %}
+                    <p class="text-warning">Essa funcionalidade exige o cadastro de uma chave PIX em <code class="text-warning">Organização</code>.</p>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+{% endif %}
+
+<div class="col-sm-12 col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ material_symbol('payments') | safe }}
+                Caixa
+                <small class="text-secondary ms-auto">{{vendas}} cadastro</small>
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>
+                Cadastre as <b>vendas</b> para formalizar as entradas do caixa.
+            </p>
+            <div class="ms-auto" style="width: fit-content;">
+                <a href="{{ url_for('get_caixa_movimentacoes_index') }}" class="btn">Visualizar Caixa</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-12 col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ material_symbol('home_storage') | safe }}
+                Estoque
+                <small class="text-secondary">{{estoques}} cadastros</small>
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>
+                Cadastre as <b>movimentações de estoque</b> para formalizar compras e/ou uso de <code>Insumos</code>.
+            </p>
+            <div class="ms-auto" style="width: fit-content;">
+                <a href="{{ url_for('get_estoques_index') }}" class="btn">Visualizar Estoque</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-12 col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ material_symbol('library_books') | safe }}
+                Receitas
+                <small class="text-secondary ms-auto">{{len_receitas}} cadastros</small>
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>
+                Cadastre <b>receitas</b> selecionando <code>Insumos</code> para determinar o preço de venda, margem e faturamento previsto.
+            </p>
+            <div class="ms-auto" style="width: fit-content;">
+                <a href="{{ url_for('get_receitas_index') }}" class="btn">Visualizar Receitas</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-12 col-lg-6 d-none">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ material_symbol('package_2') | safe }}
+                Insumos
+                <small class="text-secondary ms-auto">{{len_insumos}} cadastros</small>
+            </h3>
+        </div>
+        <div class="card-body">
+            <p>
+                Cadastre <b>insumos</b> que serão utilizados nas receitas. É possível visualizar o estoque atual de cada insumo.
+            </p>
+            <div class="ms-auto" style="width: fit-content;">
+                <a href="{{ url_for('get_insumos_index') }}" class="btn">Visualizar Insumos</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
