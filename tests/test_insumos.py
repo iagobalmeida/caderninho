@@ -3,8 +3,8 @@ import json
 import pytest
 from bs4 import BeautifulSoup
 
-from caderninho.src.tests.mocks import INSUMO_ID
-from caderninho.src.tests.utils import autenticar
+from tests.mocks import INSUMO_ID
+from tests.utils import autenticar
 
 
 async def __get_insumos_rows(test_client):

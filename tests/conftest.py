@@ -1,9 +1,9 @@
 import asyncio
 
 import pytest_asyncio
-from app import app
 
 from caderninho.src import db
+from caderninho.src.app import app
 from caderninho.src.scripts import seed
 
 

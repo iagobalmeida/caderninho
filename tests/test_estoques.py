@@ -3,8 +3,8 @@ import json
 import pytest
 from bs4 import BeautifulSoup
 
-from caderninho.src.tests.mocks import INSUMO_ID, MOCK_RECEITA, RECEITA_ID
-from caderninho.src.tests.utils import autenticar
+from tests.mocks import INSUMO_ID, MOCK_RECEITA, RECEITA_ID
+from tests.utils import autenticar
 
 
 async def __get_estoques_rows(test_client, filter_insumo_id=None):

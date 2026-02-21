@@ -1,30 +1,18 @@
-FROM python:3.12-slim
+FROM python:3.12-alpine
 
-# Configurações de ambiente para Python
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+RUN apk add --no-cache build-base libpq postgresql-dev curl
+
+RUN pip install poetry
 
 WORKDIR /app
 
-# Instala dependências de sistema (gcc, etc) necessárias para compilar pacotes
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+COPY ./pyproject.toml ./poetry.lock .
 
-# Instala o poetry
-RUN pip install --no-cache-dir poetry
-
-# Copia arquivos de dependências e o readme (necessário se citado no pyproject.toml)
-COPY pyproject.toml poetry.lock readme.md ./
-
-# Instala as dependências do projeto
-# --without dev: Não instala dependências de teste/dev para produção
-# --no-root: Não instala o pacote atual como lib (o código será copiado depois)
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --no-root --without dev
+&& poetry install --only main --no-root
 
-# Copia o restante do código da aplicação
-COPY . .
+COPY ./caderninho caderninho
 
-# Comando de execução: usa a variável $PORT do Railway ou 8000 como padrão
-CMD ["poetry", "run", "uvicorn", "caderninho.src.app:app", "--host 0.0.0.0", "--port ${PORT:-8000}"]
+EXPOSE 8000
+
+CMD ["poetry", "run", "uvicorn", "caderninho.src.app:app", "--host", "0.0.0.0", "--port", "8000"]

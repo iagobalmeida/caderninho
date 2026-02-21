@@ -4,8 +4,8 @@ from unittest.mock import patch
 import pytest
 from bs4 import BeautifulSoup
 
-from caderninho.src.tests.mocks import CAIXA_MOVIMENTACAO_ID, MOCK_CAIXA_MOVIMENTACAO
-from caderninho.src.tests.utils import autenticar
+from tests.mocks import CAIXA_MOVIMENTACAO_ID, MOCK_CAIXA_MOVIMENTACAO
+from tests.utils import autenticar
 
 
 async def __get_receitas_rows(test_client):

@@ -1,8 +1,8 @@
 import pytest
 from bs4 import BeautifulSoup
 
-from caderninho.src.tests import mocks
-from caderninho.src.tests.utils import autenticar
+from tests import mocks
+from tests.utils import autenticar
 
 
 @pytest.mark.asyncio

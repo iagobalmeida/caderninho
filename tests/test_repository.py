@@ -4,7 +4,7 @@
 # import pytest
 
 # from caderninho.src.domain import repository
-# from caderninho.src.tests.mocks import (ESTOQUE_ID, INSUMO_ID, MOCK_AUTH_SESSION,
+# from tests.mocks import (ESTOQUE_ID, INSUMO_ID, MOCK_AUTH_SESSION,
 #                          USUARIO_DONO_ID)
 
 # ESTOQUE_ID = uuid4()

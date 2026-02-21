@@ -1,0 +1,16 @@
+services:
+  app:
+    image: caderninho:latests
+    build:
+      context: .
+    environment:
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 3000
+      SMTP_LOGIN: email@gmail.com
+      SMTP_PASSWORD: deas ddwe ajus paiw
+      GMAIL_API_KEYS: JaHA8H8dHWBEAUI87GD79ajs9ajs7gs7HSja9wj
+      DATABASE_URL: sqlite+aiosqlite:///database.db
+      SCRIPTS_TOKEN: batatafrita
+    working_dir: /app
+    ports:
+      - 8000:8000

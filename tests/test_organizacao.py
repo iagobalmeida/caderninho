@@ -4,8 +4,8 @@ from unittest.mock import patch
 import pytest
 from bs4 import BeautifulSoup
 
-from caderninho.src.tests.mocks import MOCK_ORGANIZACAO
-from caderninho.src.tests.utils import autenticar
+from tests.mocks import MOCK_ORGANIZACAO
+from tests.utils import autenticar
 
 
 async def __get_organizacao(test_client):

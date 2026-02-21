@@ -1,4 +1,4 @@
-from caderninho.src.tests.mocks import MOCK_USUARIO_ADMIN, MOCK_USUARIO_DONO
+from tests.mocks import MOCK_USUARIO_ADMIN, MOCK_USUARIO_DONO
 
 
 async def autenticar(app_client):

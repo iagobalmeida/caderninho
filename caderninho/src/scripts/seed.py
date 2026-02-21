@@ -16,7 +16,7 @@ from caderninho.src.domain.entities import (
     Receita,
     ReceitaGasto,
 )
-from caderninho.src.tests import mocks
+from caderninho.src.scripts import mocks
 
 
 def __random_date(starting_off: datetime = datetime.now(), range: int = 30):

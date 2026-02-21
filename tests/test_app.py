@@ -4,8 +4,8 @@ from unittest.mock import patch
 import pytest
 from bs4 import BeautifulSoup
 
-from caderninho.src.tests.mocks import MockSMTPServer
-from caderninho.src.tests.utils import autenticar, autenticar_admin
+from tests.mocks import MockSMTPServer
+from tests.utils import autenticar, autenticar_admin
 
 
 @pytest.mark.asyncio
