@@ -133,6 +133,7 @@ class Usuario(RegistroOrganizacao, table=True):
     senha: Optional[str] = Field(default=None)
     dono: Optional[bool] = Field(default=False)
     administrador: Optional[bool] = Field(default=False)
+    email_verificado: Optional[bool] = Field(default=False)
 
     def hash_senha(self) -> str:
         if not self.senha.startswith(
@@ -427,7 +428,7 @@ class Insumo(RegistroOrganizacao, table=True):
     @classmethod
     def columns(self):
         return [
-            "#",
+            "Id",
             "Nome",
             "Custo (R$)",
             "Un./Pct.",

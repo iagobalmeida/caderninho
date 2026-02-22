@@ -45,3 +45,118 @@
     </div>
   </div>
 </div>
+
+<script>
+  const getTablePreferencesLocalStorageKey = () => {
+    const currentEndpoint = window.location.pathname.replaceAll('/', '.');
+    const key = `${currentEndpoint}.tablePreferences`.replaceAll('..','.');
+    return key;
+
+  }
+
+  const loadTablePreferencesFromLocalStorage = () => {
+    const key = getTablePreferencesLocalStorageKey();
+    try {
+      const value = localStorage.getItem(key);
+      console.log(key, value)
+      if(!value) return {}
+      return JSON.parse(value)
+    } catch {
+      return {}
+    }
+  }
+
+  const setTablePreferencesFromModal = () => {
+    const key = getTablePreferencesLocalStorageKey();
+
+    const __tablePreferences = loadTablePreferencesFromLocalStorage();
+
+    const modal = document.querySelector('#modalTablePreferences');
+    
+    const inputs = Array.from(modal.querySelectorAll('input[type="checkbox"]'));
+
+    inputs.forEach(i => {
+      const inputName = i.getAttribute('name');
+      __tablePreferences[inputName] = i.checked ? 'show' : 'hide';
+    })
+
+    localStorage.setItem(key, JSON.stringify(__tablePreferences));
+
+    applyTablePreferencesOnTable(__tablePreferences, '#table-list');
+  }
+
+  const configModalEvent = () => {
+    const modal = document.querySelector('#modalTablePreferences');
+
+    modal.addEventListener('shown.bs.modal', event => {
+      const __tablePreferences = loadTablePreferencesFromLocalStorage();
+
+      const inputs = Array.from(modal.querySelectorAll('input[type="checkbox"]'));
+      console.log(inputs)
+      
+      if(!inputs) return
+
+      inputs.forEach(i => {
+        const inputName = i.getAttribute('name');
+        if(!__tablePreferences) return i.checked = true;
+
+        const preference = __tablePreferences[inputName];
+        if(preference == 'hide') {
+          i.checked = false;
+        } else {
+          i.checked = true;
+        }
+      });
+
+    });
+
+  }
+  
+  const applyTablePreferencesOnTable = (tablePreferences, tableQuerySelector) => {
+    if (!tablePreferences) return;
+
+  const tableDOM = document.querySelector(tableQuerySelector);
+    if (!tableDOM) return;
+
+    // Pegamos todas as THs uma única vez para performance
+    const tableDOMColumns = Array.from(tableDOM.querySelectorAll('th'));
+
+    Object.keys(tablePreferences).forEach(column => {
+      // AJUSTE AQUI: Substituímos o querySelector pelo .find() no array de colunas
+      const columnDOM = tableDOMColumns.find(th => th.textContent.trim() === column);
+      
+      if (!columnDOM) return;
+
+      const columnIndex = tableDOMColumns.indexOf(columnDOM);
+      const columnPreference = tablePreferences[column];
+
+      if (columnPreference === 'hide') {
+        columnDOM.classList.add('d-none');
+        tableDOM.querySelectorAll('tbody tr').forEach(row => {
+          const cell = row.cells[columnIndex]; // Mais rápido que querySelector
+          if (cell) cell.classList.add('d-none');
+        });
+      } else if (columnPreference === 'show') {
+        columnDOM.classList.remove('d-none');
+        tableDOM.querySelectorAll('tbody tr').forEach(row => {
+          const cell = row.cells[columnIndex];
+          if (cell) cell.classList.remove('d-none');
+        });
+      }
+    });
+  }
+
+
+const clearTablePreferencesFromLocalStorage = () => {
+  const key = getTablePreferencesLocalStorageKey();
+  localStorage.removeItem(key);
+}
+configModalEvent();
+
+try {
+  const tablePreferences = loadTablePreferencesFromLocalStorage();
+  applyTablePreferencesOnTable(tablePreferences, '#table-list');
+} catch {
+  clearTablePreferencesFromLocalStorage();
+}
+</script>

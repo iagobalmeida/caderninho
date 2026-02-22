@@ -1,6 +1,10 @@
 :host, :root, [data-bs-theme="light"] {
     --tblr-primary: #38a1ff !important;
     --tblr-primary-rgb: 56,161,255 !important;
+    
+}
+:root {
+    filter: hue-rotate(285deg);
 }
 .card {
     box-shadow: 0px 0px 16px #00000012;

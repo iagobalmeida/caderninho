@@ -30,6 +30,9 @@ async def authenticate(
     if not db_usuario:
         return False
 
+    if db_usuario.email_verificado == False:
+        raise ValueError("E-mail não verificado")
+
     if (
         db_usuario.organizacao
         and db_usuario.organizacao.plano_expiracao < datetime.now()

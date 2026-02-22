@@ -20,6 +20,7 @@ MOCK_USUARIO_DONO = repository.Entities.USUARIO.value(
     nome="Zé do teste (Dono)",
     email="teste@email.com",
     senha="teste",
+    email_verificado=True,
     dono=True,
 )
 MOCK_USUARIO_DONO.hash_senha()
@@ -29,6 +30,7 @@ MOCK_USUARIO_ADMIN = repository.Entities.USUARIO.value(
     nome="Administrador",
     email="admin@email.com",
     senha="admin",
+    email_verificado=True,
     administrador=True,
 )
 MOCK_USUARIO_ADMIN.hash_senha()
@@ -38,6 +40,7 @@ MOCK_USUARIO_SENHA_RECUPERADA = repository.Entities.USUARIO.value(
     nome="Zé do teste (Senha recuperada)",
     email="teste_2@email.com",
     senha="teste",
+    email_verificado=True,
     administrador=True,
 )
 MOCK_USUARIO_ADMIN.hash_senha()

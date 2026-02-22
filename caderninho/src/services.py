@@ -90,6 +90,28 @@ async def list_entity(
                     "data-bs-target": f"#modalCreate{entity.value.__name__}",
                 },
             ),
+            Button(
+                content=f"",
+                classname="btn ps-2 pe-1",
+                symbol="settings",
+                attributes={
+                    "data-bs-toggle": "modal",
+                    "data-bs-target": f"#modalTablePreferences",
+                    "data-bs-payload": json.dumps(
+                        {
+                            "#inputsWrapper": "".join(
+                                [
+                                    f"""<label class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="{c}" />
+                                        <span class="form-check-label">{c.title()}</span>
+                                    </label>"""
+                                    for c in table_columns
+                                ]
+                            )
+                        }
+                    ),
+                },
+            ),
         ],
     )
 

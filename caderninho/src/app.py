@@ -1,6 +1,7 @@
 import logging
 import random
 import re
+import uuid
 from datetime import datetime, timedelta
 
 import fastapi
@@ -19,6 +20,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from caderninho.src import db
 from caderninho.src.domain import inputs, repository
 from caderninho.src.domain.schemas import PLANOS_DATA
+from caderninho.src.env import getenv
 from caderninho.src.modules import smpt
 from caderninho.src.modules.logger import logger, setup_logger
 from caderninho.src.routers.autenticacao import router as router_autenticacao
@@ -37,7 +39,8 @@ from caderninho.src.utils import redirect_url_for, url_incluir_query_params
 
 setup_logger()
 
-SESSION_SECRET_KEY = "SESSION_SECRET_KEY"
+REGISTER_SECRET_KEY = getenv("REGISTER_SECRET_KEY")
+SESSION_SECRET_KEY = getenv("SESSION_SECRET_KEY")
 
 rootlogger.setLevel(logging.WARN)
 
@@ -127,6 +130,14 @@ async def get_registrar(
     )
 
 
+def gerar_chave_de_registro(organizacao_id: uuid.UUID, usuario_id: uuid.UUID) -> str:
+    return (
+        f"{usuario_id}"
+        + ":"
+        + str(hash(f"{organizacao_id}_{REGISTER_SECRET_KEY}_{usuario_id}"))
+    )
+
+
 @app.post("/app/registrar", include_in_schema=False)
 async def post_registrar(
     request: fastapi.Request,
@@ -150,7 +161,7 @@ async def post_registrar(
     )
     organizacao_id = db_organizacao.id
 
-    await repository.create(
+    db_usuario = await repository.create(
         auth_session=auth_session,
         db_session=session,
         entity=repository.Entities.USUARIO,
@@ -162,10 +173,68 @@ async def post_registrar(
             "dono": True,
         },
     )
+    usuario_id = db_usuario.id
+
+    chave_registro = gerar_chave_de_registro(organizacao_id, usuario_id)
+
+    url_finalizar_registro = request.url_for(
+        "get_finalizar_registro", chave=chave_registro
+    )
+
+    smpt.enviar(
+        assunto="KDerninho - Link de verificação",
+        corpo=f"Bem vindo ao KDerninho! Agora basta confirmar seu registro e fazer o login clicando aqui: {url_finalizar_registro}",
+        para=[db_usuario.email],
+    )
 
     return redirect_url_for(
-        request, "get_app_index", message="Conta criada com sucesso!"
+        request,
+        "get_app_index",
+        message="Conta criada com sucesso! Verifique sua caixa de e-mail para finalizar o cadastro",
     )
+
+
+@app.get("/app/finalizar-registro/{chave:str}", include_in_schema=False)
+async def get_finalizar_registro(
+    request: fastapi.Request,
+    chave: str,
+    error: str = fastapi.Query(None),
+    session: db.AsyncSession = db.DBSESSAO_DEP,
+):
+
+    try:
+        usuario_id = chave.split(":")[0]
+
+        usuario, _, _ = await repository.get(
+            db_session=session,
+            entity=repository.Entities.USUARIO,
+            filters={"id": uuid.UUID(usuario_id)},
+            first=True,
+        )
+
+        if not usuario:
+            raise ValueError("Usuário não encontrado")
+
+        if gerar_chave_de_registro(usuario.organizacao.id, usuario.id) != chave:
+            raise ValueError("Chave inválida")
+
+        await repository.update(
+            db_session=session,
+            entity=repository.Entities.USUARIO,
+            filters={"id": uuid.UUID(usuario_id)},
+            values={"email_verificado": True},
+        )
+
+        return redirect_url_for(
+            request,
+            "get_app_index",
+            message="Conta verificada, prossiga autenticando-se.",
+        )
+    except Exception as ex:
+        logger.exception(ex)
+        return redirect_url_for(
+            request, "get_app_index", message="Link para finalizar registro inválido."
+        )
 
 
 @app.get("/app/recuperar_senha", include_in_schema=False)
