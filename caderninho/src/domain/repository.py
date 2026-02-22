@@ -4,8 +4,8 @@ from math import ceil
 
 from aiocache import Cache
 from loguru import logger
-from sqlalchemy import func
-from sqlmodel import Float, and_, func, select
+from sqlalchemy import case, func
+from sqlmodel import Float, and_, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from caderninho.src.domain.entities import (
@@ -332,12 +332,22 @@ async def __get_chart_fluxo_caixa_datasets(
         select(
             func.date(CaixaMovimentacao.data_criacao).label("dia"),
             func.sum(
-                func.cast(CaixaMovimentacao.tipo == CaixMovimentacaoTipo.ENTRADA, Float)
-                * CaixaMovimentacao.valor
+                case(
+                    (
+                        CaixaMovimentacao.tipo == CaixMovimentacaoTipo.ENTRADA,
+                        CaixaMovimentacao.valor,
+                    ),
+                    else_=0,
+                )
             ).label("entradas"),
             func.sum(
-                func.cast(CaixaMovimentacao.tipo == CaixMovimentacaoTipo.SAIDA, Float)
-                * CaixaMovimentacao.valor
+                case(
+                    (
+                        CaixaMovimentacao.tipo == CaixMovimentacaoTipo.SAIDA,
+                        CaixaMovimentacao.valor,
+                    ),
+                    else_=0,
+                )
             ).label("saidas"),
         )
         .where(
